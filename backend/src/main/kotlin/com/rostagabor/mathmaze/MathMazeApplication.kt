@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 class MathMazeApplication
 
 fun main(args: Array<String>) {
+    ML.train()
     runApplication<MathMazeApplication>(*args)
 }
 
@@ -21,5 +22,8 @@ class BasicController {
 
     @GetMapping("/name")
     fun name(@RequestParam("name") name: String) = "Hello, $name!"
+
+    @GetMapping("/ml")
+    fun ml() = "<pre>" + ML.ask().joinToString(separator = "<br>") + "</pre>"
 
 }

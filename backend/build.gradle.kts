@@ -22,6 +22,8 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web:3.2.2")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.1")
 	implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.22")
+	implementation ("org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow:0.5.2")
+	implementation ("org.jetbrains.kotlinx:kotlin-deeplearning-dataset:0.5.2")
 	runtimeOnly("org.postgresql:postgresql:42.7.1")
 	testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.2")
 }
