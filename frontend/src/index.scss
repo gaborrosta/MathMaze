@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Zilla+Slab&display=swap');
+
+$font-family-base: 'Zilla Slab', serif;
+$primary: #7d141d;
+
+.yellow {
+	background-color: #fedf19;
+	opacity: 0.8;
+}
+
+// Import Bootstrap
+@import '~bootstrap/scss/bootstrap';

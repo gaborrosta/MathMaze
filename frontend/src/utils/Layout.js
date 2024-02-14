@@ -1,9 +1,16 @@
-import React from "react"
+import React from "react";
 import { Outlet } from "react-router-dom";
+import Menu from "../components/Menu";
+import Container from 'react-bootstrap/Container';
 
 const Layout = () => {
   return (
-    <Outlet />
+    <>
+      <Menu />
+      <Container>
+        <Outlet />
+      </Container>
+    </>
   )
 };
 
