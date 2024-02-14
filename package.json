@@ -2,5 +2,5 @@
   "scripts": {
     "frontend": "cd frontend && npm start",
     "backend": "cd backend && java -Dserver.port=$PORT $JAVA_OPTS -jar build/libs/*.jar",
-  },
+  }
 }
