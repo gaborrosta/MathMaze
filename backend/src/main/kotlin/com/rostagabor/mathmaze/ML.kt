@@ -15,8 +15,12 @@ import org.jetbrains.kotlinx.dl.api.core.loss.Losses
 import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
-import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
+import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
+import org.jetbrains.kotlinx.dl.dataset.embedded.NUMBER_OF_CLASSES
+import org.jetbrains.kotlinx.dl.dataset.embedded.extractImages
+import org.jetbrains.kotlinx.dl.dataset.embedded.extractLabels
 import org.jetbrains.kotlinx.dl.impl.summary.logSummary
+import java.io.File
 
 object ML {
 
@@ -27,7 +31,24 @@ object ML {
     private const val SEED = 12L
     private const val TEST_BATCH_SIZE = 1000
 
-    private val mnist = mnist()
+    private val mnist by lazy {
+        val prefix = File("datasets").absolutePath + File.separator
+
+        val trainXpath = prefix + "extended-train-images.idx3-ubyte.gz"
+        val trainYpath = prefix + "extended-train-labels.idx1-ubyte.gz"
+        val testXpath = prefix + "extended-test-images.idx3-ubyte.gz"
+        val testYpath = prefix + "extended-test-labels.idx1-ubyte.gz"
+
+        OnHeapDataset.createTrainAndTestDatasets(
+            trainXpath,
+            trainYpath,
+            testXpath,
+            testYpath,
+            NUMBER_OF_CLASSES,
+            ::extractImages,
+            ::extractLabels,
+        )
+    }
 
     /**
      *   Copied from https://github.com/Kotlin/kotlindl
@@ -110,19 +131,38 @@ object ML {
     fun ask(): List<String> {
         val (_, test) = mnist
         val result = arrayListOf<String>()
+        val ones = arrayListOf<Int>()
+        val sevens = arrayListOf<Int>()
 
         lenet5Classic.let { model ->
-            repeat(10) { i ->
-                test.getX(i).toList().windowed(28, 28).forEach { row ->
+            repeat(318) { i ->
+                val index = i + 10000
+                test.getX(index).toList().windowed(28, 28).forEach { row ->
                     val r = StringBuilder()
                     row.forEach { pixel ->
                         r.append(if (pixel > 0) "X" else " ")
                     }
                     result.add(r.toString())
                 }
-                result.add("y: ${test.getY(i)}; predicted: ${model.predict(test.getX(i))}")
+
+                val y = test.getY(index)
+                val predicted = model.predict(test.getX(index))
+                if (y == 1F && predicted != 1) {
+                    ones.add(predicted)
+                }
+                if (y == 7F && predicted != 7) {
+                    sevens.add(predicted)
+                }
+
+                result.add("y: $y; predicted: $predicted")
+                result.add("Soft predict: ${model.predictSoftly(test.getX(index)).joinToString()}")
                 result.add("")
             }
+
+            result.add("")
+            result.add("Errors:")
+            result.add("Ones: ${ones.groupBy { it }.toList().joinToString { (k, v) -> "predicted $k: ${v.size} times" }}")
+            result.add("Sevens: ${sevens.groupBy { it }.toList().joinToString { (k, v) -> "predicted $k: ${v.size} times" }}")
         }
 
         return result
