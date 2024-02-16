@@ -4,8 +4,8 @@ $font-family-base: 'Zilla Slab', serif;
 $primary: #7d141d;
 
 .yellow {
-	background-color: #fedf19;
-	opacity: 0.8;
+	background-color: rgba(254, 223, 25, 0.8); // #fedf19;
+	font-weight: bold;
 }
 
 // Import Bootstrap

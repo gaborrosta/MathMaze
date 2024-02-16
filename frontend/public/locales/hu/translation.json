@@ -2,5 +2,12 @@
     "app-name": "MathMaze",
     "404": "A keresett oldal nem található.",
     "welcome": "Üdvözöljük a MathMaze-nél!",
-    "homepage": "Kezdőlap"
+    "homepage": "Kezdőlap",
+    "privacy-policy-title": "Adatvédelmi irányelvek",
+    "terms-and-conditions-title": "Felhasználási feltételek",
+    "help-title": "Segítség",
+    "signup-title": "Regisztráció",
+    "login-title": "Bejelentkezés",
+    "login-privacy-terms-help-link": "Elolvashatod at <1>Adatvédelmi irányelveinket</1>, a <3>Felhasználási feltételeinket</3>, és <5>segítséget kaphatsz</5>.",
+    "signup-privacy-terms-statement": "Regisztrációmmal kijelentem, hogy elolvastam és elfogadom a <1>Adatvédelmi irányelveket</1> és a <3>Felhasználási feltételeket</3>."
 }

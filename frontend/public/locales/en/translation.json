@@ -2,5 +2,12 @@
     "app-name": "MathMaze",
     "404": "We couldn't find the page you're looking for.",
     "welcome": "Welcome to MathMaze!",
-    "homepage": "Homepage"
+    "homepage": "Homepage",
+    "privacy-policy-title": "Privacy Policy",
+    "terms-and-conditions-title": "Terms and Conditions",
+    "help-title": "Help",
+    "signup-title": "Sign Up",
+    "login-title": "Login",
+    "login-privacy-terms-help-link": "You can read our <1>Privacy Policy</1>, our <3>Terms and Conditions</3>, and <5>can get help</5>.",
+    "signup-privacy-terms-statement": "By signing up, I state that I have read and accept the <1>Privacy Policy</1> and the <3>Terms and Conditions</3>."
 }
