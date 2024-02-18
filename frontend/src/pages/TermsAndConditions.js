@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-export default function TermsAndConditions() {
+const TermsAndConditions = () => {
   const { t } = useTranslation();
+
+  useEffect(() => { document.title = t("terms-and-conditions-title") + " | " + t("app-name"); });
 
   return (
     <>
@@ -13,3 +15,5 @@ export default function TermsAndConditions() {
     </>
   );
 }
+
+export default TermsAndConditions;

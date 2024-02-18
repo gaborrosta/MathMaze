@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-export default function PrivacyPolicy() {
+const PrivacyPolicy = () => {
   const { t } = useTranslation();
+
+  useEffect(() => { document.title = t("privacy-policy-title") + " | " + t("app-name"); });
 
   return (
     <>
@@ -13,3 +15,5 @@ export default function PrivacyPolicy() {
     </>
   );
 }
+
+export default PrivacyPolicy;

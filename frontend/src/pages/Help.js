@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
-export default function Help() {
+const Help = () => {
   const { t } = useTranslation();
+
+  useEffect(() => { document.title = t("help-title") + " | " + t("app-name"); });
 
   return (
     <>
@@ -13,3 +15,5 @@ export default function Help() {
     </>
   );
 }
+
+export default Help;

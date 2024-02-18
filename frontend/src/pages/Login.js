@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { Link } from "react-router-dom";
 
 export default function Login() {
   const { t } = useTranslation();
+
+  useEffect(() => { document.title = t("login-title") + " | " + t("app-name"); });
 
   return (
     <>
