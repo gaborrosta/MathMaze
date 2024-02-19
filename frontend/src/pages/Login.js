@@ -1,19 +1,85 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { Link } from "react-router-dom";
+import { Form, Button, InputGroup } from "react-bootstrap";
 
 export default function Login() {
   const { t } = useTranslation();
 
   useEffect(() => { document.title = t("login-title") + " | " + t("app-name"); });
 
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  
+    if (e.target.name === "email") {
+      const emailRegex = /^[\w-.]+@([\w-]+.)+[\w-]{2,4}$/;
+      if (!emailRegex.test(e.target.value)) {
+        setEmailError("login-email-error");
+      } else {
+        setEmailError("");
+      }
+    }
+    else if (e.target.name === "password") {
+      if (!e.target.value) {
+        setPasswordError("login-password-error");
+      } else {
+        setPasswordError("");
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (emailError || passwordError || !formData.email || !formData.password) {
+      setIsSubmitDisabled(true);
+    } else {
+      setIsSubmitDisabled(false);
+    }
+  }, [emailError, passwordError, formData]);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    console.log(formData);
+    //TODO...
+  };
+
   return (
     <>
       <center>
         <h1>{t("login-title")}</h1>
       </center>
-      <p>TODO...</p>
-      <p><Trans i18nKey="login-privacy-terms-help-link">You can read our <Link to="/privacy-policy">Privacy Policy</Link>, our <Link to="/terms-and-conditions">Terms and Conditions</Link>, and <Link to="/help">more</Link>.</Trans></p>
+      <Form onSubmit={handleLogin}>
+        <Form.Group className="mb-3" controlId="email">
+          <Form.Label htmlFor="email">{t("signup-login-email")}</Form.Label>
+          <Form.Control type="email" placeholder={t("signup-login-email-placeholder")} name="email" value={formData.email} onChange={handleChange} />
+          {emailError && <Form.Text className="text-danger">{t(emailError)}</Form.Text>}
+        </Form.Group>
+        <Form.Group className="mb-3" controlId="password">
+          <Form.Label htmlFor="password">{t("signup-login-password")}</Form.Label>
+          <InputGroup>
+            <Form.Control type={showPassword ? "text" : "password"} placeholder={t("login-password-placeholder")} name="password" value={formData.password} onChange={handleChange} />
+            <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>{showPassword ? t("password-hide") : t("password-show")}</Button>
+          </InputGroup>
+          {passwordError && <Form.Text className="text-danger">{t(passwordError)}</Form.Text>}
+        </Form.Group>
+        <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled}>
+          {t("login-title")}
+        </Button>
+      </Form>
+      <p>
+        <Trans i18nKey="login-privacy-terms-help-link">You can read our <Link to="/privacy-policy">Privacy Policy</Link>, our <Link to="/terms-and-conditions">Terms and Conditions</Link>, and <Link to="/help">more</Link>.</Trans>
+      </p>
     </>
   );
 }
