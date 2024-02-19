@@ -23,6 +23,26 @@ class BasicController {
     @GetMapping("/name")
     fun name(@RequestParam("name") name: String) = "Hello, $name!"
 
+    @GetMapping("/generate")
+    fun generate(@RequestParam("width") width: Int, @RequestParam("height") height: Int): String {
+        return try {
+            val result = Generator.generateCharacterMaze(width, height)
+            "<pre>" + result.joinToString(
+                separator = "<br>",
+                prefix = "-".repeat(width + 2) + "\n",
+                postfix = "\n" + "-".repeat(width + 2),
+            ) {
+                it.joinToString(
+                    separator = "",
+                    prefix = "|",
+                    postfix = "|",
+                )
+            } + "</pre>"
+        } catch (e: Exception) {
+            e.message ?: "Unknown error"
+        }
+    }
+
     @GetMapping("/ml")
     fun ml() = "<pre>" + ML.ask().joinToString(separator = "<br>") + "</pre>"
 
