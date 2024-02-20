@@ -5,6 +5,7 @@ import org.springframework.boot.runApplication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import kotlin.math.min
 
 @SpringBootApplication
 class MathMazeApplication
@@ -21,12 +22,17 @@ class BasicController {
     fun index() = "Hello"
 
     @GetMapping("/name")
-    fun name(@RequestParam("name") name: String) = "Hello, $name!"
+    fun name(@RequestParam name: String) = "Hello, $name!"
 
     @GetMapping("/generate")
-    fun generate(@RequestParam("width") width: Int, @RequestParam("height") height: Int): String {
+    fun generate(
+        @RequestParam width: Int,
+        @RequestParam height: Int,
+        @RequestParam minLength: Int = min(width, height),
+        @RequestParam maxLength: Int = Int.MAX_VALUE,
+    ): String {
         return try {
-            val result = Generator.generateCharacterMaze(width, height)
+            val (result, message) = Generator.generateCharacterMaze(width, height, minLength, maxLength)
             "<pre>" + result.joinToString(
                 separator = "<br>",
                 prefix = "-".repeat(width + 2) + "\n",
@@ -37,7 +43,7 @@ class BasicController {
                     prefix = "|",
                     postfix = "|",
                 )
-            } + "</pre>"
+            } + "</pre><br>$message"
         } catch (e: Exception) {
             e.message ?: "Unknown error"
         }
