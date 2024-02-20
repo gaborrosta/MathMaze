@@ -26,7 +26,7 @@ export default function Login() {
     if (e.target.name === "email") {
       const emailRegex = /^[\w-.]+@([\w-]+.)+[\w-]{2,4}$/;
       if (!emailRegex.test(e.target.value)) {
-        setEmailError("login-email-error");
+        setEmailError("email-error");
       } else {
         setEmailError("");
       }
@@ -61,14 +61,14 @@ export default function Login() {
       </center>
       <Form onSubmit={handleLogin}>
         <Form.Group className="mb-3" controlId="email">
-          <Form.Label htmlFor="email">{t("signup-login-email")}</Form.Label>
-          <Form.Control type="email" placeholder={t("signup-login-email-placeholder")} name="email" value={formData.email} onChange={handleChange} />
+          <Form.Label htmlFor="email">{t("email")}</Form.Label>
+          <Form.Control required type="email" placeholder={t("email-placeholder")} name="email" value={formData.email} onChange={handleChange} />
           {emailError && <Form.Text className="text-danger">{t(emailError)}</Form.Text>}
         </Form.Group>
         <Form.Group className="mb-3" controlId="password">
-          <Form.Label htmlFor="password">{t("signup-login-password")}</Form.Label>
+          <Form.Label htmlFor="password">{t("password")}</Form.Label>
           <InputGroup>
-            <Form.Control type={showPassword ? "text" : "password"} placeholder={t("login-password-placeholder")} name="password" value={formData.password} onChange={handleChange} />
+            <Form.Control required type={showPassword ? "text" : "password"} placeholder={t("login-password-placeholder")} name="password" value={formData.password} onChange={handleChange} />
             <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>{showPassword ? t("password-hide") : t("password-show")}</Button>
           </InputGroup>
           {passwordError && <Form.Text className="text-danger">{t(passwordError)}</Form.Text>}
@@ -78,6 +78,10 @@ export default function Login() {
         </Button>
       </Form>
       <p>
+        <Trans i18nKey="login-forgot-password">Did you forgot your password? You can create a new one <Link to="/reset-password">here</Link>.</Trans>
+        <br />
+        {t("login-no-account")} <Link to="/signup">{t("login-create-account")}</Link>
+        <br />
         <Trans i18nKey="login-privacy-terms-help-link">You can read our <Link to="/privacy-policy">Privacy Policy</Link>, our <Link to="/terms-and-conditions">Terms and Conditions</Link>, and <Link to="/help">more</Link>.</Trans>
       </p>
     </>

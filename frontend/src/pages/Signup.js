@@ -84,24 +84,24 @@ export default function Signup() {
       <Form onSubmit={handleSignup}>
         <Form.Group className="mb-3" controlId="username">
           <Form.Label>{t("signup-username")}</Form.Label>
-          <Form.Control type="text" placeholder={t("signup-username-placeholder")} name="username" value={formData.username} onChange={handleChange} aria-describedby="usernameHelp usernameError" />
+          <Form.Control required type="text" placeholder={t("signup-username-placeholder")} name="username" value={formData.username} onChange={handleChange} aria-describedby="usernameHelp usernameError" />
           <Form.Text id="usernameHelp" className="text-muted">
             {t("signup-username-help")}
           </Form.Text>
           {usernameError && <><br /><Form.Text id="usernameError" className="text-danger" aria-live="polite">{t(usernameError)}</Form.Text></>}
         </Form.Group>
         <Form.Group className="mb-3" controlId="email">
-          <Form.Label>{t("signup-login-email")}</Form.Label>
-          <Form.Control type="email" placeholder={t("signup-login-email-placeholder")} name="email" value={formData.email} onChange={handleChange} aria-describedby="emailHelp emailError" />
+          <Form.Label>{t("email")}</Form.Label>
+          <Form.Control required type="email" placeholder={t("email-placeholder")} name="email" value={formData.email} onChange={handleChange} aria-describedby="emailHelp emailError" />
           <Form.Text id="emailHelp" className="text-muted">
             {t("signup-email-help")}
           </Form.Text>
           {emailError && <><br /><Form.Text id="emailError" className="text-danger" aria-live="polite">{t(emailError)}</Form.Text></>}
         </Form.Group>
         <Form.Group className="mb-3" controlId="password">
-          <Form.Label>{t("signup-login-password")}</Form.Label>
+          <Form.Label>{t("password")}</Form.Label>
           <InputGroup>
-            <Form.Control type={showPassword ? "text" : "password"} placeholder={t("signup-password-placeholder")} name="password" value={formData.password} onChange={handleChange} aria-describedby="passwordHelp passwordError" />
+            <Form.Control required type={showPassword ? "text" : "password"} placeholder={t("signup-password-placeholder")} name="password" value={formData.password} onChange={handleChange} aria-describedby="passwordHelp passwordError" />
             <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>{showPassword ? t("password-hide") : t("password-show")}</Button>
           </InputGroup>
           <Form.Text id="passwordHelp" className="text-muted">
@@ -112,7 +112,7 @@ export default function Signup() {
         <Form.Group className="mb-3" controlId="confirmPassword">
           <Form.Label>{t("signup-confirm-password")}</Form.Label>
           <InputGroup>
-            <Form.Control type={showConfirmPassword ? "text" : "password"} placeholder={t("signup-confirm-password-placeholder")} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} aria-describedby="confirmPasswordHelp confirmPasswordError" />
+            <Form.Control required type={showConfirmPassword ? "text" : "password"} placeholder={t("signup-confirm-password-placeholder")} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} aria-describedby="confirmPasswordHelp confirmPasswordError" />
             <Button variant="outline-secondary" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>{showConfirmPassword ? t("password-hide") : t("password-show")}</Button>
           </InputGroup>
           {confirmPasswordError && <Form.Text id="confirmPasswordError" className="text-danger" aria-live="polite">{t(confirmPasswordError)}</Form.Text>}

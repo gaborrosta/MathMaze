@@ -13,7 +13,7 @@ export default function Menu() {
     <Navbar expand="lg" className="yellow">
       <Container>
         <Navbar.Brand as={Link} to="/">
-          <img src="/logo.png" alt="Logo" width="30" height="30" className="d-inline-block align-top" />
+          <img src="/logo.png" alt={t("logo")} width="30" height="30" className="d-inline-block align-top" />
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
@@ -24,7 +24,7 @@ export default function Menu() {
             <Nav.Link as={Link} to="/signup">{t("signup-title")}</Nav.Link>
             <Nav.Link as={Link} to="/login">{t("login-title")}</Nav.Link>
             <Form variant="outlined" size="small">
-              <Form.Select aria-label="Language change" onChange={e => i18n.changeLanguage(e.target.value)} value={i18n.resolvedLanguage} >
+              <Form.Select aria-label={t("language-change")} onChange={e => i18n.changeLanguage(e.target.value)} value={i18n.resolvedLanguage} >
                 <option value="en">🇬🇧</option>
                 <option value="hu">🇭🇺</option>
               </Form.Select>

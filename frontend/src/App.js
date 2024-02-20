@@ -9,6 +9,7 @@ import TermsAndConditions from "./pages/TermsAndConditions";
 import Help from "./pages/Help";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
+import ResetPassword from "./pages/ResetPassword";
 import NoPage from "./pages/NoPage";
 
 export default function App() {
@@ -49,6 +50,10 @@ export default function App() {
               {
                 path: "login",
                 Component: Login,
+              },
+              {
+                path: "reset-password",
+                Component: ResetPassword,
               },
               {
                 path: "*",
