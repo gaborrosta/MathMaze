@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation, Trans } from "react-i18next";
+import { Link } from "react-router-dom";
 
 const Help = () => {
   const { t } = useTranslation();
@@ -12,6 +13,7 @@ const Help = () => {
         <h1>{t("help-title")}</h1>
       </center>
       <p>TODO...</p>
+      <Trans i18nKey="help-privacy-terms-link">You can read our <Link to="/privacy-policy">Privacy Policy</Link> and our <Link to="/terms-and-conditions">Terms and Conditions</Link>.</Trans>
     </>
   );
 }

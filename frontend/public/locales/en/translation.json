@@ -9,10 +9,11 @@
     "privacy-policy-title": "Privacy Policy",
     "terms-and-conditions-title": "Terms and Conditions",
     "help-title": "Help",
+    "help-privacy-terms-link": "You can read our <1>Privacy Policy</1> and our <3>Terms and Conditions</3>.",
     "signup-title": "Sign Up",
     "signup-username": "Username",
     "signup-username-placeholder": "Enter your username",
-    "signup-username-help": "Your username must be unique, 5-20 characters long and cannot contain spaces or special characters. You will need it to login.",
+    "signup-username-help": "Your username must be unique, 5-20 characters long and cannot contain spaces or special characters.",
     "signup-username-error": "The username does not meet the requirements.",
     "email": "Email",
     "email-placeholder": "Enter your email",
@@ -38,5 +39,6 @@
     "signup-privacy-terms-statement": "By signing up, I state that I have read and accept the <1>Privacy Policy</1> and the <3>Terms and Conditions</3>.",
     "reset-password-title": "Reset Password",
     "reset-password-text": "Enter your email address and we will send you a link to reset your password.",
-    "reset-password-submit": "Send reset link"
+    "reset-password-submit": "Send reset link",
+    "maze-title": "Maze"
 }

@@ -8,10 +8,11 @@
     "privacy-policy-title": "Adatvédelmi irányelvek",
     "terms-and-conditions-title": "Felhasználási feltételek",
     "help-title": "Segítség",
+    "help-privacy-terms-link": "Elolvashatod az <1>Adatvédelmi irányelveinket</1> és a <3>Felhasználási feltételeinket</3>.",
     "signup-title": "Regisztráció",
     "signup-username": "Felhasználónév",
     "signup-username-placeholder": "Válassz egy felhasználónevet",
-    "signup-username-help": "A felhasználónevednek egyedinek és 5-20 karakter hosszúnak kell lennie, továbbá nem tartalmazhat szóközöket vagy speciális karaktereket. Bejelentkezéshez fog kelleni.",
+    "signup-username-help": "A felhasználónevednek egyedinek és 5-20 karakter hosszúnak kell lennie, továbbá nem tartalmazhat szóközöket vagy speciális karaktereket.",
     "signup-username-error": "A felhasználónév nem felel meg a feltételeknek.",
     "email": "E-mail",
     "email-placeholder": "Írd be az e-mail címedet",
@@ -37,5 +38,6 @@
     "signup-privacy-terms-statement": "Regisztrációmmal kijelentem, hogy elolvastam és elfogadom az <1>Adatvédelmi irányelveket</1> és a <3>Felhasználási feltételeket</3>.",
     "reset-password-title": "Jelszó visszaállítása",
     "reset-password-text": "Írd be az e-mail címedet, és küldünk neked egy linket, amivel új jelszót állíthatsz be.",
-    "reset-password-submit": "Link küldése"
+    "reset-password-submit": "Link küldése",
+    "maze-title": "Labirintus"
 }

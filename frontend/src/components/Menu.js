@@ -19,6 +19,7 @@ export default function Menu() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/help">{t("help-title")}</Nav.Link>
+            <Nav.Link as={Link} to="/maze">{t("maze-title")}</Nav.Link>
           </Nav>
           <Nav className="ms-auto">
             <Nav.Link as={Link} to="/signup">{t("signup-title")}</Nav.Link>

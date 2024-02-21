@@ -10,6 +10,7 @@ import Help from "./pages/Help";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
+import Maze from "./pages/Maze";
 import NoPage from "./pages/NoPage";
 
 export default function App() {
@@ -54,6 +55,10 @@ export default function App() {
               {
                 path: "reset-password",
                 Component: ResetPassword,
+              },
+              {
+                path: "maze",
+                Component: Maze,
               },
               {
                 path: "*",
