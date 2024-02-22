@@ -8,5 +8,55 @@ $primary: #7d141d;
 	font-weight: bold;
 }
 
+.maze {
+	display: grid;
+	border: 3px solid black;
+}
+
+.maze-cell {
+	border: 1px solid black;
+	position: relative;
+	padding-top: 100%;
+}
+
+.maze-cell-corner {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 10%;
+	height: 10%;
+	border-left: 1px solid black;
+	border-bottom: 1px solid black;
+}
+
+.maze-cell-content {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.maze-cell-bottom {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 50%;
+	display: flex;
+}
+
+.maze-cell-bottom-left {
+	flex: 1;
+	border-top: 1px solid black;
+	border-right: 1px solid black;
+}
+
+.maze-cell-bottom-right {
+	flex: 1;
+	border-top: 1px solid black;
+}
+
 // Import Bootstrap
 @import '~bootstrap/scss/bootstrap';
