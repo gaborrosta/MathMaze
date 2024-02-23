@@ -1,17 +1,27 @@
 package com.rostagabor.mathmaze
 
+import org.opencv.core.Core
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.io.File
 import kotlin.math.min
 
 @SpringBootApplication
 class MathMazeApplication
 
 fun main(args: Array<String>) {
-    ML.train()
+    //ML.train()
+
+    System.load(File("libs/opencv_java490.dll").absolutePath)
+    try {
+        println("OpenCV version: ${Core.VERSION}")
+    } catch (e: UnsatisfiedLinkError) {
+        println("Failed to load OpenCV: ${e.message}")
+    }
+
     runApplication<MathMazeApplication>(*args)
 }
 
@@ -49,7 +59,7 @@ class BasicController {
         }
     }
 
-    @GetMapping("/ml")
-    fun ml() = "<pre>" + ML.ask().joinToString(separator = "<br>") + "</pre>"
+    //@GetMapping("/ml")
+    //fun ml() = "<pre>" + ML.ask().joinToString(separator = "<br>") + "</pre>"
 
 }
