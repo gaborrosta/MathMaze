@@ -128,44 +128,9 @@ object ML {
         }
     }
 
-    fun ask(): List<String> {
-        val (_, test) = mnist
-        val result = arrayListOf<String>()
-        val ones = arrayListOf<Int>()
-        val sevens = arrayListOf<Int>()
-
-        lenet5Classic.let { model ->
-            repeat(318) { i ->
-                val index = i + 10000
-                test.getX(index).toList().windowed(28, 28).forEach { row ->
-                    val r = StringBuilder()
-                    row.forEach { pixel ->
-                        r.append(if (pixel > 0) "X" else " ")
-                    }
-                    result.add(r.toString())
-                }
-
-                val y = test.getY(index)
-                val predicted = model.predict(test.getX(index))
-                if (y == 1F && predicted != 1) {
-                    ones.add(predicted)
-                }
-                if (y == 7F && predicted != 7) {
-                    sevens.add(predicted)
-                }
-
-                result.add("y: $y; predicted: $predicted")
-                result.add("Soft predict: ${model.predictSoftly(test.getX(index)).joinToString()}")
-                result.add("")
-            }
-
-            result.add("")
-            result.add("Errors:")
-            result.add("Ones: ${ones.groupBy { it }.toList().joinToString { (k, v) -> "predicted $k: ${v.size} times" }}")
-            result.add("Sevens: ${sevens.groupBy { it }.toList().joinToString { (k, v) -> "predicted $k: ${v.size} times" }}")
-        }
-
-        return result
-    }
+    /**
+     *   Predicts the number on the image. The whole list of predictions is returned for further analysis.
+     */
+    fun predict(image: FloatArray): FloatArray = lenet5Classic.predictSoftly(image)
 
 }
