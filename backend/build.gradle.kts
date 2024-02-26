@@ -22,14 +22,26 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-web:3.2.2")
+	//Spring Boot & Kotlin
+	implementation("org.springframework.boot:spring-boot-starter-web:3.2.3")
+	implementation("org.springframework.boot:spring-boot-starter-security:3.2.3")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.1")
 	implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.22")
+
+	//ML
 	implementation("org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow:0.5.2")
 	implementation("org.jetbrains.kotlinx:kotlin-deeplearning-dataset:0.5.2")
+
+	//OpenCV
 	implementation(files("libs/opencv-490.jar"))
-	runtimeOnly("org.postgresql:postgresql:42.7.1")
-	testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.2")
+
+    //Database
+	implementation("org.hsqldb:hsqldb:2.7.2")
+	implementation("org.postgresql:postgresql:42.7.2")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.2.3")
+
+	//Tests
+	testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.3")
 }
 
 tasks.withType<KotlinCompile> {
