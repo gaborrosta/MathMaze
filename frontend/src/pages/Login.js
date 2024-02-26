@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Form, Button, InputGroup } from "react-bootstrap";
+import { BASE_URL } from "../utils/constants";
+import axios from "axios";
 
 export default function Login() {
   const { t } = useTranslation();
@@ -50,8 +52,32 @@ export default function Login() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log(formData);
-    //TODO...
+
+    const user = {
+      email: formData.email,
+      password: formData.password,
+    };
+
+    //CSRF token
+    axios.get(`${BASE_URL}/csrf`)
+      .then(csrfResponse => {
+        //Send data
+        axios.post(`${BASE_URL}/login`, user, {
+          headers: {
+            "Content-Type": "application/json",
+            "X-XSRF-TOKEN": csrfResponse.data
+          }
+        })
+        .then(response => {
+          console.log("Success:", response.data);
+        })
+        .catch(error => {
+          console.error("Error:", error);
+        });
+      })
+      .catch(error => {
+        console.error("Error fetching CSRF token:", error);
+      });
   };
 
   return (
