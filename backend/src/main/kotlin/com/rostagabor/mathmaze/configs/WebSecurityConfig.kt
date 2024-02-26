@@ -16,7 +16,7 @@ class WebSecurityConfig {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
-        http.csrf { csrf -> csrf.csrfTokenRepository(HttpSessionCsrfTokenRepository()) }
+        http.csrf { csrf -> csrf.disable() }
             .authorizeHttpRequests { authorizeRequests -> authorizeRequests.anyRequest().permitAll() }
             .build()
 

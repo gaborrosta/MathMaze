@@ -15,12 +15,6 @@ import org.springframework.web.bind.annotation.*
 class UserController(private val userService: UserService) {
 
     /**
-     *   Returns the CSRF token for the current session.
-     */
-    @GetMapping("/csrf")
-    fun getToken(request: HttpServletRequest): String = (request.getAttribute(CsrfToken::class.java.name) as CsrfToken).token
-
-    /**
      *   Registers a new user.
      */
     @PostMapping("/register")
