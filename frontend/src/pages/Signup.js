@@ -82,26 +82,18 @@ export default function Signup() {
       password: formData.password,
     };
 
-    //CSRF token
-    axios.get(`${BASE_URL}/csrf`)
-      .then(csrfResponse => {
-        //Send data
-        axios.post(`${BASE_URL}/register`, user, {
-          headers: {
-            "Content-Type": "application/json",
-            "X-XSRF-TOKEN": csrfResponse.data
-          }
-        })
-        .then(response => {
-          console.log("Success:", response.data);
-        })
-        .catch(error => {
-          console.error("Error:", error);
-        });
-      })
-      .catch(error => {
-        console.error("Error fetching CSRF token:", error);
-      });
+    //Send data
+    axios.post(`${BASE_URL}/users/register`, user, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(response => {
+      console.log("Success:", response.data);
+    })
+    .catch(error => {
+      console.error("Error:", error);
+    });
   };
 
   return (
