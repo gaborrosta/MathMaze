@@ -52,7 +52,7 @@ export default function ResetPassword() {
       </p>
       <Form onSubmit={handleResetPassword}>
         <Form.Group className="mb-3" controlId="email">
-          <Form.Label htmlFor="email">{t("email")}</Form.Label>
+          <Form.Label>{t("email")}</Form.Label>
           <Form.Control required type="email" placeholder={t("email-placeholder")} name="email" value={formData.email} onChange={handleChange} />
           {emailError && <Form.Text className="text-danger">{t(emailError)}</Form.Text>}
         </Form.Group>

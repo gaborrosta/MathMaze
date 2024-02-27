@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Form, Button, InputGroup } from "react-bootstrap";
+import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
 
@@ -14,6 +14,9 @@ export default function Login() {
     email: "",
     password: "",
   });
+
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -64,11 +67,18 @@ export default function Login() {
         "Content-Type": "application/json"
       }
     })
-    .then(response => {
-      console.log("Success:", response.data);
+    .then(_ => {
+      setError("");
+      setSuccess("success-login");
     })
     .catch(error => {
-      console.error("Error:", error);
+      setFormData({ ...formData, password: "" });
+
+      if (error.response.data === "InvalidCredentialsException") {
+        setError("error-invalid-credentials");
+      } else {
+        setError("error-unknown");
+      }
     });
   };
 
@@ -77,14 +87,16 @@ export default function Login() {
       <center>
         <h1>{t("login-title")}</h1>
       </center>
+      {error && <Alert variant="danger">{t(error)}</Alert>}
+      {success && <Alert variant="success">{t(success)}</Alert>}
       <Form onSubmit={handleLogin}>
         <Form.Group className="mb-3" controlId="email">
-          <Form.Label htmlFor="email">{t("email")}</Form.Label>
+          <Form.Label>{t("email")}</Form.Label>
           <Form.Control required type="email" placeholder={t("email-placeholder")} name="email" value={formData.email} onChange={handleChange} />
           {emailError && <Form.Text className="text-danger">{t(emailError)}</Form.Text>}
         </Form.Group>
         <Form.Group className="mb-3" controlId="password">
-          <Form.Label htmlFor="password">{t("password")}</Form.Label>
+          <Form.Label>{t("password")}</Form.Label>
           <InputGroup>
             <Form.Control required type={showPassword ? "text" : "password"} placeholder={t("login-password-placeholder")} name="password" value={formData.password} onChange={handleChange} />
             <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>{showPassword ? t("password-hide") : t("password-show")}</Button>

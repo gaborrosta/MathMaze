@@ -39,5 +39,14 @@
     "reset-password-title": "Jelszó visszaállítása",
     "reset-password-text": "Írd be az e-mail címedet, és küldünk neked egy linket, amivel új jelszót állíthatsz be.",
     "reset-password-submit": "Link küldése",
-    "maze-title": "Labirintus"
+    "maze-title": "Labirintus",
+    "error-username-invalid-format": "Kérjük, hogy ellenőrizd a felhasználónevedet, mert nem felel meg a feltételeknek.",
+    "error-email-invalid-format": "Kérjük, hogy helyes-e az e-mail címed.",
+    "error-password-invalid-format": "Kérjük, hogy ellenőrizd a jelszavadat, mert nem felel meg a feltételeknek.",
+    "error-username-not-unique": "Ez a felhasználónév már használatban van. Kérjük, válassz másikat.",
+    "error-email-not-unique": "Ez az e-mail cím már használatban van. Kérjük, adj meg egy másikat vagy válasszd ki az Elfelejtett jelszó opciót.",
+    "error-invalid-credentials": "Hibás e-mail cím vagy jelszó.",
+    "error-unknown": "Ismeretlen hiba történt.",
+    "success-signup": "Sikeres regisztráció! Most már bejelentkezhetsz.",
+    "success-login": "Sikeres bejelentkezés!"
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Form, Button, InputGroup } from "react-bootstrap";
+import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
 
@@ -16,6 +16,9 @@ export default function Signup() {
     confirmPassword: "",
     username: "",
   });
+
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const [usernameError, setUsernameError] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -48,10 +51,22 @@ export default function Signup() {
     }
     else if (e.target.name === "password") {
       const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,20}$/;
-      if (e.target.value && (!passwordRegex.test(e.target.value))) {
-        setPasswordError("signup-password-error");
+      if (e.target.value) {
+        if (!passwordRegex.test(e.target.value)) {
+          setPasswordError("signup-password-error");
+        } else if (e.target.value === formData.confirmPassword) {
+          setConfirmPasswordError("");
+          setPasswordError("");
+        } else {
+          setConfirmPasswordError("signup-confirm-password-error");
+          setPasswordError("");
+        }
       } else {
         setPasswordError("");
+
+        if (!formData.confirmPassword) {
+          setConfirmPasswordError("");
+        }
       }
     }
     else if (e.target.name === "confirmPassword") {
@@ -88,11 +103,32 @@ export default function Signup() {
         "Content-Type": "application/json"
       }
     })
-    .then(response => {
-      console.log("Success:", response.data);
+    .then(_ => {
+      setError("");
+      setSuccess("success-signup");
     })
     .catch(error => {
-      console.error("Error:", error);
+      setFormData({ ...formData, password: "", confirmPassword: ""});
+
+      switch (error.response.data) {
+        case "UsernameInvalidFormatException":
+          setError("error-username-invalid-format");
+          break;
+        case "EmailInvalidFormatException":
+          setError("error-email-invalid-format");
+          break;
+        case "PasswordInvalidFormatException":
+          setError("error-password-invalid-format");
+          break;
+        case "UsernameNotUniqueException":
+          setError("error-username-not-unique");
+          break;
+        case "EmailNotUniqueException":
+          setError("error-email-not-unique");
+          break;
+        default:
+          setError("error-unknown");
+      }
     });
   };
 
@@ -101,6 +137,8 @@ export default function Signup() {
       <center>
         <h1>{t("signup-title")}</h1>
       </center>
+      {error && <Alert variant="danger">{t(error)}</Alert>}
+      {success && <Alert variant="success">{t(success)}</Alert>}
       <Form onSubmit={handleSignup}>
         <Form.Group className="mb-3" controlId="username">
           <Form.Label>{t("signup-username")}</Form.Label>

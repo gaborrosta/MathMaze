@@ -40,5 +40,14 @@
     "reset-password-title": "Reset Password",
     "reset-password-text": "Enter your email address and we will send you a link to reset your password.",
     "reset-password-submit": "Send reset link",
-    "maze-title": "Maze"
+    "maze-title": "Maze",
+    "error-username-invalid-format": "Please check the username, because it does not meet the requirements.",
+    "error-email-invalid-format": "Please check if your email address is correct.",
+    "error-password-invalid-format": "Please check the password, because it does not meet the requirements.",
+    "error-username-not-unique": "This username is already in use, please choose another one.",
+    "error-email-not-unique": "This email is already in use, please choose another one or choose the forgot password option.",
+    "error-invalid-credentials": "The email or password is incorrect.",
+    "error-unknown": "An unknown error occurred.",
+    "success-signup": "You have successfully signed up. You can now log in.",
+    "success-login": "You have successfully logged in."
 }
