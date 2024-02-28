@@ -9,15 +9,15 @@ import jakarta.persistence.*
 @Table(name = "users")
 data class User @JvmOverloads constructor(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "user_id")
-    var userId: Long = 0,
+    val userId: Long = 0,
 
     @Column(name = "username", nullable = false, unique = true)
-    var username: String = "",
+    val username: String = "",
 
     @Column(name = "email", nullable = false, unique = true)
-    var email: String = "",
+    val email: String = "",
 
     @Column(name = "password", nullable = false)
     var password: String = "",

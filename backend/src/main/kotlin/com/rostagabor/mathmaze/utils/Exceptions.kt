@@ -35,3 +35,14 @@ class EmailNotUniqueException : Exception()
  *   Exception for when a user is not found with the given credentials.
  */
 class InvalidCredentialsException : Exception()
+
+
+/**
+ *   Exception for when a user is not found with the given email.
+ */
+class UserNotFoundException : Exception()
+
+/**
+ *   Exception for when a token is invalid or expired.
+ */
+class TokenInvalidOrExpiredException : Exception()

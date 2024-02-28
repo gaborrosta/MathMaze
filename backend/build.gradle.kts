@@ -40,6 +40,9 @@ dependencies {
 	implementation("org.postgresql:postgresql:42.7.2")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.2.3")
 
+	//Mail
+	implementation("org.springframework.boot:spring-boot-starter-mail:3.2.3")
+
 	//Tests
 	testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.3")
 }
