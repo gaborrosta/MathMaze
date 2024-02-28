@@ -91,21 +91,21 @@ export default function Signup() {
     e.preventDefault();
 
     //Convert user data to JSON
-    const user = {
+    const data = {
       username: formData.username,
       email: formData.email,
       password: formData.password,
     };
 
     //Send data
-    axios.post(`${BASE_URL}/users/register`, user, {
+    axios.post(`${BASE_URL}/users/register`, data, {
       headers: {
         "Content-Type": "application/json"
       }
     })
     .then(_ => {
       setError("");
-      setSuccess("success-signup");
+      setSuccess("success-signup"); //TODO...
     })
     .catch(error => {
       setFormData({ ...formData, password: "", confirmPassword: ""});

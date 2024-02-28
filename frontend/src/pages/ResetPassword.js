@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, Alert } from "react-bootstrap";
+import { BASE_URL } from "../utils/constants";
+import axios from "axios";
 
 export default function ResetPassword() {
   const { t } = useTranslation();
@@ -10,6 +12,9 @@ export default function ResetPassword() {
   const [formData, setFormData] = useState({
     email: "",
   });
+
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const [emailError, setEmailError] = useState("");
 
@@ -38,8 +43,25 @@ export default function ResetPassword() {
 
   const handleResetPassword = (e) => {
     e.preventDefault();
-    console.log(formData);
-    //TODO...
+
+    const data = {
+      email: formData.email,
+    };
+
+    //Send data
+    axios.post(`${BASE_URL}/users/password-request`, data, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(_ => {
+      setError("");
+      setSuccess("success-password-reset");
+      setFormData({ email: "" });
+    })
+    .catch(_ => {
+      setError("error-unknown");
+    });
   };
 
   return (
@@ -50,6 +72,8 @@ export default function ResetPassword() {
       <p>
         {t("reset-password-text")}
       </p>
+      {error && <Alert variant="danger">{t(error)}</Alert>}
+      {success && <Alert variant="success">{t(success)}</Alert>}
       <Form onSubmit={handleResetPassword}>
         <Form.Group className="mb-3" controlId="email">
           <Form.Label>{t("email")}</Form.Label>

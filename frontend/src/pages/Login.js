@@ -56,20 +56,20 @@ export default function Login() {
   const handleLogin = (e) => {
     e.preventDefault();
 
-    const user = {
+    const data = {
       email: formData.email,
       password: formData.password,
     };
 
     //Send data
-    axios.post(`${BASE_URL}/users/login`, user, {
+    axios.post(`${BASE_URL}/users/login`, data, {
       headers: {
         "Content-Type": "application/json"
       }
     })
     .then(_ => {
       setError("");
-      setSuccess("success-login");
+      setSuccess("success-login"); //TODO...
     })
     .catch(error => {
       setFormData({ ...formData, password: "" });

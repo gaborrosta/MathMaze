@@ -49,5 +49,11 @@
     "error-invalid-credentials": "The email or password is incorrect.",
     "error-unknown": "An unknown error occurred.",
     "success-signup": "You have successfully signed up. You can now log in.",
-    "success-login": "You have successfully logged in."
+    "success-login": "You have successfully logged in.",
+    "success-password-reset": "If the email address is used by a user, we have sent you a link to reset your password.",
+    "set-new-password-title": "Set new password",
+    "set-new-password-text": "You can set a new password for your account.",
+    "set-new-password-error-token-invalid-or-expired": "The token/link is invalid or expired. Please try to reset your password again.",
+    "set-new-password-error-no-token": "Check if you clicked on the right link as there is no token provided, i.e. the end is missing.",
+    "success-set-new-password": "You have successfully set a new password. You can now log in with it."
 }

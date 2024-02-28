@@ -48,5 +48,11 @@
     "error-invalid-credentials": "Hibás e-mail cím vagy jelszó.",
     "error-unknown": "Ismeretlen hiba történt.",
     "success-signup": "Sikeres regisztráció! Most már bejelentkezhetsz.",
-    "success-login": "Sikeres bejelentkezés!"
+    "success-login": "Sikeres bejelentkezés!",
+    "success-password-reset": "Ha a megadott e-mail címmel rendelkezik fiók, akkor elküldtünk egy linket a jelszó visszaállításához.",
+    "set-new-password-title": "Új jelszó beállítása",
+    "set-new-password-text": "Beállíthatsz egy új jelszót a fiókodhoz.",
+    "set-new-password-error-token-invalid-or-expired": "A link/token érvénytelen vagy lejárt. Kérjük, próbáld meg újra visszaállítani a jelszavadat.",
+    "set-new-password-error-no-token": "Ellenőrizd, hogy a helyes linkre kattintottál-e, mert a vége lemaradt.",
+    "success-set-new-password": "Sikeresen beállítottál egy új jelszót. Most már bejelentkezhetsz vele."
 }
