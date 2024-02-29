@@ -46,3 +46,19 @@ class UserNotFoundException : Exception()
  *   Exception for when a token is invalid or expired.
  */
 class TokenInvalidOrExpiredException : Exception()
+
+
+/**
+ *   Exception for when a maze dimension is invalid.
+ */
+class InvalidMazeDimensionException : Exception()
+
+/**
+ *   Exception for when a path range is invalid.
+ */
+class InvalidPathRangeException : Exception()
+
+/**
+ *   Exception for when a numbers range is invalid.
+ */
+class InvalidNumbersRangeException : Exception()

@@ -23,3 +23,12 @@ fun validatePassword(password: String): Boolean {
     val passwordRegex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$".toRegex()
     return passwordRegex.matches(password)
 }
+
+
+/**
+ *   Validates the dimensions of a maze.
+ */
+fun validateMazeDimensions(width: Int, height: Int): Boolean {
+    val validRange = 11 until 50
+    return width in validRange && height in validRange && width % 2 != 0 && height % 2 != 0
+}
