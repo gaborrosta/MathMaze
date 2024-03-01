@@ -23,8 +23,8 @@ $primary: #7d141d;
 	position: absolute;
 	top: 0;
 	right: 0;
-	width: 10%;
-	height: 10%;
+	width: 15%;
+	height: 15%;
 	border-left: 1px solid black;
 	border-bottom: 1px solid black;
 }
@@ -56,6 +56,15 @@ $primary: #7d141d;
 .maze-cell-bottom-right {
 	flex: 1;
 	border-top: 1px solid black;
+}
+
+.arrow {
+	display: inline-block;
+	transition: transform 0.3s;
+	padding-right: 0.5rem;
+}
+.rotate {
+	transform: rotate(90deg);
 }
 
 // Import Bootstrap

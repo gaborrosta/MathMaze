@@ -11,7 +11,7 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import SetNewPassword from "./pages/SetNewPassword";
-import Maze from "./pages/Maze";
+import GenerateMaze from "./pages/GenerateMaze";
 import NoPage from "./pages/NoPage";
 
 export default function App() {
@@ -62,8 +62,8 @@ export default function App() {
                 Component: SetNewPassword,
               },
               {
-                path: "maze",
-                Component: Maze,
+                path: "generate-maze",
+                Component: GenerateMaze,
               },
               {
                 path: "*",
