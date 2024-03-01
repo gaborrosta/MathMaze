@@ -1,13 +1,12 @@
 package com.rostagabor.mathmaze.controllers
 
-import com.rostagabor.mathmaze.data.OperationType
+import com.rostagabor.mathmaze.data.MazeGenerationRequest
 import com.rostagabor.mathmaze.services.MazeService
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import kotlin.math.min
 
 /**
  *   Controller for maze-related tasks.
@@ -19,19 +18,19 @@ class MazeController(private val mazeService: MazeService) {
     /**
      *   Generates a maze.
      */
-    @GetMapping("/generate")
-    fun generate(
-        @RequestParam width: Int,
-        @RequestParam height: Int,
-        @RequestParam numbersRangeStart: Int = 1,
-        @RequestParam numbersRangeEnd: Int = 10,
-        @RequestParam operation: OperationType = OperationType.MULTIPLICATION,
-        @RequestParam pathTypeEven: Boolean = true,
-        @RequestParam minLength: Int = min(width, height),
-        @RequestParam maxLength: Int = Int.MAX_VALUE,
-    ): ResponseEntity<Any> {
+    @PostMapping("/generate")
+    fun generate(@RequestBody mazeGenerationRequest: MazeGenerationRequest): ResponseEntity<Any> {
         return try {
-            val maze = mazeService.generateMaze(width, height, numbersRangeStart, numbersRangeEnd, operation, pathTypeEven, minLength, maxLength)
+            val maze = mazeService.generateMaze(
+                mazeGenerationRequest.width,
+                mazeGenerationRequest.height,
+                mazeGenerationRequest.numbersRangeStart,
+                mazeGenerationRequest.numbersRangeEnd,
+                mazeGenerationRequest.operation,
+                mazeGenerationRequest.pathTypeEven,
+                mazeGenerationRequest.minLength,
+                mazeGenerationRequest.maxLength,
+            )
             ResponseEntity.ok().body(maze)
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(e::class.simpleName)
