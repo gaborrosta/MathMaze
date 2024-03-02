@@ -48,8 +48,7 @@
     "error-email-not-unique": "This email is already in use, please choose another one or choose the forgot password option.",
     "error-invalid-credentials": "The email or password is incorrect.",
     "error-unknown": "An unknown error occurred.",
-    "success-signup": "You have successfully signed up. You can now log in.",
-    "success-login": "You have successfully logged in.",
+    "success-signup": "You have successfully signed up. We will redirect you to the account page in 5 seconds.",
     "success-password-reset": "If the email address is used by a user, we have sent you a link to reset your password.",
     "set-new-password-title": "Set new password",
     "set-new-password-text": "You can set a new password for your account.",
@@ -58,6 +57,9 @@
     "success-set-new-password": "You have successfully set a new password. You can now log in with it.",
     "maze-start": "Start",
     "maze-end": "Finish",
+    "maze-path-show": "Show path",
+    "maze-path-hide": "Hide path",
+    "maze-path-length": "The length of the path: {{length}}",
     "maze-generate-title": "Generate Maze",
     "maze-generate-info": "You can generate a maze with the desired options.",
     "maze-generate-info-not-logged-in": "You are not logged in. You can still generate a maze, but you won't be able to save it, so you have to print it or solve it right now.",
@@ -96,5 +98,8 @@
     "operation-addition-subtraction": "Both Addition and Subtraction",
     "operation-multiplication": "Multiplication",
     "operation-division": "Division",
-    "operation-multiplication-division": "Both Multiplication and Division"
+    "operation-multiplication-division": "Both Multiplication and Division",
+    "account-title": "Your account",
+    "logout": "Logout",
+    "must-be-logged-in": "You must be logged in to access this page."
 }

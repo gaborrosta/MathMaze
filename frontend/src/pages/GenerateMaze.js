@@ -10,6 +10,8 @@ export default function GenerateMaze() {
 
   useEffect(() => { document.title = t("maze-generate-title") + " | " + t("app-name"); });
 
+  const token = sessionStorage.getItem("token");
+
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
 
   const isAdditionOrSubtraction = value => value === "ADDITION" || value === "SUBTRACTION" || value === "BOTH_ADDITION_AND_SUBTRACTION";
@@ -168,7 +170,7 @@ export default function GenerateMaze() {
       numbersRangeEnd: formData.numbersRangeEnd,
       minLength: formData.minLength,
       maxLength: formData.maxLength,
-      numberType: formData.numberType,
+      pathTypeEven: formData.numberType == "even",
     };
 
     setIsRequestInProgress(true);
@@ -207,7 +209,9 @@ export default function GenerateMaze() {
       }
     })
     .finally(() => {
-      setIsRequestInProgress(false);
+      setTimeout(() => {
+        setIsRequestInProgress(false);
+      }, 1000);
     });
   };
 
@@ -220,9 +224,15 @@ export default function GenerateMaze() {
       <Row>
         <Col xs={12} md={4}>
           <div className="border p-3 m-2">
-            <Alert variant="warning">{t("maze-generate-info-not-logged-in")}</Alert>
+            {!token && <Alert variant="warning">{t("maze-generate-info-not-logged-in")}</Alert>}
             {error && <Alert variant="danger">{t(error)}</Alert>}
             <Form onSubmit={handleGenerateMaze}>
+              <Button variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
+                {maze ? t("maze-generate-path-regenerate") : t("maze-generate-path-generate")}
+              </Button>
+              <br />
+              <hr />
+              <br />
               <Form.Group controlId="width">
                 <Form.Label>{t("maze-width")}</Form.Label>
                 <Form.Control name="width" as="select" value={formData.width} onChange={handleChange}>
@@ -332,7 +342,7 @@ export default function GenerateMaze() {
               )}
               <hr />
               <br />
-              <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
+              <Button variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
                 {maze ? t("maze-generate-path-regenerate") : t("maze-generate-path-generate")}
               </Button>
             </Form>

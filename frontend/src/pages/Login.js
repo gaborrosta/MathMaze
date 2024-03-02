@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation, Trans } from "react-i18next";
-import { Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom"
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
@@ -10,6 +10,10 @@ export default function Login() {
 
   useEffect(() => { document.title = t("login-title") + " | " + t("app-name"); });
 
+  const navigate = useNavigate();
+
+  const nextPage = useLocation().search.split("=")[1];
+
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -18,7 +22,6 @@ export default function Login() {
   });
 
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -72,9 +75,8 @@ export default function Login() {
       }
     })
     .then(response => {
-      console.log(response);
-      setError("");
-      setSuccess("success-login"); //TODO...
+      sessionStorage.setItem("token", response.data);
+      navigate(nextPage || "/account");
     })
     .catch(error => {
       setFormData({ ...formData, password: "" });
@@ -100,8 +102,8 @@ export default function Login() {
       <center>
         <h1>{t("login-title")}</h1>
       </center>
+      {nextPage && <Alert variant="warning">{t("must-be-logged-in")}</Alert>}
       {error && <Alert variant="danger">{t(error)}</Alert>}
-      {success && <Alert variant="success">{t(success)}</Alert>}
       <Form onSubmit={handleLogin}>
         <Form.Group className="mb-3" controlId="email">
           <Form.Label>{t("email")}</Form.Label>

@@ -47,8 +47,7 @@
     "error-email-not-unique": "Ez az e-mail cím már használatban van. Kérjük, adj meg egy másikat vagy válasszd ki az Elfelejtett jelszó opciót.",
     "error-invalid-credentials": "Hibás e-mail cím vagy jelszó.",
     "error-unknown": "Ismeretlen hiba történt.",
-    "success-signup": "Sikeres regisztráció! Most már bejelentkezhetsz.",
-    "success-login": "Sikeres bejelentkezés!",
+    "success-signup": "Sikeres regisztráció! 5 másodperc múlva átirányítunk a profilodra.",
     "success-password-reset": "Ha a megadott e-mail címmel rendelkezik fiók, akkor elküldtünk egy linket a jelszó visszaállításához.",
     "set-new-password-title": "Új jelszó beállítása",
     "set-new-password-text": "Beállíthatsz egy új jelszót a fiókodhoz.",
@@ -57,6 +56,9 @@
     "success-set-new-password": "Sikeresen beállítottál egy új jelszót. Most már bejelentkezhetsz vele.",
     "maze-start": "Start",
     "maze-end": "Cél",
+    "maze-path-show": "Útvonal megjelenítése",
+    "maze-path-hide": "Útvonal elrejtése",
+    "maze-path-length": "Az útvonal hossza: {{length}}",
     "maze-generate-title": "Labirintus készítése",
     "maze-generate-info": "Készíts egy labirintust a kívánt beállításokkal.",
     "maze-generate-info-not-logged-in": "Nem vagy bejelentkezve. Így is készíthetsz egy labirintust, de nem fogod tudni elmenteni, így ki kell nyomtatnod vagy meg kell oldanod online most.",
@@ -95,5 +97,8 @@
     "operation-addition-subtraction": "Összeadás és kivonás",
     "operation-multiplication": "Szorzás",
     "operation-division": "Osztás",
-    "operation-multiplication-division": "Szorzás és osztás"
+    "operation-multiplication-division": "Szorzás és osztás",
+    "account-title": "Profilod",
+    "logout": "Kilépés",
+    "must-be-logged-in": "Az oldal megtekintéséhez be kell jelentkezned."
 }

@@ -1,13 +1,22 @@
-import React from 'react';
+import React from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import Form from 'react-bootstrap/Form';
+import { Link, useNavigate } from "react-router-dom";
+import Container from "react-bootstrap/Container";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import Form from "react-bootstrap/Form";
 
 export default function Menu() {
   const { i18n, t } = useTranslation();
+
+  const token = sessionStorage.getItem("token");
+
+  const navigate = useNavigate();
+
+  const logout = () => {
+    sessionStorage.removeItem("token");
+    navigate("/");
+  };
 
   return (
     <Navbar expand="lg" className="yellow">
@@ -22,8 +31,17 @@ export default function Menu() {
             <Nav.Link as={Link} to="/generate-maze">{t("maze-generate-title")}</Nav.Link>
           </Nav>
           <Nav className="ms-auto">
-            <Nav.Link as={Link} to="/signup">{t("signup-title")}</Nav.Link>
-            <Nav.Link as={Link} to="/login">{t("login-title")}</Nav.Link>
+            {token ?
+              <>
+                <Nav.Link as={Link} to="/account">{t("account-title")}</Nav.Link>
+                <Nav.Link onClick={logout}>{t("logout")}</Nav.Link>
+              </>
+            :
+              <>
+                <Nav.Link as={Link} to="/signup">{t("signup-title")}</Nav.Link>
+                <Nav.Link as={Link} to="/login">{t("login-title")}</Nav.Link>
+              </>
+            }
             <Form variant="outlined" size="small">
               <Form.Select aria-label={t("language-change")} onChange={e => i18n.changeLanguage(e.target.value)} value={i18n.resolvedLanguage} >
                 <option value="en">🇬🇧</option>

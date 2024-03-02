@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import SetNewPassword from "./pages/SetNewPassword";
 import GenerateMaze from "./pages/GenerateMaze";
+import Account from "./pages/Account";
 import NoPage from "./pages/NoPage";
 
 export default function App() {
@@ -64,6 +65,10 @@ export default function App() {
               {
                 path: "generate-maze",
                 Component: GenerateMaze,
+              },
+              {
+                path: "account",
+                Component: Account,
               },
               {
                 path: "*",
