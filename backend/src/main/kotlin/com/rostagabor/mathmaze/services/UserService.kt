@@ -4,6 +4,10 @@ import com.rostagabor.mathmaze.data.*
 import com.rostagabor.mathmaze.repositories.PasswordResetTokenRepository
 import com.rostagabor.mathmaze.repositories.UserRepository
 import com.rostagabor.mathmaze.utils.*
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.Keys
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.CommandLineRunner
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -17,12 +21,44 @@ class UserService(
     private val userRepository: UserRepository,
     private val passwordResetTokenRepository: PasswordResetTokenRepository,
     private val mailService: MailService,
-) {
+) : CommandLineRunner {
 
     /**
      *   The password encoder.
      */
     private val passwordEncoder = BCryptPasswordEncoder()
+
+
+    /**
+     *   The password for admin account.
+     */
+    @Value("\${app.admin-password}")
+    private lateinit var adminPassword: String
+
+
+    /**
+     *   The secret key for JWT.
+     */
+    @Value("\${app.secret-key}")
+    private lateinit var secretKey: String
+
+
+    /**
+     *   Checks if there is an admin user in the database. If not, it creates one.
+     */
+    override fun run(vararg args: String?) {
+        userRepository.findByEmail(ADMIN_EMAIL_ADDRESS)?.let {
+            println("Admin user already exists.")
+            return
+        }
+
+        try {
+            userRepository.save(User(username = "MathMaze", email = ADMIN_EMAIL_ADDRESS, password = passwordEncoder.encode(adminPassword)))
+            println("Admin user was created successfully.")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
 
     /**
@@ -63,6 +99,25 @@ class UserService(
 
         //Throw an exception if the user does not exist or the password is incorrect
         throw InvalidCredentialsException()
+    }
+
+
+    /**
+     *   Generates a JWT token for the user.
+     */
+    fun generateToken(email: String): String {
+        //Expiration time - 1 hour
+        val expirationTime = 1000 * 60 * 60
+
+        //Get the secret key
+        val key = Keys.hmacShaKeyFor(secretKey.toByteArray(Charsets.UTF_8))
+
+        //Generate the token
+        return Jwts.builder()
+            .subject(email)
+            .expiration(Date(System.currentTimeMillis() + expirationTime))
+            .signWith(key, Jwts.SIG.HS512)
+            .compact()
     }
 
 

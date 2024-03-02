@@ -1,6 +1,9 @@
 package com.rostagabor.mathmaze.controllers
 
-import com.rostagabor.mathmaze.data.*
+import com.rostagabor.mathmaze.data.EmailRequest
+import com.rostagabor.mathmaze.data.LoginRequest
+import com.rostagabor.mathmaze.data.PasswordResetRequest
+import com.rostagabor.mathmaze.data.User
 import com.rostagabor.mathmaze.services.UserService
 import com.rostagabor.mathmaze.utils.UserNotFoundException
 import org.springframework.http.ResponseEntity
@@ -20,7 +23,7 @@ class UserController(private val userService: UserService) {
     fun register(@RequestBody user: User): ResponseEntity<Any> {
         return try {
             userService.register(user)
-            ResponseEntity.ok().body("1")
+            ResponseEntity.ok().body(userService.generateToken(user.email))
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(e::class.simpleName)
         }
@@ -33,7 +36,7 @@ class UserController(private val userService: UserService) {
     fun login(@RequestBody loginRequest: LoginRequest): ResponseEntity<Any> {
         return try {
             userService.login(loginRequest.email, loginRequest.password)
-            ResponseEntity.ok().body("1")
+            ResponseEntity.ok().body(userService.generateToken(loginRequest.email))
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(e::class.simpleName)
         }
