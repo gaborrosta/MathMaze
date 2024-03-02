@@ -10,6 +10,8 @@ export default function GenerateMaze() {
 
   useEffect(() => { document.title = t("maze-generate-title") + " | " + t("app-name"); });
 
+  const [isRequestInProgress, setIsRequestInProgress] = useState(false);
+
   const isAdditionOrSubtraction = value => value === "ADDITION" || value === "SUBTRACTION" || value === "BOTH_ADDITION_AND_SUBTRACTION";
   const isMultiplicationOrDivision = value => value === "MULTIPLICATION" || value === "DIVISION" || value === "BOTH_MULTIPLICATION_AND_DIVISION";
 
@@ -95,6 +97,11 @@ export default function GenerateMaze() {
           numbersRangeStart: 1,
           numbersRangeEnd: 10,
         });
+      } else {
+        setFormData({
+          ...formData,
+          operation: value,
+        });
       }
 
       // Check if the value is one of the specified values
@@ -141,7 +148,7 @@ export default function GenerateMaze() {
       }
     }
   };
-  
+
   useEffect(() => {
     if (widthError || heightError || operationError || rangeError || numberTypeError || minLengthError || maxLengthError) {
       setIsSubmitDisabled(true);
@@ -152,7 +159,7 @@ export default function GenerateMaze() {
 
   const handleGenerateMaze = (e) => {
     e.preventDefault();
-  
+
     const data = {
       width: formData.width,
       height: formData.height,
@@ -163,18 +170,27 @@ export default function GenerateMaze() {
       maxLength: formData.maxLength,
       numberType: formData.numberType,
     };
-  
+
+    setIsRequestInProgress(true);
+
+    //Send data
     axios.post(`${BASE_URL}/maze/generate`, data, {
       headers: {
         "Content-Type": "application/json"
       }
     })
     .then(response => {
+      setError("");
       setMaze(response.data);
       //TODO ~ Add extra form so the maze can be saved...
     })
     .catch(error => {
       setMaze("");
+
+      if (!error.response) {
+        setError("error-unknown");
+        return;
+      }
 
       switch (error.response.data) {
         case "InvalidMazeDimensionException":
@@ -189,6 +205,9 @@ export default function GenerateMaze() {
         default:
           setError("error-unknown");
       }
+    })
+    .finally(() => {
+      setIsRequestInProgress(false);
     });
   };
 
@@ -245,7 +264,7 @@ export default function GenerateMaze() {
               <Form.Group controlId="range">
                 <Form.Label>{t("maze-generate-range")}</Form.Label>
                 <Form.Control name="range" as="select" value={`${formData.numbersRangeStart}-${formData.numbersRangeEnd}`} onChange={handleChange}>
-                  {formData.operation === "MULTIPLICATION" || formData.operation === "DIVISION" || formData.operation === "BOTH_MULTIPLICATION_AND_DIVISION" ? 
+                  {isMultiplicationOrDivision(formData.operation) ? 
                       ["1-10", "1-20", "11-20"].map(range => <option key={range}>{range}</option>) :
                       ["1-10", "1-20", "1-100"].map(range => <option key={range}>{range}</option>)
                   }
@@ -313,7 +332,7 @@ export default function GenerateMaze() {
               )}
               <hr />
               <br />
-              <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled}>
+              <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
                 {maze ? t("maze-generate-path-regenerate") : t("maze-generate-path-generate")}
               </Button>
             </Form>

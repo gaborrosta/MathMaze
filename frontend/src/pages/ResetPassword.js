@@ -9,6 +9,8 @@ export default function ResetPassword() {
 
   useEffect(() => { document.title = t("reset-password-title") + " | " + t("app-name"); });
 
+  const [isRequestInProgress, setIsRequestInProgress] = useState(false);
+
   const [formData, setFormData] = useState({
     email: "",
   });
@@ -48,6 +50,8 @@ export default function ResetPassword() {
       email: formData.email,
     };
 
+    setIsRequestInProgress(true);
+
     //Send data
     axios.post(`${BASE_URL}/users/password-request`, data, {
       headers: {
@@ -61,6 +65,9 @@ export default function ResetPassword() {
     })
     .catch(_ => {
       setError("error-unknown");
+    })
+    .finally(() => {
+      setIsRequestInProgress(false);
     });
   };
 
@@ -80,7 +87,7 @@ export default function ResetPassword() {
           <Form.Control required type="email" placeholder={t("email-placeholder")} name="email" value={formData.email} onChange={handleChange} />
           {emailError && <Form.Text className="text-danger">{t(emailError)}</Form.Text>}
         </Form.Group>
-        <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled}>
+        <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
           {t("reset-password-submit")}
         </Button>
       </Form>

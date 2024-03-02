@@ -10,6 +10,8 @@ export default function Signup() {
 
   useEffect(() => { document.title = t("signup-title") + " | " + t("app-name"); });
 
+  const [isRequestInProgress, setIsRequestInProgress] = useState(false);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -90,12 +92,13 @@ export default function Signup() {
   const handleSignup = (e) => {
     e.preventDefault();
 
-    //Convert user data to JSON
     const data = {
       username: formData.username,
       email: formData.email,
       password: formData.password,
     };
+
+    setIsRequestInProgress(true);
 
     //Send data
     axios.post(`${BASE_URL}/users/register`, data, {
@@ -109,6 +112,11 @@ export default function Signup() {
     })
     .catch(error => {
       setFormData({ ...formData, password: "", confirmPassword: ""});
+
+      if (!error.response) {
+        setError("error-unknown");
+        return;
+      }
 
       switch (error.response.data) {
         case "UsernameInvalidFormatException":
@@ -129,6 +137,9 @@ export default function Signup() {
         default:
           setError("error-unknown");
       }
+    })
+    .finally(() => {
+      setIsRequestInProgress(false);
     });
   };
 
@@ -178,7 +189,7 @@ export default function Signup() {
         <p>
           <Trans i18nKey="signup-privacy-terms-statement">By signing up, I state that I have read and accept the <Link to="/privacy-policy">Privacy Policy</Link> and the <Link to="/terms-and-conditions">Terms and Conditions</Link>.</Trans>
         </p>
-        <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled}>
+        <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
           {t("signup-title")}
         </Button>
       </Form>

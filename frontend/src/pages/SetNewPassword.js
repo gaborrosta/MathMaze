@@ -11,6 +11,8 @@ export default function SetPassword() {
 
   useEffect(() => { document.title = t("set-new-password-title") + " | " + t("app-name"); });
 
+  const [isRequestInProgress, setIsRequestInProgress] = useState(false);
+
   const [params] = useSearchParams();
 
   const [formData, setFormData] = useState({
@@ -104,11 +106,12 @@ export default function SetPassword() {
   const handleSetNewPassword = (e) => {
     e.preventDefault();
 
-    //Convert user data to JSON
     const data = {
       token: params.get("token"),
       password: formData.password,
     };
+
+    setIsRequestInProgress(true);
 
     //Send data
     axios.post(`${BASE_URL}/users/password-reset`, data, {
@@ -123,6 +126,11 @@ export default function SetPassword() {
     .catch(error => {
       setFormData({ password: "", confirmPassword: ""});
 
+      if (!error.response) {
+        setError("error-unknown");
+        return;
+      }
+
       switch (error.response.data) {
         case "PasswordInvalidFormatException":
           setError("error-password-invalid-format");
@@ -130,6 +138,9 @@ export default function SetPassword() {
         default:
           setError("error-unknown");
       }
+    })
+    .finally(() => {
+      setIsRequestInProgress(false);
     });
   }
 
@@ -165,7 +176,7 @@ export default function SetPassword() {
               </InputGroup>
               {confirmPasswordError && <Form.Text id="confirmPasswordError" className="text-danger" aria-live="polite">{t(confirmPasswordError)}</Form.Text>}
             </Form.Group>
-            <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled}>
+            <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
               {t("set-new-password-title")}
             </Button>
           </Form>

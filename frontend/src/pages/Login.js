@@ -10,6 +10,8 @@ export default function Login() {
 
   useEffect(() => { document.title = t("login-title") + " | " + t("app-name"); });
 
+  const [isRequestInProgress, setIsRequestInProgress] = useState(false);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -61,24 +63,35 @@ export default function Login() {
       password: formData.password,
     };
 
+    setIsRequestInProgress(true);
+
     //Send data
     axios.post(`${BASE_URL}/users/login`, data, {
       headers: {
         "Content-Type": "application/json"
       }
     })
-    .then(_ => {
+    .then(response => {
+      console.log(response);
       setError("");
       setSuccess("success-login"); //TODO...
     })
     .catch(error => {
       setFormData({ ...formData, password: "" });
 
+      if (!error.response) {
+        setError("error-unknown");
+        return;
+      }
+
       if (error.response.data === "InvalidCredentialsException") {
         setError("error-invalid-credentials");
       } else {
         setError("error-unknown");
       }
+    })
+    .finally(() => {
+      setIsRequestInProgress(false);
     });
   };
 
@@ -103,7 +116,7 @@ export default function Login() {
           </InputGroup>
           {passwordError && <Form.Text className="text-danger">{t(passwordError)}</Form.Text>}
         </Form.Group>
-        <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled}>
+        <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
           {t("login-title")}
         </Button>
       </Form>
