@@ -1,5 +1,7 @@
 package com.rostagabor.mathmaze.data
 
+import kotlin.math.min
+
 /**
  *   Data class for the maze generation request.
  */
@@ -10,6 +12,6 @@ data class MazeGenerationRequest(
     val numbersRangeEnd: Int,
     val operation: OperationType,
     val pathTypeEven: Boolean,
-    val minLength: Int,
-    val maxLength: Int,
+    val minLength: Int = min(height, width),
+    val maxLength: Int = width * height,
 )

@@ -1,5 +1,7 @@
 package com.rostagabor.mathmaze.utils
 
+import com.rostagabor.mathmaze.data.OperationType
+
 /**
  *   Validates a username. The same regex is used in the frontend.
  */
@@ -31,4 +33,13 @@ fun validatePassword(password: String): Boolean {
 fun validateMazeDimensions(width: Int, height: Int): Boolean {
     val validRange = 11 until 50
     return width in validRange && height in validRange && width % 2 != 0 && height % 2 != 0
+}
+
+/**
+ *   Validates the numbers range of a maze.
+ */
+fun validateNumbersRange(numbersRangeStart: Int, numbersRangeEnd: Int, operation: OperationType): Boolean {
+    val range = numbersRangeStart..numbersRangeEnd
+    val ranges = if (operation.involvesSum) listOf(1..10, 1..20, 1..100) else listOf(1..10, 1..20, 11..20)
+    return numbersRangeStart < numbersRangeEnd && range in ranges
 }

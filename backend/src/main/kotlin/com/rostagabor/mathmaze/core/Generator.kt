@@ -3,6 +3,8 @@ package com.rostagabor.mathmaze.core
 import com.rostagabor.mathmaze.data.OperationType
 import com.rostagabor.mathmaze.data.Point
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  *   Algorithms for generating a maze.
@@ -134,52 +136,60 @@ object Generator {
         pathTypeEven: Boolean,
         endpoint: Point,
     ): List<List<String>> {
+        //Maze size
+        val width = maze[0].size
+        val height = maze.size
+
         //Generate a list of type of operations for the path
         val pathLength = path.size - 2
         val pathOperations = generateOperationList(pathLength, operation)
 
         //Generate a list of type of operations for the maze
-        val mazeLength = maze.size * maze[0].size - pathLength - 2
+        val mazeLength = height * width - pathLength - 2
         val mazeOperations = generateOperationList(mazeLength, operation)
 
+        //Neighbours so operations are not repeated next to each other
+        val neighbours = Array(height) { Array<Triple<Int, Int, Int>?>(width) { null } }
+
+        //Generate the possible values for the products
+        val possibleValues = numbersRange.flatMap { a -> numbersRange.map { b -> Triple(a, b, a * b) } }
+
         //Populate the maze with numbers and operations
-        return if (operation.involvesProduct) {
-            //Generate the possible values for the products
-            val possibleValues = numbersRange.flatMap { a -> numbersRange.map { b -> Triple(a, b, a * b) } }
+        return maze.mapIndexed { y, row ->
+            row.mapIndexed { x, _ ->
+                if (x == 0 && y == 0 || Point(x, y) == endpoint) {
+                    "" //Empty string for the start and end points
+                } else {
+                    //Is the current cell a path?
+                    val isPartOfPath = Point(x, y) in path
 
-            //Populate the maze
-            maze.mapIndexed { y, row ->
-                row.mapIndexed { x, _ ->
-                    if (x == 0 && y == 0 || Point(x, y) == endpoint) {
-                        "" //Empty string for the start and end points
+                    //Get the next operation
+                    val multiplication = (if (isPartOfPath) pathOperations else mazeOperations).next()
+
+                    //Generate the operation
+                    val (new, savable) = if (operation.involvesProduct) {
+                        generateProductOperation(
+                            multiplication = multiplication,
+                            possibleValues = possibleValues,
+                            pathTypeEven = pathTypeEven,
+                            isPartOfPath = isPartOfPath,
+                            neighbours = Point(x, y).neighboursInRange(width, height).map { (x, y) -> neighbours[y][x] },
+                        )
                     } else {
-                        //Is the current cell a path?
-                        val isPartOfPath = Point(x, y) in path
-
-                        //Get the next operation
-                        val multiplication = (if (isPartOfPath) pathOperations else mazeOperations).next()
-
-                        //Generate the operation
-                        generateProductOperation(multiplication, possibleValues, pathTypeEven, isPartOfPath)
+                        generateSumOperation(
+                            addition = multiplication,
+                            numbersRange = numbersRange,
+                            pathTypeEven = pathTypeEven,
+                            isPartOfPath = isPartOfPath,
+                            neighbours = Point(x, y).neighboursInRange(width, height).map { (x, y) -> neighbours[y][x] },
+                        )
                     }
-                }
-            }
-        } else {
-            //Populate the maze
-            maze.mapIndexed { y, row ->
-                row.mapIndexed { x, _ ->
-                    if (x == 0 && y == 0 || Point(x, y) == endpoint) {
-                        "" //Empty string for the start and end points
-                    } else {
-                        //Is the current cell a path?
-                        val isPartOfPath = Point(x, y) in path
 
-                        //Get the next operation
-                        val addition = (if (isPartOfPath) pathOperations else mazeOperations).next()
+                    //Save the operation to the neighbours array
+                    neighbours[y][x] = savable
 
-                        //Generate the operation
-                        generateSumOperation(addition, numbersRange, pathTypeEven, isPartOfPath)
-                    }
+                    //Return the operation
+                    new
                 }
             }
         }
@@ -200,48 +210,71 @@ object Generator {
         multiplication: Boolean,
         possibleValues: List<Triple<Int, Int, Int>>,
         pathTypeEven: Boolean,
-        isPartOfPath: Boolean
-    ): String {
+        isPartOfPath: Boolean,
+        neighbours: List<Triple<Int, Int, Int>?>,
+    ): Pair<String, Triple<Int, Int, Int>> {
         //Should be the answer even or odd?
         val even = (pathTypeEven && isPartOfPath) || (!pathTypeEven && !isPartOfPath)
 
         //Select a value randomly
         val selected = if (even) {
             if (multiplication) {
-                possibleValues.filter { it.third % 2 == 0 }.random()
+                possibleValues.filter { it.third % 2 == 0 && it !in neighbours }.random()
             } else {
-                possibleValues.filter { it.second % 2 == 0 }.random()
+                possibleValues.filter { it.second % 2 == 0 && it !in neighbours }.random()
             }
         } else {
             if (multiplication) {
-                possibleValues.filter { it.third % 2 != 0 }.random()
+                possibleValues.filter { it.third % 2 != 0 && it !in neighbours }.random()
             } else {
-                possibleValues.filter { it.second % 2 != 0 }.random()
+                possibleValues.filter { it.second % 2 != 0 && it !in neighbours }.random()
             }
         }
 
         //Return the operation
         return if (multiplication) {
-            "${selected.first} * ${selected.second}"
+            "${selected.first} * ${selected.second}" to selected
         } else {
-            "${selected.third} / ${selected.first}"
+            "${selected.third} / ${selected.first}" to selected
         }
     }
 
     /**
      *   Generates a sum operation (addition or subtraction).
      */
-    private fun generateSumOperation(addition: Boolean, numbersRange: IntRange, pathTypeEven: Boolean, isPartOfPath: Boolean): String {
-        //Should be the answer even or odd?
-        val even = (pathTypeEven && isPartOfPath) || (!pathTypeEven && !isPartOfPath)
+    private fun generateSumOperation(
+        addition: Boolean,
+        numbersRange: IntRange,
+        pathTypeEven: Boolean,
+        isPartOfPath: Boolean,
+        neighbours: List<Triple<Int, Int, Int>?>,
+    ): Pair<String, Triple<Int, Int, Int>> {
+        //Should the answer be even or odd?
+        val remainder = if ((pathTypeEven && isPartOfPath) || (!pathTypeEven && !isPartOfPath)) 0 else 1
 
-        //TODO...
+        //Generate two random numbers within the numbersRange
+        var firstNumber: Int
+        var secondNumber: Int
+        do {
+            firstNumber = numbersRange.random()
+            secondNumber = numbersRange.random()
+        } while (
+            (firstNumber + secondNumber) % 2 != remainder
+            || firstNumber + secondNumber !in numbersRange
+            || Triple(firstNumber, secondNumber, firstNumber + secondNumber) in neighbours
+            || Triple(secondNumber, firstNumber, firstNumber + secondNumber) in neighbours
+            || Triple(firstNumber, secondNumber, firstNumber - secondNumber) in neighbours
+            || Triple(secondNumber, firstNumber, secondNumber - firstNumber) in neighbours
+            || (firstNumber == secondNumber && !addition)
+        )
 
         //Return the operation
-        return if (even) {
-            "1 + 1"
+        return if (addition) {
+            "$firstNumber + $secondNumber" to Triple(firstNumber, secondNumber, firstNumber + secondNumber)
         } else {
-            "1 + 2"
+            val max = max(firstNumber, secondNumber)
+            val min = min(firstNumber, secondNumber)
+            "$max - $min" to Triple(max, min, max - min)
         }
     }
 

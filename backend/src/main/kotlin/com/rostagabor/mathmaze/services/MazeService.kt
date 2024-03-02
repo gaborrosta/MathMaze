@@ -3,11 +3,9 @@ package com.rostagabor.mathmaze.services
 import com.beust.klaxon.JsonObject
 import com.rostagabor.mathmaze.core.Generator
 import com.rostagabor.mathmaze.data.OperationType
-import com.rostagabor.mathmaze.utils.InvalidMazeDimensionException
-import com.rostagabor.mathmaze.utils.InvalidNumbersRangeException
-import com.rostagabor.mathmaze.utils.InvalidPathRangeException
-import com.rostagabor.mathmaze.utils.validateMazeDimensions
+import com.rostagabor.mathmaze.utils.*
 import org.springframework.stereotype.Service
+import kotlin.math.min
 
 /**
  *   Handles maze related operations.
@@ -33,11 +31,11 @@ class MazeService {
         validateMazeDimensions(width, height).let { if (!it) throw InvalidMazeDimensionException() }
 
         //Validate the length range
-        if (minLength > maxLength) throw InvalidPathRangeException()
+        if (minLength > maxLength || minLength < min(height, width) || maxLength > width * height) throw InvalidPathRangeException()
         val lengthRange = (minLength + 2)..(maxLength + 2)
 
         //Validate the numbers range
-        if (numbersRangeStart > numbersRangeEnd) throw InvalidNumbersRangeException()
+        validateNumbersRange(numbersRangeStart, numbersRangeEnd, operation).let { if (!it) throw InvalidNumbersRangeException() }
         val numbersRange = numbersRangeStart..numbersRangeEnd
 
         //Generate the maze and the endpoint maximum 10 times to find a path that is in the range
