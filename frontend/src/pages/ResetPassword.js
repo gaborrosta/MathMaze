@@ -84,7 +84,7 @@ export default function ResetPassword() {
       <Form onSubmit={handleResetPassword}>
         <Form.Group className="mb-3" controlId="email">
           <Form.Label>{t("email")}</Form.Label>
-          <Form.Control required type="email" placeholder={t("email-placeholder")} name="email" value={formData.email} onChange={handleChange} />
+          <Form.Control required type="email" placeholder={t("email-placeholder")} name="email" value={formData.email} onChange={handleChange} aria-describedby="emailHelp emailError" />
           {emailError && <Form.Text className="text-danger">{t(emailError)}</Form.Text>}
         </Form.Group>
         <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>

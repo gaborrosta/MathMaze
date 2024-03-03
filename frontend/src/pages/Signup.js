@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom"
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
+import { authObserver } from "../utils/auth";
 
 export default function Signup() {
   const { t } = useTranslation();
@@ -109,7 +110,7 @@ export default function Signup() {
       }
     })
     .then(response => {
-      sessionStorage.setItem("token", response.data);
+      authObserver.publish("token", response.data);
       setSuccess("success-signup");
       setTimeout(() => {
         navigate("/account");

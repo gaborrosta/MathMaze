@@ -1,20 +1,32 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Form from "react-bootstrap/Form";
+import { authObserver } from "../utils/auth";
 
 export default function Menu() {
   const { i18n, t } = useTranslation();
 
-  const token = sessionStorage.getItem("token");
+  const [token, setToken] = useState(sessionStorage.getItem("token"));
+
+  useEffect(() => {
+    authObserver.subscribe("token", data => {
+      console.log("token", data);
+      sessionStorage.setItem("token", data);
+      setToken(data);
+    });
+    return () => { authObserver.unsubscribe("token"); }
+  }, []);
+
 
   const navigate = useNavigate();
 
   const logout = () => {
     sessionStorage.removeItem("token");
+    setToken("");
     navigate("/");
   };
 

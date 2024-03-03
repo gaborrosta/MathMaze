@@ -4,13 +4,14 @@ import { Row, Col, Alert, Form, Button } from "react-bootstrap";
 import MazeGrid from "../components/MazeGrid";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
+import { authObserver } from "../utils/auth";
 
 export default function GenerateMaze() {
   const { t } = useTranslation();
 
   useEffect(() => { document.title = t("maze-generate-title") + " | " + t("app-name"); });
 
-  const token = sessionStorage.getItem("token");
+  const [token, setToken] = useState(sessionStorage.getItem("token"));
 
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
 
@@ -34,6 +35,7 @@ export default function GenerateMaze() {
     width: 11,
     height: 11,
     numberType: "even",
+    discardedMazes: [],
   });
 
   const [error, setError] = useState("");
@@ -162,6 +164,11 @@ export default function GenerateMaze() {
   const handleGenerateMaze = (e) => {
     e.preventDefault();
 
+    //Discard the maze
+    if (maze) {
+      formData.discardedMazes = [...formData.discardedMazes, maze.id];
+    }
+
     const data = {
       width: formData.width,
       height: formData.height,
@@ -170,7 +177,9 @@ export default function GenerateMaze() {
       numbersRangeEnd: formData.numbersRangeEnd,
       minLength: formData.minLength,
       maxLength: formData.maxLength,
-      pathTypeEven: formData.numberType == "even",
+      pathTypeEven: formData.numberType === "even",
+      discardedMazes: formData.discardedMazes,
+      token: token,
     };
 
     setIsRequestInProgress(true);
@@ -183,10 +192,13 @@ export default function GenerateMaze() {
     })
     .then(response => {
       setError("");
-      setMaze(response.data);
+      setToken(response.data.token);
+      authObserver.publish("token", response.data.token);
+      setMaze(response.data.maze);
       //TODO ~ Add extra form so the maze can be saved...
     })
     .catch(error => {
+      console.log(error);
       setMaze("");
 
       if (!error.response) {
@@ -235,7 +247,7 @@ export default function GenerateMaze() {
               <br />
               <Form.Group controlId="width">
                 <Form.Label>{t("maze-width")}</Form.Label>
-                <Form.Control name="width" as="select" value={formData.width} onChange={handleChange}>
+                <Form.Control name="width" as="select" value={formData.width} onChange={handleChange} aria-describedby="widthHelp widthError">
                   {[...Array(20).keys()].map(i => <option key={i}>{i * 2 + 11}</option>)}
                 </Form.Control>
                 <Form.Text id="widthHelp" className="text-muted">
@@ -246,7 +258,7 @@ export default function GenerateMaze() {
               <br />
               <Form.Group controlId="height">
                 <Form.Label>{t("maze-height")}</Form.Label>
-                <Form.Control name="height" as="select" value={formData.height} onChange={handleChange}>
+                <Form.Control name="height" as="select" value={formData.height} onChange={handleChange} aria-describedby="heightHelp heightError">
                   {[...Array(20).keys()].map(i => <option key={i}>{i * 2 + 11}</option>)}
                 </Form.Control>
                 <Form.Text id="heightHelp" className="text-muted">
@@ -257,7 +269,7 @@ export default function GenerateMaze() {
               <br />
               <Form.Group controlId="operation">
                 <Form.Label>{t("maze-operation-type")}</Form.Label>
-                <Form.Control name="operation" as="select" value={formData.operation} onChange={handleChange}>
+                <Form.Control name="operation" as="select" value={formData.operation} onChange={handleChange} aria-describedby="operationHelp operationError">
                   <option value="ADDITION">{t("operation-addition")}</option>
                   <option value="SUBTRACTION">{t("operation-subtraction")}</option>
                   <option value="BOTH_ADDITION_AND_SUBTRACTION">{t("operation-addition-subtraction")}</option>
@@ -273,7 +285,7 @@ export default function GenerateMaze() {
               <br />
               <Form.Group controlId="range">
                 <Form.Label>{t("maze-generate-range")}</Form.Label>
-                <Form.Control name="range" as="select" value={`${formData.numbersRangeStart}-${formData.numbersRangeEnd}`} onChange={handleChange}>
+                <Form.Control name="range" as="select" value={`${formData.numbersRangeStart}-${formData.numbersRangeEnd}`} onChange={handleChange} aria-describedby="rangeHelp rangeError">
                   {isMultiplicationOrDivision(formData.operation) ? 
                       ["1-10", "1-20", "11-20"].map(range => <option key={range}>{range}</option>) :
                       ["1-10", "1-20", "1-100"].map(range => <option key={range}>{range}</option>)
@@ -296,23 +308,25 @@ export default function GenerateMaze() {
                 <>
                   <Form.Group>
                     <Form.Label>{t("maze-generate-path-type")}</Form.Label>
-                    <Form.Check 
-                      type="radio" 
-                      id="evenNumbers" 
-                      name="numberType" 
+                    <Form.Check
+                      type="radio"
+                      id="evenNumbers"
+                      name="numberType"
                       label={t("maze-generate-path-type-even")}
                       value="even"
-                      checked={formData.numberType === "even"} 
-                      onChange={handleChange} 
+                      checked={formData.numberType === "even"}
+                      onChange={handleChange}
+                      aria-describedby="numberTypeHelp numberTypeError"
                     />
-                    <Form.Check 
-                      type="radio" 
-                      id="oddNumbers" 
-                      name="numberType" 
+                    <Form.Check
+                      type="radio"
+                      id="oddNumbers"
+                      name="numberType"
                       label={t("maze-generate-path-type-odd")}
                       value="odd"
-                      checked={formData.numberType === "odd"} 
-                      onChange={handleChange} 
+                      checked={formData.numberType === "odd"}
+                      onChange={handleChange}
+                      aria-describedby="numberTypeHelp numberTypeError"
                     />
                     <Form.Text id="numberTypeHelp" className="text-muted">
                       {t("maze-generate-path-type-help")}
@@ -322,7 +336,7 @@ export default function GenerateMaze() {
                   <br />
                   <Form.Group controlId="minLength">
                     <Form.Label>{t("maze-generate-path-min-length")}</Form.Label>
-                    <Form.Control name="minLength" type="number" value={formData.minLength} onChange={handleChange} />
+                    <Form.Control name="minLength" type="number" value={formData.minLength} onChange={handleChange} aria-describedby="minLengthHelp minLengthError" />
                     <Form.Text id="minLengthHelp" className="text-muted">
                       {t("maze-generate-path-min-length-help")}
                     </Form.Text>
@@ -331,7 +345,7 @@ export default function GenerateMaze() {
                   <br />
                   <Form.Group controlId="maxLength">
                     <Form.Label>{t("maze-generate-path-max-length")}</Form.Label>
-                    <Form.Control name="maxLength" type="number" value={formData.maxLength} onChange={handleChange} />
+                    <Form.Control name="maxLength" type="number" value={formData.maxLength} onChange={handleChange} aria-describedby="maxLengthHelp maxLengthError" />
                     <Form.Text id="maxLengthHelp" className="text-muted">
                       {t("maze-generate-path-max-length-help")}
                     </Form.Text>

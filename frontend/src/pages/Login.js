@@ -4,6 +4,7 @@ import { useNavigate, Link, useLocation } from "react-router-dom"
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
+import { authObserver } from "../utils/auth";
 
 export default function Login() {
   const { t } = useTranslation();
@@ -75,7 +76,7 @@ export default function Login() {
       }
     })
     .then(response => {
-      sessionStorage.setItem("token", response.data);
+      authObserver.publish("token", response.data);
       navigate(nextPage || "/account");
     })
     .catch(error => {
@@ -107,13 +108,13 @@ export default function Login() {
       <Form onSubmit={handleLogin}>
         <Form.Group className="mb-3" controlId="email">
           <Form.Label>{t("email")}</Form.Label>
-          <Form.Control required type="email" placeholder={t("email-placeholder")} name="email" value={formData.email} onChange={handleChange} />
+          <Form.Control required type="email" placeholder={t("email-placeholder")} name="email" value={formData.email} onChange={handleChange} aria-describedby="emailHelp emailError" />
           {emailError && <Form.Text className="text-danger">{t(emailError)}</Form.Text>}
         </Form.Group>
         <Form.Group className="mb-3" controlId="password">
           <Form.Label>{t("password")}</Form.Label>
           <InputGroup>
-            <Form.Control required type={showPassword ? "text" : "password"} placeholder={t("login-password-placeholder")} name="password" value={formData.password} onChange={handleChange} />
+            <Form.Control required type={showPassword ? "text" : "password"} placeholder={t("login-password-placeholder")} name="password" value={formData.password} onChange={handleChange} aria-describedby="passwordHelp passwordError" />
             <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>{showPassword ? t("password-hide") : t("password-show")}</Button>
           </InputGroup>
           {passwordError && <Form.Text className="text-danger">{t(passwordError)}</Form.Text>}
