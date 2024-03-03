@@ -2,7 +2,11 @@ package com.rostagabor.mathmaze.services
 
 import com.beust.klaxon.JsonObject
 import com.rostagabor.mathmaze.core.Generator
+import com.rostagabor.mathmaze.data.Maze
 import com.rostagabor.mathmaze.data.OperationType
+import com.rostagabor.mathmaze.data.Point
+import com.rostagabor.mathmaze.repositories.MazeRepository
+import com.rostagabor.mathmaze.repositories.UserRepository
 import com.rostagabor.mathmaze.utils.*
 import org.springframework.stereotype.Service
 import kotlin.math.min
@@ -11,7 +15,10 @@ import kotlin.math.min
  *   Handles maze related operations.
  */
 @Service
-class MazeService {
+class MazeService(
+    private val userRepository: UserRepository,
+    private val mazeRepository: MazeRepository,
+) {
 
     /**
      *   Generates a maze.
@@ -26,6 +33,7 @@ class MazeService {
         pathTypeEven: Boolean,
         minLength: Int,
         maxLength: Int,
+        discardedMazes: List<Long>,
     ): JsonObject {
         //Validate the dimensions of the maze
         validateMazeDimensions(width, height).let { if (!it) throw InvalidMazeDimensionException() }
@@ -38,10 +46,40 @@ class MazeService {
         validateNumbersRange(numbersRangeStart, numbersRangeEnd, operation).let { if (!it) throw InvalidNumbersRangeException() }
         val numbersRange = numbersRangeStart..numbersRangeEnd
 
+        //Admin user
+        val adminUser = userRepository.findByEmail(ADMIN_EMAIL_ADDRESS)!!
+
+        //Check if there is a maze in the database with the same parameters
+        val foundMaze = mazeRepository.findByWidthAndHeightAndNumbersRangeStartAndNumbersRangeEndAndOperationAndPathTypeEvenAndSaved(
+            width = width,
+            height = height,
+            numbersRangeStart = numbersRangeStart,
+            numbersRangeEnd = numbersRangeEnd,
+            operation = operation,
+            pathTypeEven = pathTypeEven,
+        ).firstOrNull {
+            it.generatedBy == adminUser
+                    && it.mazeId !in discardedMazes
+                    && it.pathLength in lengthRange
+        }
+
+        //If there is a maze with the same parameters, return it
+        if (foundMaze != null) {
+            return JsonObject().apply {
+                this["height"] = height
+                this["width"] = width
+                this["start"] = listOf(0, 0)
+                this["end"] = foundMaze.endPoint.toList()
+                this["data"] = foundMaze.sendableData
+                this["path"] = foundMaze.sendablePath
+                this["id"] = foundMaze.mazeId
+            }
+        }
+
         //Generate the maze and the endpoint maximum 10 times to find a path that is in the range
         var maxRepeat = 10
         var booleanMaze: Array<BooleanArray>
-        var endpoint: com.rostagabor.mathmaze.data.Point
+        var endpoint: Point
         var pathLength: Int
         do {
             val result = Generator.generateMazeAndEndpoint(width, height, lengthRange)
@@ -58,6 +96,23 @@ class MazeService {
         //Populate the maze with numbers and operations
         val maze = Generator.populateMazeWithNumbersAndOperations(booleanMaze, path, numbersRange, operation, pathTypeEven, endpoint)
 
+        //Save the maze
+        val savedMaze = mazeRepository.save(
+            Maze(
+                generatedBy = adminUser,
+                location = "/",
+                description = "",
+                width = width,
+                height = height,
+                numbersRangeStart = numbersRangeStart,
+                numbersRangeEnd = numbersRangeEnd,
+                operation = operation,
+                pathTypeEven = pathTypeEven,
+                path = path.joinToString(";") { (x, y) -> "$x,$y" },
+                data = maze.flatten().joinToString(";")
+            )
+        )
+
         //Return the maze
         return JsonObject().apply {
             this["height"] = height
@@ -66,6 +121,7 @@ class MazeService {
             this["end"] = endpoint.toList()
             this["data"] = maze
             this["path"] = path
+            this["id"] = savedMaze.mazeId
         }
     }
 

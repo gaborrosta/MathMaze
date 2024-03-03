@@ -1,7 +1,9 @@
 package com.rostagabor.mathmaze.controllers
 
+import com.beust.klaxon.JsonObject
 import com.rostagabor.mathmaze.data.MazeGenerationRequest
 import com.rostagabor.mathmaze.services.MazeService
+import com.rostagabor.mathmaze.services.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -13,7 +15,10 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/maze")
-class MazeController(private val mazeService: MazeService) {
+class MazeController(
+    private val userService: UserService,
+    private val mazeService: MazeService,
+) {
 
     /**
      *   Generates a maze.
@@ -21,6 +26,8 @@ class MazeController(private val mazeService: MazeService) {
     @PostMapping("/generate")
     fun generate(@RequestBody mazeGenerationRequest: MazeGenerationRequest): ResponseEntity<Any> {
         return try {
+            val token = userService.regenerateTokenIfStillValid(mazeGenerationRequest.token)
+
             val maze = mazeService.generateMaze(
                 mazeGenerationRequest.width,
                 mazeGenerationRequest.height,
@@ -30,8 +37,14 @@ class MazeController(private val mazeService: MazeService) {
                 mazeGenerationRequest.pathTypeEven,
                 mazeGenerationRequest.minLength,
                 mazeGenerationRequest.maxLength,
+                mazeGenerationRequest.discardedMazes,
             )
-            ResponseEntity.ok().body(maze)
+            ResponseEntity.ok().body(
+                JsonObject().apply {
+                    this["maze"] = maze
+                    this["token"] = token
+                }
+            )
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(e::class.simpleName)
         }

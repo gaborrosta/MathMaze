@@ -1,11 +1,11 @@
 package com.rostagabor.mathmaze.services
 
+import com.rostagabor.mathmaze.configs.JwtConfig
 import com.rostagabor.mathmaze.data.*
 import com.rostagabor.mathmaze.repositories.PasswordResetTokenRepository
 import com.rostagabor.mathmaze.repositories.UserRepository
 import com.rostagabor.mathmaze.utils.*
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.CommandLineRunner
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -21,6 +21,7 @@ class UserService(
     private val userRepository: UserRepository,
     private val passwordResetTokenRepository: PasswordResetTokenRepository,
     private val mailService: MailService,
+    private val jwtConfig: JwtConfig,
 ) : CommandLineRunner {
 
     /**
@@ -34,13 +35,6 @@ class UserService(
      */
     @Value("\${app.admin-password}")
     private lateinit var adminPassword: String
-
-
-    /**
-     *   The secret key for JWT.
-     */
-    @Value("\${app.secret-key}")
-    private lateinit var secretKey: String
 
 
     /**
@@ -106,18 +100,24 @@ class UserService(
      *   Generates a JWT token for the user.
      */
     fun generateToken(email: String): String {
-        //Expiration time - 1 hour
-        val expirationTime = 1000 * 60 * 60
-
-        //Get the secret key
-        val key = Keys.hmacShaKeyFor(secretKey.toByteArray(Charsets.UTF_8))
-
         //Generate the token
         return Jwts.builder()
             .subject(email)
-            .expiration(Date(System.currentTimeMillis() + expirationTime))
-            .signWith(key, Jwts.SIG.HS512)
+            .expiration(jwtConfig.expirationTime)
+            .signWith(jwtConfig.key, Jwts.SIG.HS512)
             .compact()
+    }
+
+    /**
+     *   Checks if a token is still valid, i.e. the user is still logged in, and if so, generates a new token.
+     */
+    fun regenerateTokenIfStillValid(token: String): String {
+        return try {
+            val email = Jwts.parser().verifyWith(jwtConfig.key).build().parseSignedClaims(token).payload.subject
+            userRepository.findByEmail(email)?.let { generateToken(email) } ?: ""
+        } catch (e: Exception) {
+            ""
+        }
     }
 
 
