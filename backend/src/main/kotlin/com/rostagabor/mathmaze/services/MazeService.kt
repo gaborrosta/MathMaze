@@ -9,6 +9,7 @@ import com.rostagabor.mathmaze.repositories.MazeRepository
 import com.rostagabor.mathmaze.repositories.UserRepository
 import com.rostagabor.mathmaze.utils.*
 import org.springframework.stereotype.Service
+import java.time.Instant
 import kotlin.math.min
 
 /**
@@ -47,7 +48,7 @@ class MazeService(
         val numbersRange = numbersRangeStart..numbersRangeEnd
 
         //Admin user
-        val adminUser = userRepository.findByEmail(ADMIN_EMAIL_ADDRESS)!!
+        val adminUser = userRepository.findByEmail(ADMIN_EMAIL_ADDRESS) ?: throw Exception()
 
         //Check if there is a maze in the database with the same parameters
         val foundMaze = mazeRepository.findByWidthAndHeightAndNumbersRangeStartAndNumbersRangeEndAndOperationAndPathTypeEvenAndSaved(
@@ -65,15 +66,7 @@ class MazeService(
 
         //If there is a maze with the same parameters, return it
         if (foundMaze != null) {
-            return JsonObject().apply {
-                this["height"] = height
-                this["width"] = width
-                this["start"] = listOf(0, 0)
-                this["end"] = foundMaze.endPoint.toList()
-                this["data"] = foundMaze.sendableData
-                this["path"] = foundMaze.sendablePath
-                this["id"] = foundMaze.mazeId
-            }
+            return foundMaze.jsonObject
         }
 
         //Generate the maze and the endpoint maximum 10 times to find a path that is in the range
@@ -114,15 +107,25 @@ class MazeService(
         )
 
         //Return the maze
-        return JsonObject().apply {
-            this["height"] = height
-            this["width"] = width
-            this["start"] = listOf(0, 0)
-            this["end"] = endpoint.toList()
-            this["data"] = maze
-            this["path"] = path
-            this["id"] = savedMaze.mazeId
-        }
+        return savedMaze.jsonObject
+    }
+
+    /**
+     *   Saves a maze.
+     */
+    @Throws(Exception::class)
+    fun saveMaze(email: String, mazeId: Long): JsonObject {
+        //Find the user or the admin
+        val user = userRepository.findByEmail(email) ?: userRepository.findByEmail(ADMIN_EMAIL_ADDRESS) ?: throw Exception()
+
+        //Find the maze
+        val maze = mazeRepository.findById(mazeId).get()
+
+        //Save the maze
+        mazeRepository.save(maze.copy(generatedBy = user, saved = true, createdAt = Instant.now()))
+
+        //Return the maze
+        return maze.jsonObject
     }
 
 }

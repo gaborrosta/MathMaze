@@ -15,5 +15,5 @@ data class MazeGenerationRequest(
     val minLength: Int = min(height, width),
     val maxLength: Int = width * height,
     val discardedMazes: List<Long> = emptyList(),
-    val token: String = "",
+    val token: String?,
 )

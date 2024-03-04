@@ -111,12 +111,14 @@ class UserService(
     /**
      *   Checks if a token is still valid, i.e. the user is still logged in, and if so, generates a new token.
      */
-    fun regenerateTokenIfStillValid(token: String): String {
+    fun regenerateTokenIfStillValid(token: String?): Pair<String, String> {
+        if (token == null) return "" to ""
+
         return try {
             val email = Jwts.parser().verifyWith(jwtConfig.key).build().parseSignedClaims(token).payload.subject
-            userRepository.findByEmail(email)?.let { generateToken(email) } ?: ""
+            Pair(email, generateToken(email))
         } catch (e: Exception) {
-            ""
+            "" to ""
         }
     }
 

@@ -1,5 +1,6 @@
 package com.rostagabor.mathmaze.data
 
+import com.beust.klaxon.JsonObject
 import jakarta.persistence.*
 import java.time.Instant
 
@@ -69,13 +70,30 @@ data class Maze(
     /**
      *   Properly formatted data for the frontend.
      */
-    val sendableData: List<List<String>>
+    private val sendableData: List<List<String>>
         get() = data.split(";").windowed(width, width)
 
     /**
      *   Properly formatted path for the frontend.
      */
-    val sendablePath: List<Point>
+    private val sendablePath: List<Point>
         get() = path.split(";").map { it.split(",").let { (x, y) -> Point(x.toInt(), y.toInt()) } }
+
+
+    /**
+     *   The JSON representation of the maze for the frontend.
+     */
+    val jsonObject: JsonObject
+        get() = JsonObject().apply {
+            this["height"] = height
+            this["width"] = width
+            this["start"] = listOf(0, 0)
+            this["end"] = endPoint.toList()
+            this["data"] = sendableData
+            this["path"] = sendablePath
+            this["id"] = mazeId
+            this["even"] = pathTypeEven
+            this["digits"] = if (operation.involvesProduct && numbersRangeEnd == 20) 3 else 2
+        }
 
 }
