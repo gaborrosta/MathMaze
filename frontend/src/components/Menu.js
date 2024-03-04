@@ -14,7 +14,6 @@ export default function Menu() {
 
   useEffect(() => {
     authObserver.subscribe("token", data => {
-      console.log("token", data);
       sessionStorage.setItem("token", data);
       setToken(data);
     });

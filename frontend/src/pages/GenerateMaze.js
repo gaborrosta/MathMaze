@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Row, Col, Alert, Form, Button } from "react-bootstrap";
 import MazeGrid from "../components/MazeGrid";
+import MazeModal from "../components/MazeModal";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
 import { authObserver } from "../utils/auth";
@@ -195,10 +196,8 @@ export default function GenerateMaze() {
       setToken(response.data.token);
       authObserver.publish("token", response.data.token);
       setMaze(response.data.maze);
-      //TODO ~ Add extra form so the maze can be saved...
     })
     .catch(error => {
-      console.log(error);
       setMaze("");
 
       if (!error.response) {
@@ -219,6 +218,41 @@ export default function GenerateMaze() {
         default:
           setError("error-unknown");
       }
+    })
+    .finally(() => {
+      setTimeout(() => {
+        setIsRequestInProgress(false);
+      }, 1000);
+    });
+  };
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const [saveError, setSaveError] = useState("");
+
+  const saveMaze = () => {
+    const data = {
+      mazeId: maze.id,
+      token: token,
+    };
+
+    setIsRequestInProgress(true);
+
+    //Send data
+    axios.post(`${BASE_URL}/maze/save`, data, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(response => {
+      setSaveError("");
+      setToken(response.data.token);
+      authObserver.publish("token", response.data.token);
+      setMaze(response.data.maze);
+      setModalVisible(true);
+    })
+    .catch(_ => {
+      setSaveError("error-unknown");
     })
     .finally(() => {
       setTimeout(() => {
@@ -364,10 +398,11 @@ export default function GenerateMaze() {
         </Col>
         <Col xs={12} md={8}>
           <div className="border p-3 m-2">
-          {maze ? <MazeGrid data={maze} /> : <Alert variant="info">{t("maze-generate-not-yet-generated-info")}</Alert>}
+          {maze ? <MazeGrid data={maze} disabled={isRequestInProgress} save={saveMaze} saveError={saveError} setSaveError={setSaveError} /> : <Alert variant="info">{t("maze-generate-not-yet-generated-info")}</Alert>}
           </div>
         </Col>
       </Row>
+      <MazeModal data={maze} visible={modalVisible} setVisible={setModalVisible} />
     </>
   );
 }

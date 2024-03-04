@@ -61,7 +61,7 @@
     "maze-path-length": "Az útvonal hossza: {{length}}",
     "maze-generate-title": "Labirintus készítése",
     "maze-generate-info": "Készíts egy labirintust a kívánt beállításokkal.",
-    "maze-generate-info-not-logged-in": "Nem vagy bejelentkezve. Így is készíthetsz egy labirintust, de nem fogod tudni elmenteni, így ki kell nyomtatnod vagy meg kell oldanod online most.",
+    "maze-generate-info-not-logged-in": "Nem vagy bejelentkezve. Így is készíthetsz egy labirintust, de nem fogod tudni elmenteni a gyűjteményedbe.",
     "maze-generate-not-yet-generated-info": "Itt fog megjelenni a labirintusod, ha készítettél egyet.",
     "maze-width": "Labirintus szélessége",
     "maze-generate-width-help": "Add meg a kívánt szélességet.",
@@ -100,5 +100,14 @@
     "operation-multiplication-division": "Szorzás és osztás",
     "account-title": "Profilod",
     "logout": "Kilépés",
-    "must-be-logged-in": "Az oldal megtekintéséhez be kell jelentkezned."
+    "must-be-logged-in": "Az oldal megtekintéséhez be kell jelentkezned.",
+    "pdf-maze-id": "Labirintus ID: {{id}}",
+    "pdf-explanation": "Meg kell találnod az utat a célig a műveletek elvégzése alapján a <b>{{type}}</b> eredményeket követve. Az út hossza {{length}} mező.<br>A megoldásaidat a mezők alján található cellákba írd be és satírozd be a cella jobb felső sarkában található négyzetet, ha az a cella az útvonal része.",
+    "pdf-path-even": "páros",
+    "pdf-path-odd": "páratlan",
+    "pdf-good-luck": "Sok szerencsét!",
+    "pdf-check-solution": "A labirintust könnyedén ellenőrizheted, ha lefényképezed vagy beszkennelled és feltöltöd a MathMaze weboldalra: <i>https://mathmaze.rostagabor.com/check</i>.",
+    "pdf-copyright": "Ezt a labirintust a MathMaze készítette és a MathMaze tulajdona. További labirintust generálhatsz itt: <i>https://mathmaze.rostagabor.com</i>.",
+    "maze-generated-use": "Szeretném használni ezt a labirintust",
+    "maze-generated-download-pdf": "Labirintus letöltése PDF formátumban"
 }

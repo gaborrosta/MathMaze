@@ -47,15 +47,14 @@ $primary: #7d141d;
 	display: flex;
 }
 
-.maze-cell-bottom-left {
+.maze-cell-bottom > div {
 	flex: 1;
 	border-top: 1px solid black;
 	border-right: 1px solid black;
 }
 
-.maze-cell-bottom-right {
-	flex: 1;
-	border-top: 1px solid black;
+.maze-cell-bottom > div:last-child {
+	border-right: none;
 }
 
 .arrow {
