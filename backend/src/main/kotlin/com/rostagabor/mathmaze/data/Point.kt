@@ -29,4 +29,19 @@ data class Point(val x: Int, val y: Int) {
         return neighbours
     }
 
+
+    companion object {
+
+        /**
+         *   The start point of the maze.
+         */
+        val START = Point(0, 0)
+
+        /**
+         *   A point outside the maze.
+         */
+        val NOWHERE = Point(-1, -1)
+
+    }
+
 }

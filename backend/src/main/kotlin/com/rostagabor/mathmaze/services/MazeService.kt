@@ -73,18 +73,14 @@ class MazeService(
         var maxRepeat = 10
         var booleanMaze: Array<BooleanArray>
         var endpoint: Point
-        var pathLength: Int
+        var path: List<Point>
         do {
             val result = Generator.generateMazeAndEndpoint(width, height, lengthRange)
             booleanMaze = result.first
             endpoint = result.second
-            pathLength = result.third + 1
+            path = result.third
             maxRepeat--
-        } while (pathLength !in lengthRange && maxRepeat > 0)
-
-        //Find the actual path
-        val path = Generator.findPath(booleanMaze, endpoint)
-        if (path.isEmpty()) throw Exception()
+        } while (path.size !in lengthRange && maxRepeat > 0)
 
         //Populate the maze with numbers and operations
         val maze = Generator.populateMazeWithNumbersAndOperations(booleanMaze, path, numbersRange, operation, pathTypeEven, endpoint)

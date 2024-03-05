@@ -21,7 +21,7 @@ object Generator {
     /**
      *   Generates a boolean maze.
      */
-    private fun generateMaze(maze: Array<BooleanArray>, x: Int, y: Int, lengths: HashMap<Point, Int>) {
+    private fun generateMaze(maze: Array<BooleanArray>, x: Int, y: Int, lengths: HashMap<Point, Pair<Point, Int>>) {
         //Mark the current cell as path
         maze[y][x] = true
 
@@ -33,25 +33,29 @@ object Generator {
             when (way) {
                 Direction.UP -> if (y >= 2 && !maze[y - 2][x]) {
                     maze[y - 1][x] = true
-                    lengths[Point(x, y - 2)] = lengths[Point(x, y)]!! + 2
+                    lengths[Point(x, y - 1)] = Point(x, y) to (lengths[Point(x, y)]!!.second + 1)
+                    lengths[Point(x, y - 2)] = Point(x, y - 1) to (lengths[Point(x, y - 1)]!!.second + 1)
                     generateMaze(maze, x, y - 2, lengths)
                 }
 
                 Direction.DOWN -> if (y < maze.size - 2 && !maze[y + 2][x]) {
                     maze[y + 1][x] = true
-                    lengths[Point(x, y + 2)] = lengths[Point(x, y)]!! + 2
+                    lengths[Point(x, y + 1)] = Point(x, y) to (lengths[Point(x, y)]!!.second + 1)
+                    lengths[Point(x, y + 2)] = Point(x, y + 1) to (lengths[Point(x, y + 1)]!!.second + 1)
                     generateMaze(maze, x, y + 2, lengths)
                 }
 
                 Direction.LEFT -> if (x >= 2 && !maze[y][x - 2]) {
                     maze[y][x - 1] = true
-                    lengths[Point(x - 2, y)] = lengths[Point(x, y)]!! + 2
+                    lengths[Point(x - 1, y)] = Point(x, y) to (lengths[Point(x, y)]!!.second + 1)
+                    lengths[Point(x - 2, y)] = Point(x - 1, y) to (lengths[Point(x - 1, y)]!!.second + 1)
                     generateMaze(maze, x - 2, y, lengths)
                 }
 
                 Direction.RIGHT -> if (x < maze[0].size - 2 && !maze[y][x + 2]) {
                     maze[y][x + 1] = true
-                    lengths[Point(x + 2, y)] = lengths[Point(x, y)]!! + 2
+                    lengths[Point(x + 1, y)] = Point(x, y) to (lengths[Point(x, y)]!!.second + 1)
+                    lengths[Point(x + 2, y)] = Point(x + 1, y) to (lengths[Point(x + 1, y)]!!.second + 1)
                     generateMaze(maze, x + 2, y, lengths)
                 }
             }
@@ -63,65 +67,36 @@ object Generator {
      *   Generates a maze and find an endpoint for it.
      */
     @Throws(Exception::class)
-    fun generateMazeAndEndpoint(width: Int, height: Int, lengthRange: IntRange): Triple<Array<BooleanArray>, Point, Int> {
+    fun generateMazeAndEndpoint(width: Int, height: Int, lengthRange: IntRange): Triple<Array<BooleanArray>, Point, List<Point>> {
         //Create the maze and the lengths of the possible paths
         val maze = Array(height) { BooleanArray(width) { false } }
-        val lengths = hashMapOf(Point(0, 0) to 0)
+        val lengths = hashMapOf(Point.START to Pair(Point.NOWHERE, 1))
 
         //Generate the maze
         generateMaze(maze, 0, 0, lengths)
 
         //Original end point and its length from the start
         val originalEndPoint = Point(width - 1, height - 1)
-        val originalLength = lengths[originalEndPoint] ?: 0
+        val (_, originalLength) = lengths[originalEndPoint] ?: throw Exception()
 
         //If the original length is not in the range, find a new border point that is in the range
         val endPoint = if (originalLength !in lengthRange) {
-            lengths.entries.filter { it.value in lengthRange && it.key.atBorder(width, height) }.minByOrNull { it.value }?.key ?: originalEndPoint
+            lengths.entries.filter { it.value.second in lengthRange && it.key.atBorder(width, height) }
+                .minByOrNull { it.value.second }?.key ?: originalEndPoint
         } else {
             originalEndPoint
         }
 
-        //Return the maze and the end point
-        return lengths[endPoint]?.let { length -> Triple(maze, endPoint, length) } ?: throw Exception()
-    }
-
-
-    /**
-     *   Finds the path in the maze.
-     */
-    fun findPath(maze: Array<BooleanArray>, endpoint: Point): List<Point> {
-        val width = maze[0].size
-        val height = maze.size
-        val start = Point(0, 0)
-
-        //Visited array and queue for the BFS
-        val visited = Array(height) { BooleanArray(width) { false } }
-        val queue: Queue<Pair<Point, List<Point>>> = LinkedList()
-
-        //Add the start point to the queue
-        queue.add(Pair(start, listOf(start)))
-        visited[start.y][start.x] = true
-
-        //BFS
-        while (queue.isNotEmpty()) {
-            //Get the current point and path
-            val (currentPoint, path) = queue.remove()
-
-            //If the current point is the end point, return the path
-            if (currentPoint == endpoint) return path
-
-            //Add the neighbours to the queue
-            for (neighbor in currentPoint.neighboursInRange(width, height)) {
-                if (maze[neighbor.y][neighbor.x] && !visited[neighbor.y][neighbor.x]) {
-                    queue.add(Pair(neighbor, path + neighbor))
-                    visited[neighbor.y][neighbor.x] = true
-                }
+        //Return the maze, the end point and the path
+        return lengths[endPoint]?.let { _ ->
+            val path = arrayListOf(endPoint)
+            var current = endPoint
+            while (current != Point.START) {
+                path.add(lengths[current]!!.first)
+                current = lengths[current]!!.first
             }
-        }
-
-        //Return an empty list if no path was found
-        return emptyList()
+            Triple(maze, endPoint, path.reversed())
+        } ?: throw Exception()
     }
 
 
@@ -157,31 +132,32 @@ object Generator {
         //Populate the maze with numbers and operations
         return maze.mapIndexed { y, row ->
             row.mapIndexed { x, _ ->
-                if (x == 0 && y == 0 || Point(x, y) == endpoint) {
+                val p = Point(x, y)
+                if (p == Point.START || p == endpoint) {
                     "" //Empty string for the start and end points
                 } else {
                     //Is the current cell a path?
-                    val isPartOfPath = Point(x, y) in path
+                    val isPartOfPath = p in path
 
                     //Get the next operation
-                    val multiplication = (if (isPartOfPath) pathOperations else mazeOperations).next()
+                    val isFirstTypeOfOperation = (if (isPartOfPath) pathOperations else mazeOperations).next()
 
                     //Generate the operation
                     val (new, savable) = if (operation.involvesProduct) {
                         generateProductOperation(
-                            multiplication = multiplication,
+                            multiplication = isFirstTypeOfOperation,
                             possibleValues = possibleValues,
                             pathTypeEven = pathTypeEven,
                             isPartOfPath = isPartOfPath,
-                            neighbours = Point(x, y).neighboursInRange(width, height).map { (x, y) -> neighbours[y][x] },
+                            neighbours = p.neighboursInRange(width, height).map { (x, y) -> neighbours[y][x] },
                         )
                     } else {
                         generateSumOperation(
-                            addition = multiplication,
+                            addition = isFirstTypeOfOperation,
                             numbersRange = numbersRange,
                             pathTypeEven = pathTypeEven,
                             isPartOfPath = isPartOfPath,
-                            neighbours = Point(x, y).neighboursInRange(width, height).map { (x, y) -> neighbours[y][x] },
+                            neighbours = p.neighboursInRange(width, height).map { (x, y) -> neighbours[y][x] },
                         )
                     }
 
