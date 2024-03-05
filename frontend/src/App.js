@@ -14,6 +14,7 @@ import SetNewPassword from "./pages/SetNewPassword";
 import GenerateMaze from "./pages/GenerateMaze";
 import Account from "./pages/Account";
 import NoPage from "./pages/NoPage";
+import AuthChecker from "./utils/AuthChecker";
 
 export default function App() {
   const { i18n } = useTranslation();
@@ -68,7 +69,7 @@ export default function App() {
               },
               {
                 path: "account",
-                Component: Account,
+                element: <AuthChecker Component={Account} url={"account"} />,
               },
               {
                 path: "*",

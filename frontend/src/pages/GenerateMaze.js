@@ -31,8 +31,8 @@ export default function GenerateMaze() {
     operation: "ADDITION",
     numbersRangeStart: 1,
     numbersRangeEnd: 10,
-    minLength: undefined,
-    maxLength: undefined,
+    minLength: "",
+    maxLength: "",
     width: 11,
     height: 11,
     numberType: "even",
@@ -52,8 +52,8 @@ export default function GenerateMaze() {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
 
   const handleChange = (event) => {
-    var name = event.target.name;
-    var value = event.target.value;
+    let name = event.target.name;
+    let value = event.target.value;
 
     if (name === "range") {
       value = value.split("-").map(Number);
@@ -63,7 +63,7 @@ export default function GenerateMaze() {
         numbersRangeEnd: value[1],
       });
 
-      // Check if the value meets the conditions based on the operation
+      //Check if the value meets the conditions based on the operation
       const validRanges = isAdditionOrSubtraction(formData.operation) ? ["1-10", "1-20", "1-100"] : ["1-10", "1-20", "11-20"];
       if (!validRanges.includes(event.target.value)) {
         setRangeError("maze-range-error");
@@ -71,28 +71,39 @@ export default function GenerateMaze() {
         setRangeError("");
       }
     } else if (name === "minLength" || name === "maxLength") {
-      value = Number(value);
       setFormData({
         ...formData,
         [name]: value,
       });
 
-      // Check if the value meets the conditions
-      if (name === "minLength") {
-        if (value < Math.min(formData.width, formData.height) || value > formData.maxLength) {
-          setMinLengthError("maze-min-length-error");
+      let number = Number(value);
+      let min = formData.minLength ? Number(formData.minLength) : 0;
+      let max = formData.maxLength ? Number(formData.maxLength) : formData.width * formData.height;
+
+      //Check if the value meets the conditions
+      if (value) {
+        if (name === "minLength") {
+          if (number < Math.min(formData.width, formData.height) || number > max) {
+            setMinLengthError("maze-min-length-error");
+          } else {
+            setMinLengthError("");
+          }
         } else {
-          setMinLengthError("");
+          if (number < min || number > formData.width * formData.height) {
+            setMaxLengthError("maze-max-length-error");
+          } else {
+            setMaxLengthError("");
+          }
         }
-      } else if (name === "maxLength") {
-        if (value < formData.minLength || value > formData.width * formData.height) {
-          setMaxLengthError("maze-max-length-error");
+      } else {
+        if (name === "minLength") {
+          setMinLengthError("");
         } else {
           setMaxLengthError("");
         }
       }
     } else if (name === "operation") {
-      var oldValue = formData.operation;
+      let oldValue = formData.operation;
 
       if ((isAdditionOrSubtraction(oldValue) && isMultiplicationOrDivision(value)) || 
           (isMultiplicationOrDivision(oldValue) && isAdditionOrSubtraction(value))) {
@@ -109,7 +120,7 @@ export default function GenerateMaze() {
         });
       }
 
-      // Check if the value is one of the specified values
+      //Check if the value is one of the specified values
       if (!isAdditionOrSubtraction(value) && !isMultiplicationOrDivision(value)) {
         setOperationError("maze-operation-error");
       } else {
@@ -121,7 +132,7 @@ export default function GenerateMaze() {
         width: value,
       });
 
-      // Check if the value is between 11 and 49 and odd
+      //Check if the value is between 11 and 49 and odd
       if (value < 11 || value > 49 || value % 2 === 0) {
         setWidthError("maze-generate-width-error");
       } else {
@@ -133,7 +144,7 @@ export default function GenerateMaze() {
         height: value,
       });
 
-      // Check if the value is between 11 and 49 and odd
+      //Check if the value is between 11 and 49 and odd
       if (value < 11 || value > 49 || value % 2 === 0) {
         setHeightError("maze-generate-height-error");
       } else {
@@ -145,7 +156,7 @@ export default function GenerateMaze() {
         numberType: value,
       });
 
-      // Check if the value is "even" or "odd"
+      //Check if the value is "even" or "odd"
       if (value !== "even" && value !== "odd") {
         setNumberTypeError("maze-number-type-error");
       } else {
@@ -170,18 +181,24 @@ export default function GenerateMaze() {
       formData.discardedMazes = [...formData.discardedMazes, maze.id];
     }
 
-    const data = {
+    let data = {
       width: formData.width,
       height: formData.height,
       operation: formData.operation,
       numbersRangeStart: formData.numbersRangeStart,
       numbersRangeEnd: formData.numbersRangeEnd,
-      minLength: formData.minLength,
-      maxLength: formData.maxLength,
       pathTypeEven: formData.numberType === "even",
       discardedMazes: formData.discardedMazes,
       token: token,
     };
+
+    if (formData.minLength) {
+      data.minLength = Number(formData.minLength);
+    }
+
+    if (formData.maxLength) {
+      data.maxLength = Number(formData.maxLength);
+    }
 
     setIsRequestInProgress(true);
 
@@ -278,7 +295,6 @@ export default function GenerateMaze() {
               </Button>
               <br />
               <hr />
-              <br />
               <Form.Group controlId="width">
                 <Form.Label>{t("maze-width")}</Form.Label>
                 <Form.Control name="width" as="select" value={formData.width} onChange={handleChange} aria-describedby="widthHelp widthError">
@@ -385,14 +401,8 @@ export default function GenerateMaze() {
                     </Form.Text>
                     {maxLengthError && <><br /><Form.Text className="text-danger">{t(maxLengthError)}</Form.Text></>}
                   </Form.Group>
-                  <br />
                 </>
               )}
-              <hr />
-              <br />
-              <Button variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
-                {maze ? t("maze-generate-path-regenerate") : t("maze-generate-path-generate")}
-              </Button>
             </Form>
           </div>
         </Col>

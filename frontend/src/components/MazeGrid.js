@@ -24,7 +24,7 @@ export default function MazeGrid({ data, disabled, save, saveError, setSaveError
   useEffect(() => {
     setShowPath(false);
     setIsSaveDisabled(false);
-  }, [data]);
+  }, [data.id]);
 
   return (
     <>
