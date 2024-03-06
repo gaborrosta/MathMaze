@@ -109,5 +109,12 @@
     "pdf-check-solution": "A labirintust könnyedén ellenőrizheted, ha lefényképezed vagy beszkennelled és feltöltöd a MathMaze weboldalra: <i>https://mathmaze.rostagabor.com/check</i>.",
     "pdf-copyright": "Ezt a labirintust a MathMaze készítette és a MathMaze tulajdona. További labirintust generálhatsz itt: <i>https://mathmaze.rostagabor.com</i>.",
     "maze-generated-use": "Szeretném használni ezt a labirintust",
-    "maze-generated-download-pdf": "Labirintus letöltése PDF formátumban"
+    "maze-generated-download-pdf": "Labirintus letöltése PDF formátumban",
+    "no-mazes": "Nincs még egy labirintusod sem.",
+    "maze-description": "Leírás",
+    "maze-size": "Méret: {{height}} (magasság) x {{width}} (szélesség)",
+    "maze-length-of-the-path": "Útvonal hossza: {{length}}",
+    "maze-created-at": "Készítve: {{date}}",
+    "loading": "Egy pillanat...",
+    "maze-edit-details": "Labirintus szerkesztése"
 }
