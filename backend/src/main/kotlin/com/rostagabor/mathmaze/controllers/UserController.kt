@@ -86,4 +86,22 @@ class UserController(private val userService: UserService) {
         }
     }
 
+
+    /**
+     *   Checks if a user is still logged in.
+     */
+    @GetMapping("/check")
+    fun isUserStillLoggedIn(@RequestParam token: String): ResponseEntity<Any> {
+        return try {
+            val (_, newToken) = userService.regenerateTokenIfStillValid(token)
+            if (newToken.isEmpty()) {
+                ResponseEntity.badRequest().body("1")
+            } else {
+                ResponseEntity.ok().body("1")
+            }
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(e::class.simpleName)
+        }
+    }
+
 }

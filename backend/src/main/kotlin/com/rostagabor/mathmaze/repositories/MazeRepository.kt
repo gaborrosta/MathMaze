@@ -2,6 +2,7 @@ package com.rostagabor.mathmaze.repositories
 
 import com.rostagabor.mathmaze.data.Maze
 import com.rostagabor.mathmaze.data.OperationType
+import com.rostagabor.mathmaze.data.User
 import org.springframework.data.jpa.repository.JpaRepository
 
 /**
@@ -21,5 +22,11 @@ interface MazeRepository : JpaRepository<Maze, Long> {
         pathTypeEven: Boolean,
         saved: Boolean = false,
     ): List<Maze>
+
+
+    /**
+     *   Finds mazes by the user who generated them.
+     */
+    fun findByGeneratedByAndSaved(user: User, saved: Boolean = true): List<Maze>
 
 }

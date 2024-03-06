@@ -81,7 +81,7 @@ data class Maze(
 
 
     /**
-     *   The JSON representation of the maze for the frontend.
+     *   The JSON representation of the maze to display as an actual maze.
      */
     val jsonObject: JsonObject
         get() = JsonObject().apply {
@@ -94,6 +94,25 @@ data class Maze(
             this["id"] = mazeId
             this["even"] = pathTypeEven
             this["digits"] = if (operation.involvesProduct && numbersRangeEnd == 20) 3 else 2
+        }
+
+
+    /**
+     *   The JSON representation of the maze to display in the profile page.
+     */
+    val displayableDataObject: JsonObject
+        get() = JsonObject().apply {
+            this["id"] = mazeId
+            this["location"] = location
+            this["description"] = description
+            this["width"] = width
+            this["height"] = height
+            this["numbersRangeStart"] = numbersRangeStart
+            this["numbersRangeEnd"] = numbersRangeEnd
+            this["operation"] = operation.ordinal
+            this["pathTypeEven"] = pathTypeEven
+            this["pathLength"] = pathLength
+            this["createdAt"] = createdAt.toEpochMilli()
         }
 
 }

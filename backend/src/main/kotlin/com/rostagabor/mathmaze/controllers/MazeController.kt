@@ -6,10 +6,7 @@ import com.rostagabor.mathmaze.data.MazeSaveRequest
 import com.rostagabor.mathmaze.services.MazeService
 import com.rostagabor.mathmaze.services.UserService
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 /**
  *   Controller for maze-related tasks.
@@ -64,6 +61,27 @@ class MazeController(
                 JsonObject().apply {
                     this["maze"] = maze
                     this["token"] = token
+                }
+            )
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(e::class.simpleName)
+        }
+    }
+
+
+    /**
+     *   Retrieves all mazes created by the user.
+     */
+    @GetMapping("/getAll")
+    fun getAll(@RequestParam token: String): ResponseEntity<Any> {
+        return try {
+            val (email, newToken) = userService.regenerateTokenIfStillValid(token)
+            val mazes = mazeService.getAllMazes(email)
+
+            ResponseEntity.ok().body(
+                JsonObject().apply {
+                    this["mazes"] = mazes
+                    this["token"] = newToken
                 }
             )
         } catch (e: Exception) {

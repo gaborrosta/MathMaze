@@ -124,4 +124,20 @@ class MazeService(
         return maze.jsonObject
     }
 
+
+    /**
+     *   Retrieves all mazes created by the user.
+     */
+    @Throws(Exception::class)
+    fun getAllMazes(email: String): List<JsonObject> {
+        //Find the user or the admin
+        val user = userRepository.findByEmail(email) ?: throw Exception()
+
+        //Find the mazes
+        val mazes = mazeRepository.findByGeneratedByAndSaved(user)
+
+        //Return the mazes
+        return mazes.map { it.displayableDataObject }
+    }
+
 }
