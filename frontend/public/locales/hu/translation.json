@@ -47,6 +47,7 @@
     "error-email-not-unique": "Ez az e-mail cím már használatban van. Kérjük, adj meg egy másikat vagy válasszd ki az Elfelejtett jelszó opciót.",
     "error-invalid-credentials": "Hibás e-mail cím vagy jelszó.",
     "error-unknown": "Ismeretlen hiba történt.",
+    "error-unknown-form": "Ismeretlen hiba történt. Kérjük, ellenőrizd az adatokat.",
     "success-signup": "Sikeres regisztráció! 5 másodperc múlva átirányítunk a profilodra.",
     "success-password-reset": "Ha a megadott e-mail címmel rendelkezik fiók, akkor elküldtünk egy linket a jelszó visszaállításához.",
     "set-new-password-title": "Új jelszó beállítása",
@@ -99,6 +100,7 @@
     "operation-division": "Osztás",
     "operation-multiplication-division": "Szorzás és osztás",
     "account-title": "Profilod",
+    "account-info": "Itt kezelheted a labirintusaidat.",
     "logout": "Kilépés",
     "must-be-logged-in": "Az oldal megtekintéséhez be kell jelentkezned.",
     "pdf-maze-id": "Labirintus ID: {{id}}",
@@ -106,7 +108,7 @@
     "pdf-path-even": "páros",
     "pdf-path-odd": "páratlan",
     "pdf-good-luck": "Sok szerencsét!",
-    "pdf-check-solution": "A labirintust könnyedén ellenőrizheted, ha lefényképezed vagy beszkennelled és feltöltöd a MathMaze weboldalra: <i>https://mathmaze.rostagabor.com/check</i>.",
+    "pdf-check-solution": "A labirintust könnyedén ellenőrizheted, ha lefényképezed vagy beszkennelled és feltöltöd a MathMaze weboldalra: <i>https://mathmaze.rostagabor.com/check-maze</i>.",
     "pdf-copyright": "Ezt a labirintust a MathMaze készítette és a MathMaze tulajdona. További labirintust generálhatsz itt: <i>https://mathmaze.rostagabor.com</i>.",
     "maze-generated-use": "Szeretném használni ezt a labirintust",
     "maze-generated-download-pdf": "Labirintus letöltése PDF formátumban",
@@ -116,5 +118,6 @@
     "maze-length-of-the-path": "Útvonal hossza: {{length}}",
     "maze-created-at": "Készítve: {{date}}",
     "loading": "Egy pillanat...",
-    "maze-edit-details": "Labirintus szerkesztése"
+    "maze-edit-details": "Labirintus kezelése",
+    "session-expired": "A munkameneted lejárt. Kérjük, jelentkezz be újra."
 }

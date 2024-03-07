@@ -233,7 +233,8 @@ export default function GenerateMaze() {
           setError("error-invalid-numbers-range");
           break;
         default:
-          setError("error-unknown");
+          setError("error-unknown-form");
+          break;
       }
     })
     .finally(() => {

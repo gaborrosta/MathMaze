@@ -3,6 +3,10 @@
 $font-family-base: 'Zilla Slab', serif;
 $primary: #7d141d;
 
+body {
+	overflow-y: scroll;
+}
+
 .yellow {
 	background-color: rgba(254, 223, 25, 0.8); // #fedf19;
 	font-weight: bold;

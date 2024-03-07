@@ -90,7 +90,7 @@ export default function Login() {
       if (error.response.data === "InvalidCredentialsException") {
         setError("error-invalid-credentials");
       } else {
-        setError("error-unknown");
+        setError("error-unknown-form");
       }
     })
     .finally(() => {

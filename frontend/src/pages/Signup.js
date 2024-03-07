@@ -143,7 +143,8 @@ export default function Signup() {
           setError("error-email-not-unique");
           break;
         default:
-          setError("error-unknown");
+          setError("error-unknown-form");
+          break;
       }
     })
     .finally(() => {

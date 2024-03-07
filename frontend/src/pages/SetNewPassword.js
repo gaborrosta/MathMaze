@@ -52,6 +52,12 @@ export default function SetPassword() {
         loadingDone();
       })
       .catch(error => {
+        if (!error.response) {
+          setError("error-unknown");
+          loadingDone();
+          return;
+        }
+
         if (error.response.data === "TokenInvalidOrExpiredException") {
           setTokenError("set-new-password-error-token-invalid-or-expired");
           loadingDone();
@@ -136,7 +142,8 @@ export default function SetPassword() {
           setError("error-password-invalid-format");
           break;
         default:
-          setError("error-unknown");
+          setError("error-unknown-form");
+          break;
       }
     })
     .finally(() => {

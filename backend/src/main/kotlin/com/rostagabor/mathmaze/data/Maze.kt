@@ -101,12 +101,9 @@ data class Maze(
      *   The JSON representation of the maze to display in the profile page.
      */
     val displayableDataObject: JsonObject
-        get() = JsonObject().apply {
-            this["id"] = mazeId
+        get() = jsonObject.apply {
             this["location"] = location
             this["description"] = description
-            this["width"] = width
-            this["height"] = height
             this["numbersRangeStart"] = numbersRangeStart
             this["numbersRangeEnd"] = numbersRangeEnd
             this["operation"] = operation.ordinal

@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
-import Container from "react-bootstrap/Container";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
-import Form from "react-bootstrap/Form";
-import Modal from "react-bootstrap/Modal";
+import { Container, Nav, Navbar, Form, Modal} from "react-bootstrap";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
 import { authObserver } from "../utils/auth";
