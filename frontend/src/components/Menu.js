@@ -70,6 +70,7 @@ export default function Menu() {
             <Nav className="me-auto">
               <Nav.Link as={Link} to="/help">{t("help-title")}</Nav.Link>
               <Nav.Link as={Link} to="/generate-maze">{t("maze-generate-title")}</Nav.Link>
+              <Nav.Link as={Link} to="/check-maze">{t("maze-check-title")}</Nav.Link>
             </Nav>
             <Nav className="ms-auto">
               {token ?
