@@ -1,12 +1,14 @@
 package com.rostagabor.mathmaze.controllers
 
 import com.beust.klaxon.JsonObject
+import com.rostagabor.mathmaze.data.MazeCheckRequest
 import com.rostagabor.mathmaze.data.MazeGenerationRequest
 import com.rostagabor.mathmaze.data.MazeSaveRequest
 import com.rostagabor.mathmaze.services.MazeService
 import com.rostagabor.mathmaze.services.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 /**
  *   Controller for maze-related tasks.
@@ -60,6 +62,53 @@ class MazeController(
             ResponseEntity.ok().body(
                 JsonObject().apply {
                     this["maze"] = maze
+                    this["token"] = token
+                }
+            )
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(e::class.simpleName)
+        }
+    }
+
+
+    /**
+     *   Recognises a maze in an image.
+     */
+    @PostMapping("/recognise", consumes = ["multipart/form-data"])
+    fun recognise(
+        @RequestParam("mazeId") mazeId: Long,
+        @RequestParam("image") image: MultipartFile,
+        @RequestParam("rotation") rotation: Int,
+        @RequestParam("token") token: String?,
+    ): ResponseEntity<Any> {
+        return try {
+            val (_, newToken) = userService.regenerateTokenIfStillValid(token)
+
+            val recognisedMaze = mazeService.recogniseMaze(mazeId, image, rotation)
+            ResponseEntity.ok().body(
+                JsonObject().apply {
+                    this["recognisedMaze"] = recognisedMaze
+                    this["token"] = newToken
+                }
+            )
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(e::class.simpleName)
+        }
+    }
+
+
+    /**
+     *   Checks a maze.
+     */
+    @PostMapping("/check")
+    fun check(@RequestBody mazeCheckRequest: MazeCheckRequest): ResponseEntity<Any> {
+        return try {
+            val (_, token) = userService.regenerateTokenIfStillValid(mazeCheckRequest.token)
+
+            val maze = mazeService.checkMaze(mazeCheckRequest.mazeId, mazeCheckRequest.data, mazeCheckRequest.path, mazeCheckRequest.nickname)
+            ResponseEntity.ok().body(
+                JsonObject().apply {
+                    this["checkedMaze"] = maze
                     this["token"] = token
                 }
             )

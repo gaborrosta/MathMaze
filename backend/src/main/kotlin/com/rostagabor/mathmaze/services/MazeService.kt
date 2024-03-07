@@ -2,6 +2,7 @@ package com.rostagabor.mathmaze.services
 
 import com.beust.klaxon.JsonObject
 import com.rostagabor.mathmaze.core.Generator
+import com.rostagabor.mathmaze.core.Recogniser
 import com.rostagabor.mathmaze.data.Maze
 import com.rostagabor.mathmaze.data.OperationType
 import com.rostagabor.mathmaze.data.Point
@@ -9,7 +10,9 @@ import com.rostagabor.mathmaze.repositories.MazeRepository
 import com.rostagabor.mathmaze.repositories.UserRepository
 import com.rostagabor.mathmaze.utils.*
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import java.time.Instant
+import kotlin.jvm.optionals.getOrNull
 import kotlin.math.min
 
 /**
@@ -121,6 +124,43 @@ class MazeService(
         mazeRepository.save(maze.copy(generatedBy = user, saved = true, createdAt = Instant.now()))
 
         //Return the maze
+        return maze.jsonObject
+    }
+
+
+    /**
+     *   Recognises a maze in an image.
+     */
+    @Throws(Exception::class)
+    fun recogniseMaze(mazeId: Long, image: MultipartFile, rotation: Int): JsonObject {
+        //Validate the rotation
+        if (rotation % 90 != 0) throw InvalidRotationException()
+
+        //Find the maze
+        val maze = mazeRepository.findById(mazeId).getOrNull() ?: throw InvalidMazeIdException()
+
+        //Recognise the maze
+        val (recognisedNumbers, recognisedPath) = Recogniser.recogniseMaze(image, rotation, maze.width, maze.height, maze.endPoint)
+
+        //Return the maze
+        return maze.basicJsonObject.apply {
+            this["data"] = recognisedNumbers
+            this["path"] = recognisedPath
+        }
+    }
+
+
+    /**
+     *   Checks a maze.
+     */
+    @Throws(Exception::class)
+    fun checkMaze(mazeId: Long, data: List<List<String>>, path: List<Point>, nickname: String): JsonObject {
+        //Find the maze
+        val maze = mazeRepository.findById(mazeId).getOrNull() ?: throw InvalidMazeIdException()
+
+        //TODO...
+
+        //Return the result
         return maze.jsonObject
     }
 

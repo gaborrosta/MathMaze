@@ -62,3 +62,19 @@ class InvalidPathRangeException : Exception()
  *   Exception for when a numbers range is invalid.
  */
 class InvalidNumbersRangeException : Exception()
+
+
+/**
+ *   Exception for when a maze is not found with the given id.
+ */
+class InvalidMazeIdException : Exception()
+
+/**
+ *   Exception for when the given rotation is invalid (not 0, 90, 180 or 270).
+ */
+class InvalidRotationException : Exception()
+
+/**
+ *   Exception for when a maze is not recognised in the image.
+ */
+class CouldNotRecogniseMazeException : Exception()
