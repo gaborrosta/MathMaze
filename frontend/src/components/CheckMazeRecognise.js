@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Form, Button, Alert } from "react-bootstrap";
 
-export default function CheckMazeUpload({ data, handleSubmit }) {
+export default function CheckMazeUpload({ data, handleSubmit, initialNickname }) {
   const { t } = useTranslation();
 
   const [mazeData, setMazeData] = useState(data.data);
   const [pathData, setPathData] = useState(data.path.map(coord => ({x: coord.x, y: coord.y})));
 
-  const [nickname, setNickname] = useState("");
+  const [nickname, setNickname] = useState(initialNickname || "");
   const [nicknameError, setNicknameError] = useState("");
 
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
@@ -32,7 +32,7 @@ export default function CheckMazeUpload({ data, handleSubmit }) {
   const handleNicknameChange = (e) => {
     const value = e.target.value;
     setNickname(value);
-    const regex = /^[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű .-]{5,20}$/;
+    const regex = /^[A-Za-z0-9ÁÉÍÓÖŐÚÜŰáéíóöőúüű .-]{5,20}$/;
 
     if (!regex.test(value)) {
       setNicknameError(t("error-invalid-nickname"));

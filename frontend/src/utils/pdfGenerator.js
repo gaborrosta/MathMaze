@@ -7,7 +7,7 @@ export default function pdfGenerator(data, t) {
   const scaleFactor = dpi / 96;
 
   //Maze div
-  let maze = document.createElement('div');
+  let maze = document.createElement("div");
   maze.className = "maze";
   maze.style.gridTemplateColumns = `repeat(${data.width}, 1fr)`;
   maze.style.minWidth = `${30 * data.digits * data.width}px`;
@@ -16,7 +16,7 @@ export default function pdfGenerator(data, t) {
   for (let i = 0; i < data.height; i++) {
     for (let j = 0; j < data.width; j++) {
       //Create cell
-      let cell = document.createElement('div');
+      let cell = document.createElement("div");
       cell.className = "maze-cell";
 
       //Start? End?
@@ -25,13 +25,13 @@ export default function pdfGenerator(data, t) {
 
       //Create corner div
       if (!isStart && !isEnd) {
-        let corner = document.createElement('div');
+        let corner = document.createElement("div");
         corner.className = "maze-cell-corner";
         cell.appendChild(corner);
       }
 
       //Create content div
-      let content = document.createElement('div');
+      let content = document.createElement("div");
       content.className = "maze-cell-content";
       content.style.bottom = (data.start[0] === j && data.start[1] === i) || (data.end[0] === j && data.end[1] === i) ? "0" : "50%";
       content.textContent = (data.start[0] === j && data.start[1] === i) ? t("maze-start") : (data.end[0] === j && data.end[1] === i) ? t("maze-end") : data.data[i][j];
@@ -39,11 +39,11 @@ export default function pdfGenerator(data, t) {
 
       //Create cells for numbers
       if (!isStart && !isEnd) {
-        let bottom = document.createElement('div');
+        let bottom = document.createElement("div");
         bottom.className = "maze-cell-bottom";
 
         for (let k = 0; k < data.digits; k++) {
-          let bottomDiv = document.createElement('div');
+          let bottomDiv = document.createElement("div");
           bottomDiv.className = `maze-cell-bottom-${k+1}`;
           bottom.appendChild(bottomDiv);
         }

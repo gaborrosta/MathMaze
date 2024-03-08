@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Form, Button, Alert, Row, Col } from "react-bootstrap";
 
-export default function CheckMazeUpload({ handleSubmit }) {
+export default function CheckMazeUpload({ handleSubmit, initialId }) {
   const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
-    id: "",
+    id: initialId || "",
     file: null,
     fileUrl: "",
     rotation: 0,

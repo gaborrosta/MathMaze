@@ -1,6 +1,8 @@
 {
     "app-name": "MathMaze",
     "404": "A keresett oldal nem található.",
+    "404-info": "A keresett oldal lehet, hogy eltávolításra került, megváltozott a neve, vagy átmenetileg nem érhető el. Kérjük, ellenőrizd az URL-t, és próbáld újra.",
+    "404-go-back": "Vissza a kezdőlapra",
     "logo": "Logó",
     "language-change": "Nyelv váltása",
     "welcome": "Üdvözöljük a MathMaze-nél!",
@@ -134,8 +136,8 @@
     "error-invalid-rotation": "A kép forgatása sikertelen, próbáld meg újra feltölteni.",
     "error-could-not-regonise-maze": "Sajnos nem tudtuk felismerni a labirintust a képen. Kérjük, ellenőrizd, hogy a kép nem homályos, és esetleg újra szkenneld be nagyobb felbontásban. Ha továbbra is problémát tapasztalsz, kérjük, töltsd ki online manuálisan.",
     "maze-check-recognised-but-ai-make-mistake": "Mivel az gépi tanulású modellünk nem tökéletes, ezért hibázhat. Kérjük, ellenőrizd az alább látható felismert válaszokat, és módosítsd őket, ha azokat nem ismerte fel helyesen. Az útvonalat is módosíthatod a jelölőnégyzetekkel. Ha kész, kattints az 'Ellenőrzés' gombra.",
-    "maze-check-recognised-nickname": "Név ami alatt elmented a megoldásodat",
-    "maze-check-recognised-nickname-help": "A nevednek egyedinek és 5-20 karakter hosszúnak kell lennie, továbbá nem tartalmazhat speciális karaktereket.",
-    "error-invalid-nickname": "A név nem felel meg a feltételeknek.",
+    "maze-check-recognised-nickname": "Becenév, ami alatt elmented a megoldásodat",
+    "maze-check-recognised-nickname-help": "A becenebednek egyedinek és 5-20 karakter hosszúnak kell lennie, továbbá nem tartalmazhat speciális karaktereket.",
+    "error-invalid-nickname": "A bevenév nem felel meg a feltételeknek.",
     "maze-check-recognised-check": "Ellenőrzés"
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import Menu from "../components/Menu";
 import Container from "react-bootstrap/Container";
+import Menu from "../components/Menu";
 
 const Layout = () => {
   return (

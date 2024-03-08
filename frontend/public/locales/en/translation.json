@@ -2,6 +2,8 @@
     "app-name": "MathMaze",
     "app-name-with-slogan": "MathMaze - An Entertaining Way to Practice Mathematics",
     "404": "We couldn't find the page you're looking for.",
+    "404-info": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable. Please check the URL and try again.",
+    "404-go-back": "Go back to the homepage",
     "logo": "Logo",
     "language-change": "Change language",
     "welcome": "Welcome to MathMaze!",
@@ -135,8 +137,8 @@
     "error-invalid-rotation": "The image rotation failed, try uploading it again.",
     "error-could-not-regonise-maze": "Unfortunately, we could not recognise the maze in the image. Please check if the image is clear and maybe scan it again with a higher resolution. If you still have problems then, please fill it online manually.",
     "maze-check-recognised-but-ai-make-mistake": "As our ML model is not perfect, it might make mistakes. Please check the recognised answers below and modify them if they were not correctly identified. You can also edit the path with the checkboxes. If you are done, click on the 'Check' button.",
-    "maze-check-recognised-nickname": "Name under which you save your solution",
-    "maze-check-recognised-nickname-help": "Your name must be unique and 5-20 characters long, and it cannot contain special characters.",
-    "error-invalid-nickname": "The name does not meet the requirements.",
+    "maze-check-recognised-nickname": "Nickname, under which you save your solution",
+    "maze-check-recognised-nickname-help": "Your nickname must be unique and 5-20 characters long, and it cannot contain special characters.",
+    "error-invalid-nickname": "The nickname does not meet the requirements.",
     "maze-check-recognised-check": "Check"
 }

@@ -18,6 +18,9 @@ export default function CheckMaze() {
   const [step, setStep] = useState(0);
   const [recognisedData, setRecognisedData] = useState({});
 
+  const [mazeId, setMazeId] = useState("");
+  const [nickname, setNickname] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -25,6 +28,8 @@ export default function CheckMaze() {
     setLoading(true);
 
     data.append("token", token);
+
+    setMazeId(data.get("mazeId"));
 
     axios.post(`${BASE_URL}/maze/recognise`, data, {
       headers: {
@@ -70,6 +75,13 @@ export default function CheckMaze() {
 
     data["token"] = token;
 
+    setNickname(data.nickname);
+    setRecognisedData(prevData => ({
+      ...prevData,
+      data: data.data,
+      path: data.path,
+    }));
+
     axios.post(`${BASE_URL}/maze/check`, data, {
       headers: {
         "Content-Type": "application/json"
@@ -83,7 +95,7 @@ export default function CheckMaze() {
       console.log(response.data.checkedMaze); //TODO...
     })
     .catch(error => {
-      console.log(error); //TODO... The maze should be displayed again
+      console.log(error); //TODO...
       setLoading(false);
 
       if (!error.response) {
@@ -113,8 +125,8 @@ export default function CheckMaze() {
         <>
           {error && <Alert variant="danger">{t(error)}</Alert>}
 
-          {step === 0 && <CheckMazeUpload handleSubmit={handleSubmit1} />}
-          {step === 1 && <CheckMazeRecognise data={recognisedData} handleSubmit={handleSubmit2} />}
+          {step === 0 && <CheckMazeUpload handleSubmit={handleSubmit1} initialId={mazeId}/>}
+          {step === 1 && <CheckMazeRecognise data={recognisedData} handleSubmit={handleSubmit2} initialNickname={nickname} />}
         </>
       )}
     </>
