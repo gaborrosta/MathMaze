@@ -7,7 +7,7 @@ import java.util.*
 import javax.crypto.SecretKey
 
 /**
- *   Configuration for JWT.
+ *   JWT Configuration.
  */
 @Configuration
 class JwtConfig {

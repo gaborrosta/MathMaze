@@ -4,6 +4,9 @@ import com.beust.klaxon.JsonObject
 import jakarta.persistence.*
 import java.time.Instant
 
+/**
+ *   Data class representing a maze in the database.
+ */
 @Entity
 @Table(name = "mazes")
 data class Maze(
@@ -12,7 +15,7 @@ data class Maze(
     @Column(name = "maze_id")
     val mazeId: Long = 0,
 
-    @ManyToOne
+    @ManyToOne(targetEntity = User::class)
     @JoinColumn(name = "generated_by", nullable = false)
     val generatedBy: User = User(),
 
@@ -40,11 +43,11 @@ data class Maze(
     @Column(name = "path_type_even", nullable = false)
     val pathTypeEven: Boolean = true,
 
-    @Column(name = "path", nullable = false, length = 25000)
-    val path: String = "",
-
     @Column(name = "data", nullable = false, length = 25000)
     val data: String = "",
+
+    @Column(name = "path", nullable = false, length = 25000)
+    val path: String = "",
 
     @Column(name = "created_at", nullable = false)
     var createdAt: Instant = Instant.now(),
@@ -70,13 +73,13 @@ data class Maze(
     /**
      *   Properly formatted data for the frontend.
      */
-    private val sendableData: List<List<String>>
+    val sendableData: List<List<String>>
         get() = data.split(";").windowed(width, width)
 
     /**
      *   Properly formatted path for the frontend.
      */
-    private val sendablePath: List<Point>
+    val sendablePath: List<Point>
         get() = path.split(";").map { it.split(",").let { (x, y) -> Point(x.toInt(), y.toInt()) } }
 
 
@@ -85,11 +88,11 @@ data class Maze(
      */
     val basicJsonObject: JsonObject
         get() = JsonObject().apply {
-            this["height"] = height
+            this["id"] = mazeId
             this["width"] = width
+            this["height"] = height
             this["start"] = listOf(0, 0)
             this["end"] = endPoint.toList()
-            this["id"] = mazeId
         }
 
     /**

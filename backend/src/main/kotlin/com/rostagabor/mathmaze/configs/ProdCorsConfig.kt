@@ -6,7 +6,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 /**
- *   Production CORS Config.
+ *   Production CORS Configuration.
  */
 @Configuration
 @Profile("prod")

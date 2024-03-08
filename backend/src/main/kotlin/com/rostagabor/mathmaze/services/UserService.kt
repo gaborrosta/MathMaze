@@ -78,6 +78,7 @@ class UserService(
         return userRepository.save(user)
     }
 
+
     /**
      *   Logs in a user.
      */
@@ -107,6 +108,7 @@ class UserService(
             .signWith(jwtConfig.key, Jwts.SIG.HS512)
             .compact()
     }
+
 
     /**
      *   Checks if a token is still valid, i.e. the user is still logged in, and if so, generates a new token.
@@ -142,6 +144,7 @@ class UserService(
         mailService.sendPasswordResetMail(user, token)
     }
 
+
     /**
      *   Validates a password reset token.
      */
@@ -158,6 +161,7 @@ class UserService(
         //Return the token
         return passwordResetToken
     }
+
 
     /**
      *   Resets a user's password.

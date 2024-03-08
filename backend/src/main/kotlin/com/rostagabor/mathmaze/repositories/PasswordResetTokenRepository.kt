@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface PasswordResetTokenRepository : JpaRepository<PasswordResetToken, Long> {
 
     /**
-     *   Finds a password reset token by token column.
+     *   Finds a password reset token by token.
      */
     fun findByToken(token: String): PasswordResetToken?
 

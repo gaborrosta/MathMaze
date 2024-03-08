@@ -1,7 +1,6 @@
 package com.rostagabor.mathmaze.core
 
 import com.rostagabor.mathmaze.data.Point
-import com.rostagabor.mathmaze.utils.CouldNotRecogniseMazeException
 import org.opencv.core.*
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
@@ -10,14 +9,14 @@ import java.io.File
 import kotlin.random.Random
 
 /**
- *   Algorithms to recognise the numbers in a maze.
+ *   Algorithms for recognising the numbers in a maze.
  */
 object Recogniser {
 
     /**
      *   Recognises the number in the maze from the uploaded image.
      */
-    @Throws(CouldNotRecogniseMazeException::class)
+    @Throws(Exception::class)
     fun recogniseMaze(
         uploadedFile: MultipartFile,
         rotation: Int,
@@ -34,9 +33,7 @@ object Recogniser {
 
         //TODO...
         return List(11) {
-            List(11) {
-                if (Random.nextFloat() < 0.7) Random.nextInt(1, 11).toString() else ""
-            }
+            List(11) { if (Random.nextFloat() < 0.7) Random.nextInt(1, 11).toString() else "" }
         } to listOf(Point.START, endPoint)
     }
 
@@ -55,23 +52,23 @@ object Recogniser {
         }
 
         //Convert the image to grayscale
-        val gray = Mat()
-        Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY)
+        var gray = Mat()
+        if (image.channels() > 1) {
+            Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY)
+        } else {
+            gray = image.clone()
+        }
 
         //Rotate if needed
         return if (rotation != 0) {
-            //Size
-            val width = gray.cols().toDouble()
-            val height = gray.rows().toDouble()
-
-            //Create a rotation matrix
-            val center = Point((width / 2), (height / 2))
-            val rotationMatrix = Imgproc.getRotationMatrix2D(center, rotation.toDouble(), 1.0)
-
-            //Rotate the image
+            val rotateCode = when (rotation) {
+                90 -> Core.ROTATE_90_CLOCKWISE
+                180 -> Core.ROTATE_180
+                270 -> Core.ROTATE_90_COUNTERCLOCKWISE
+                else -> throw RuntimeException("Invalid rotation value: $rotation")
+            }
             val rotatedImage = Mat()
-            Imgproc.warpAffine(gray, rotatedImage, rotationMatrix, Size(width, height))
-
+            Core.rotate(gray, rotatedImage, rotateCode)
             rotatedImage
         } else {
             gray

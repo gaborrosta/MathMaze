@@ -7,12 +7,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain
 
 /**
- *   Security Config.
+ *   Security Configuration.
  */
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig {
 
+    /**
+     *   Configures the security filter chain.
+     */
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
         http.csrf { csrf -> csrf.disable() }

@@ -1,9 +1,11 @@
-package com.rostagabor.mathmaze.data
+package com.rostagabor.mathmaze.requests
+
+import com.rostagabor.mathmaze.data.Point
 
 /**
- *   Data class for the maze check request.
+ *   Class for maze check request.
  */
-data class MazeCheckRequest(
+class MazeCheckRequest(
     val mazeId: Long,
     val data: List<List<String>>,
     val path: List<Point>,

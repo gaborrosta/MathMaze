@@ -6,7 +6,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 /**
- *   Development CORS Config.
+ *   Development CORS Configuration.
  */
 @Configuration
 @Profile("dev")

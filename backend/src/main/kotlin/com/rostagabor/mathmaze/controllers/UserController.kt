@@ -1,9 +1,9 @@
 package com.rostagabor.mathmaze.controllers
 
-import com.rostagabor.mathmaze.data.EmailRequest
-import com.rostagabor.mathmaze.data.LoginRequest
-import com.rostagabor.mathmaze.data.PasswordResetRequest
 import com.rostagabor.mathmaze.data.User
+import com.rostagabor.mathmaze.requests.EmailRequest
+import com.rostagabor.mathmaze.requests.LoginRequest
+import com.rostagabor.mathmaze.requests.PasswordResetRequest
 import com.rostagabor.mathmaze.services.UserService
 import com.rostagabor.mathmaze.utils.UserNotFoundException
 import org.springframework.http.ResponseEntity
@@ -29,6 +29,7 @@ class UserController(private val userService: UserService) {
         }
     }
 
+
     /**
      *   Logs in a user.
      */
@@ -41,6 +42,7 @@ class UserController(private val userService: UserService) {
             ResponseEntity.badRequest().body(e::class.simpleName)
         }
     }
+
 
     /**
      *   Requests a password reset.
@@ -60,6 +62,7 @@ class UserController(private val userService: UserService) {
         }
     }
 
+
     /**
      *   Validates a password reset token.
      */
@@ -72,6 +75,7 @@ class UserController(private val userService: UserService) {
             ResponseEntity.badRequest().body(e::class.simpleName)
         }
     }
+
 
     /**
      *   Resets a user's password.

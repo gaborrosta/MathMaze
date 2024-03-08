@@ -17,7 +17,7 @@ data class PasswordResetToken @JvmOverloads constructor(
     @Column(name = "token", nullable = false, unique = true)
     val token: String = "",
 
-    @ManyToOne(targetEntity = User::class, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = User::class)
     @JoinColumn(name = "user_id", nullable = false)
     val user: User = User(),
 

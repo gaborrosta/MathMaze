@@ -1,11 +1,12 @@
-package com.rostagabor.mathmaze.data
+package com.rostagabor.mathmaze.requests
 
+import com.rostagabor.mathmaze.data.OperationType
 import kotlin.math.min
 
 /**
- *   Data class for the maze generation request.
+ *   Class for maze generation request.
  */
-data class MazeGenerationRequest(
+class MazeGenerationRequest(
     val width: Int,
     val height: Int,
     val numbersRangeStart: Int,

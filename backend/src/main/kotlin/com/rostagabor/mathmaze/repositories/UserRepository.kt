@@ -9,13 +9,14 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface UserRepository : JpaRepository<User, Long> {
 
     /**
-     *   Finds a user by email.
-     */
-    fun findByEmail(email: String): User?
-
-    /**
      *   Finds a user by username.
      */
     fun findByUsername(username: String): User?
+
+
+    /**
+     *   Finds a user by email.
+     */
+    fun findByEmail(email: String): User?
 
 }
