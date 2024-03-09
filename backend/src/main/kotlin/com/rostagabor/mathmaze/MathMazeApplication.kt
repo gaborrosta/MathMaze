@@ -1,26 +1,35 @@
 package com.rostagabor.mathmaze
 
-import com.rostagabor.mathmaze.utils.loadOpenCV
+import com.rostagabor.mathmaze.core.ML
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.ApplicationArguments
+import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.runApplication
 
 /**
  *   The main class of the application.
  */
 @SpringBootApplication
-class MathMazeApplication
+class MathMazeApplication : ApplicationRunner {
+
+    /**
+     *   States whether the machine learning is enabled or not.
+     */
+    @Value("\${app.ml-enabled}")
+    private val isMLEnabled: Boolean = false
 
 
-/**
- *   This is the main entry point of the application.
- */
-fun main(args: Array<String>) {
-    //Load OpenCV
-    loadOpenCV()
+    /**
+     *   Trains the machine learning model if it is enabled.
+     */
+    override fun run(args: ApplicationArguments?) {
+        if (isMLEnabled) {
+            println("Training the machine learning model...")
+            val accuracy = ML.train()
+            println("Machine learning model is trained with accuracy: $accuracy.")
+        } else {
+            println("Machine learning is disabled, all the predictions will be 0.")
+        }
+    }
 
-    //Load ML model
-    //ML.train()
-
-    //Run Spring Boot application
-    runApplication<MathMazeApplication>(*args)
 }

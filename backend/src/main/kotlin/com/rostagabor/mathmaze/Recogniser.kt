@@ -1,7 +1,7 @@
 package com.rostagabor.mathmaze
 
+import com.rostagabor.mathmaze.core.ML
 import com.rostagabor.mathmaze.data.Point
-import org.jetbrains.kotlinx.dl.impl.util.argmax
 import org.opencv.core.*
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
@@ -302,9 +302,7 @@ object Recogniser {
                 println()
             }
 
-            val predictedNumberLeft = ML.predict(shiftedFloatLeft)
-            println("$index left max: ${predictedNumberLeft.argmax()}; ${predictedNumberLeft.joinToString()}, ")
-            predictedNumberLeft.argmax().toString()
+            ML.predict(shiftedFloatLeft).toString()
         } else {
             ""
         }
@@ -319,9 +317,7 @@ object Recogniser {
                 println()
             }
 
-            val predictedNumberRight = ML.predict(shiftedFloatRight)
-            println("$index right max: ${predictedNumberRight.argmax()}; ${predictedNumberRight.joinToString()}")
-            predictedNumberRight.argmax().toString()
+            ML.predict(shiftedFloatRight).toString()
         } else {
             ""
         }

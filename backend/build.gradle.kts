@@ -66,6 +66,6 @@ tasks.withType<Test> {
 tasks.getByName<Jar>("jar") {
 	enabled = false
 	manifest {
-		attributes["Main-Class"] = "com.rostagabor.mathmaze.MathMazeApplicationKt"
+		attributes["Main-Class"] = "com.rostagabor.mathmaze.MainKt"
 	}
 }
