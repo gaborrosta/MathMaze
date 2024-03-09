@@ -61,6 +61,28 @@ body {
 	border-right: none;
 }
 
+
+.correct {
+	background-color: lightgreen;
+}
+
+.wrong {
+	background-color: lightcoral;
+}
+
+.correct-path {
+	background-color: lightgreen;
+}
+
+.wrong-path {
+	background-color: lightcoral;
+}
+
+.missed-path {
+	background-color: lightseagreen;
+}
+
+
 .arrow {
 	display: inline-block;
 	transition: transform 0.3s;

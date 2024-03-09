@@ -12,6 +12,9 @@ i18next
     interpolation: {
       escapeValue: false,
     },
+    react: {
+      transKeepBasicHtmlNodesFor: ["b"],
+    },
     nonExplicitSupportedLngs: true, //Allows "en-US" and "en-UK" to be implcitly supported
     load: "languageOnly",
     fallbackLng: "en",
