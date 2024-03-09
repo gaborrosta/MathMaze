@@ -1,59 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
-import { Container, Nav, Navbar, Form, Modal} from "react-bootstrap";
-import { BASE_URL } from "../utils/constants";
-import axios from "axios";
-import { authObserver } from "../utils/auth";
+import { Container, Nav, Navbar, Form} from "react-bootstrap";
+import { TokenContext } from "../utils/TokenContext";
 
 export default function Menu() {
   const { i18n, t } = useTranslation();
 
-  const [token, setToken] = useState(sessionStorage.getItem("token"));
-  const [sessionExpired, setSessionExpired] = useState(false);
-
-  const timeoutId = useRef(null);
-
-  useEffect(() => {
-    let privateToken = sessionStorage.getItem("token");
-
-    authObserver.subscribe("token", data => {
-      privateToken = data;
-      sessionStorage.setItem("token", data);
-      setToken(data);
-
-      //Clear the existing timeout
-      if (timeoutId) {
-        clearTimeout(timeoutId.current);
-      }
-
-      //Start a new timeout
-      if (privateToken) {
-        timeoutId.current = setTimeout(() => {
-          axios.get(`${BASE_URL}/users/check?token=${privateToken}`)
-          .catch(_ => {
-            privateToken = "";
-            setToken("");
-            authObserver.publish("token", "");
-            setSessionExpired(true);
-          });
-        }, 65 * 60 * 1000); //65 minutes (token expires in 1 hour)
-      }
-    });
-
-    return () => {
-      authObserver.unsubscribe("token");
-
-      if (timeoutId) {
-        clearTimeout(timeoutId.current);
-      }
-    };
-  }, []);
+  const { token, setToken } = useContext(TokenContext);
 
   const navigate = useNavigate();
 
   const logout = () => {
-    sessionStorage.removeItem("token");
     setToken("");
     navigate("/");
   };
@@ -94,11 +52,6 @@ export default function Menu() {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-      <Modal show={sessionExpired} onHide={() => setSessionExpired(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>{t("session-expired")}</Modal.Title>
-        </Modal.Header>
-      </Modal>
     </>
   );
 }

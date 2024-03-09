@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Row, Col, Alert, Button, Card } from "react-bootstrap";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
-import { authObserver } from "../utils/auth";
+import { TokenContext } from "../utils/TokenContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import MazeModal from "../components/MazeModal";
 
@@ -14,7 +14,14 @@ export default function Account() {
 
   useEffect(() => { document.title = t("account-title") + " | " + t("app-name"); });
 
-  const [token, setToken] = useState(sessionStorage.getItem("token"));
+  const { token, setToken } = useContext(TokenContext);
+  const tokenRef = useRef(token);
+  const setTokenRef = useRef(setToken);
+
+  useEffect(() => {
+    tokenRef.current = token;
+    setTokenRef.current = setToken;
+  }, [token, setToken]);
 
   const [loading, setLoading] = useState(true);
   const [mazes, setMazes] = useState(null);
@@ -34,13 +41,9 @@ export default function Account() {
   };
 
   useEffect(() => {
-    let privateToken = sessionStorage.getItem("token");
-
-    axios.get(`${BASE_URL}/maze/getAll?token=${privateToken}`)
+    axios.get(`${BASE_URL}/maze/getAll?token=${tokenRef.current}`)
     .then(response => {
-      privateToken = response.data.token;
-      setToken(privateToken);
-      authObserver.publish("token", privateToken);
+      setTokenRef.current(response.data.token);
 
       setTimeout(() => {
         setLoading(false);

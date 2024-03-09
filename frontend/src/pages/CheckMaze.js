@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert } from "react-bootstrap";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -7,14 +7,14 @@ import CheckMazeRecognise from "../components/CheckMazeRecognise";
 import CheckMazeResults from "../components/CheckMazeResults";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
-import { authObserver } from "../utils/auth";
+import { TokenContext } from "../utils/TokenContext";
 
 export default function CheckMaze() {
   const { t } = useTranslation();
 
   useEffect(() => { document.title = t("maze-check-title") + " | " + t("app-name"); });
 
-  const [token, setToken] = useState(sessionStorage.getItem("token"));
+  const { token, setToken } = useContext(TokenContext);
 
   const [step, setStep] = useState(0);
   const [recognisedData, setRecognisedData] = useState({});
@@ -41,7 +41,6 @@ export default function CheckMaze() {
     .then(response => {
       setError("");
       setToken(response.data.token);
-      authObserver.publish("token", response.data.token);
       setLoading(false);
       setRecognisedData(response.data.recognisedMaze);
       setStep(1);
@@ -92,7 +91,6 @@ export default function CheckMaze() {
     .then(response => {
       setError("");
       setToken(response.data.token);
-      authObserver.publish("token", response.data.token);
       setLoading(false);
       setCheckData(response.data.checkedMaze);
       setStep(2);

@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { useNavigate, Link, useLocation } from "react-router-dom"
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
-import { authObserver } from "../utils/auth";
+import { TokenContext } from "../utils/TokenContext";
 
 export default function Login() {
   const { t } = useTranslation();
 
   useEffect(() => { document.title = t("login-title") + " | " + t("app-name"); });
+
+  const { setToken } = useContext(TokenContext);
 
   const navigate = useNavigate();
 
@@ -76,7 +78,7 @@ export default function Login() {
       }
     })
     .then(response => {
-      authObserver.publish("token", response.data);
+      setToken(response.data);
       navigate(nextPage || "/account");
     })
     .catch(error => {

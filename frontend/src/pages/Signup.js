@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom"
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import { BASE_URL } from "../utils/constants";
 import axios from "axios";
-import { authObserver } from "../utils/auth";
+import { TokenContext } from "../utils/TokenContext";
 
 export default function Signup() {
   const { t } = useTranslation();
 
   useEffect(() => { document.title = t("signup-title") + " | " + t("app-name"); });
+
+  const { setToken } = useContext(TokenContext);
 
   const navigate = useNavigate();
 
@@ -110,7 +112,7 @@ export default function Signup() {
       }
     })
     .then(response => {
-      authObserver.publish("token", response.data);
+      setToken(response.data);
       setSuccess("success-signup");
       setTimeout(() => {
         navigate("/account");
