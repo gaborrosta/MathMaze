@@ -104,9 +104,9 @@ class MazeController(
     @PostMapping("/check")
     fun check(@RequestBody mazeCheckRequest: MazeCheckRequest): ResponseEntity<Any> {
         return try {
-            val (_, token) = userService.regenerateTokenIfStillValid(mazeCheckRequest.token)
+            val (email, token) = userService.regenerateTokenIfStillValid(mazeCheckRequest.token)
 
-            val maze = mazeService.checkMaze(mazeCheckRequest.mazeId, mazeCheckRequest.data, mazeCheckRequest.path, mazeCheckRequest.nickname)
+            val maze = mazeService.checkMaze(mazeCheckRequest.mazeId, mazeCheckRequest.data, mazeCheckRequest.path, mazeCheckRequest.nickname, email)
             ResponseEntity.ok().body(
                 JsonObject().apply {
                     this["checkedMaze"] = maze

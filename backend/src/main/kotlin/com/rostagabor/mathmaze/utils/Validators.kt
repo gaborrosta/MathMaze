@@ -43,3 +43,12 @@ fun validateNumbersRange(numbersRangeStart: Int, numbersRangeEnd: Int, operation
     val ranges = if (operation.involvesSum) listOf(1..10, 1..20, 1..100) else listOf(1..10, 1..20, 11..20)
     return numbersRangeStart < numbersRangeEnd && range in ranges
 }
+
+
+/**
+ *   Validates a nickname. The same regex is used in the frontend.
+ */
+fun validateNickname(nickname: String): Boolean {
+    val nicknameRegex = "^[A-Za-z0-9ÁÉÍÓÖŐÚÜŰáéíóöőúüű .-]{5,20}$".toRegex()
+    return nicknameRegex.matches(nickname)
+}

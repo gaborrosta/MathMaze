@@ -84,6 +84,13 @@ data class Maze(
 
 
     /**
+     *   Maximum numbers of digits involved in the results.
+     */
+    val numberOfDigits: Int
+        get() = if (operation.involvesProduct && numbersRangeEnd == 20) 3 else 2
+
+
+    /**
      *   Basic JSON representation of the maze.
      */
     val basicJsonObject: JsonObject
@@ -103,7 +110,7 @@ data class Maze(
             this["data"] = sendableData
             this["path"] = sendablePath
             this["even"] = pathTypeEven
-            this["digits"] = if (operation.involvesProduct && numbersRangeEnd == 20) 3 else 2
+            this["digits"] = numberOfDigits
         }
 
     /**

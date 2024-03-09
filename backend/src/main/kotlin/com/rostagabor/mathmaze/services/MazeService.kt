@@ -3,10 +3,9 @@ package com.rostagabor.mathmaze.services
 import com.beust.klaxon.JsonObject
 import com.rostagabor.mathmaze.core.Generator
 import com.rostagabor.mathmaze.core.Recogniser
-import com.rostagabor.mathmaze.data.Maze
-import com.rostagabor.mathmaze.data.OperationType
-import com.rostagabor.mathmaze.data.Point
+import com.rostagabor.mathmaze.data.*
 import com.rostagabor.mathmaze.repositories.MazeRepository
+import com.rostagabor.mathmaze.repositories.SolutionRepository
 import com.rostagabor.mathmaze.repositories.UserRepository
 import com.rostagabor.mathmaze.utils.*
 import org.springframework.stereotype.Service
@@ -22,6 +21,7 @@ import kotlin.math.min
 class MazeService(
     private val userRepository: UserRepository,
     private val mazeRepository: MazeRepository,
+    private val solutionRepository: SolutionRepository,
 ) {
 
     /**
@@ -141,7 +141,14 @@ class MazeService(
         val maze = mazeRepository.findById(mazeId).getOrNull() ?: throw InvalidMazeIdException()
 
         //Recognise the maze
-        val (recognisedNumbers, recognisedPath) = Recogniser.recogniseMaze(image, rotation, maze.width, maze.height, maze.endPoint)
+        val (recognisedNumbers, recognisedPath) = Recogniser.recogniseMaze(
+            uploadedFile = image,
+            rotation = rotation,
+            widthInTiles = maze.width,
+            heightInTiles = maze.height,
+            endPoint = maze.endPoint,
+            numberOfDigits = maze.numberOfDigits,
+        )
 
         //Return the maze
         return maze.basicJsonObject.apply {
@@ -155,14 +162,42 @@ class MazeService(
      *   Checks a maze.
      */
     @Throws(Exception::class)
-    fun checkMaze(mazeId: Long, data: List<List<String>>, path: List<Point>, nickname: String): JsonObject {
+    fun checkMaze(mazeId: Long, data: List<List<String>>, path: List<Point>, nickname: String, email: String): JsonObject {
+        //Validate the nickname
+        validateNickname(nickname).let { if (!it) throw NicknameInvalidFormatException() }
+
         //Find the maze
         val maze = mazeRepository.findById(mazeId).getOrNull() ?: throw InvalidMazeIdException()
 
-        //TODO...
+        //Check if the nickname is unique at this maze
+        solutionRepository.existsByMazeAndNickname(maze, nickname).let { if (it) throw NicknameNotUniqueException() }
+
+        //Validate the path
+        if (Point.START !in path || maze.endPoint !in path) throw InvalidPathException()
+
+        //Validate the data
+        if (data.size != maze.height || data.any { it.size != maze.width }) throw InvalidMazeDimensionException()
+
+        //Save the solution
+        val solution = solutionRepository.save(
+            Solution(
+                maze = maze,
+                nickname = nickname,
+                data = data.flatten().joinToString(";"),
+                path = path.joinToString(";") { (x, y) -> "$x,$y" },
+            )
+        )
+
+        //Who generated the maze?
+        val generatedBy = maze.generatedBy
+        val userType = when (generatedBy.email) {
+            ADMIN_EMAIL_ADDRESS -> UserType.ADMIN
+            email -> UserType.ME
+            else -> UserType.SOMEONE
+        }
 
         //Return the result
-        return maze.jsonObject
+        return solution.createResultsObject(userType)
     }
 
 

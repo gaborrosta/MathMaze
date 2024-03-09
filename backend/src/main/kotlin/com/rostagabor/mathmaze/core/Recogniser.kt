@@ -23,6 +23,7 @@ object Recogniser {
         widthInTiles: Int,
         heightInTiles: Int,
         endPoint: Point,
+        numberOfDigits: Int,
     ): Pair<List<List<String>>, List<Point>> {
         //Open the image in grayscale
         val image = openImage(uploadedFile, rotation)

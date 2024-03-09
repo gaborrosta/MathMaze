@@ -78,3 +78,19 @@ class InvalidRotationException : Exception()
  *   Exception for when a maze is not recognised in the image.
  */
 class CouldNotRecogniseMazeException : Exception()
+
+
+/**
+ *   Exception for when a nickname is in an invalid format.
+ */
+class NicknameInvalidFormatException : Exception()
+
+/**
+ *   Exception for when a nickname is not unique.
+ */
+class NicknameNotUniqueException : Exception()
+
+/**
+ *   Exception for when a path is invalid (the start point or the end point are not in the path).
+ */
+class InvalidPathException : Exception()
