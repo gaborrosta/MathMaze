@@ -17,6 +17,8 @@ const Layout = () => {
   const { t } = useTranslation();
 
   const [token, setToken] = useState(sessionStorage.getItem("token"));
+  const prevTokenRef = useRef();
+  const logoutRef = useRef(false);
   const [sessionExpired, setSessionExpired] = useState(SessionExpired.NO);
 
   const navigate = useNavigate();
@@ -32,12 +34,39 @@ const Layout = () => {
 
   const timeoutId = useRef(null);
 
+  const logout = () => {
+    logoutRef.current = true;
+    setToken("");
+    navigate("/");
+  };
+
+  const expired = () => {
+    setToken("");
+
+    if (pathnameRef.current === "/account") {
+      navigateRef.current("/login?next=/account");
+      setSessionExpired(SessionExpired.ACCOUNT);
+    } else {
+      setSessionExpired(SessionExpired.OTHER_PAGE);
+    }
+  }
+
   useEffect(() => {
+    //Previous token value
+    const prevToken = prevTokenRef.current;
+    prevTokenRef.current = token;
+
     //Clear the existing timeout
     if (timeoutId) {
       clearTimeout(timeoutId.current);
+      if (!token && prevToken && !logoutRef.current) {
+        expired();
+      }
     }
-    
+
+    //Clear the logout flag
+    logoutRef.current = false;
+
     //Save the token in sessionStorage
     sessionStorage.setItem("token", token);
 
@@ -46,14 +75,7 @@ const Layout = () => {
       timeoutId.current = setTimeout(() => {
         axios.get(`${BASE_URL}/users/check?token=${token}`)
         .catch(_ => {
-          setToken("");
-
-          if (pathnameRef.current === "/account") {
-            navigateRef.current("/login?next=/account");
-            setSessionExpired(SessionExpired.ACCOUNT);
-          } else {
-            setSessionExpired(SessionExpired.OTHER_PAGE);
-          }
+          expired();
         });
       }, 62 * 60 * 1000); //62 minutes (token expires in 1 hour)
     }
@@ -66,7 +88,7 @@ const Layout = () => {
   }, [token]);
 
   return (
-    <TokenContext.Provider value={{ token, setToken }}>
+    <TokenContext.Provider value={{ token, setToken, logout }}>
       <Menu />
       <Container>
         <Outlet />
