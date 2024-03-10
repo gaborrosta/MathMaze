@@ -186,4 +186,25 @@ class UserService(
         passwordResetTokenRepository.save(passwordResetToken)
     }
 
+    /**
+     *   Resets a user's password in the account page.
+     */
+    @Throws(Exception::class)
+    fun accountResetPassword(email: String, oldPassword: String, newPassword: String) {
+        //Find the user by email
+        val user = userRepository.findByEmail(email) ?: throw UserNotFoundException()
+
+        //Check if the old password is correct
+        if (!passwordEncoder.matches(oldPassword, user.password)) {
+            throw InvalidCredentialsException()
+        }
+
+        //Validate the new password
+        validatePassword(newPassword).let { if (!it) throw PasswordInvalidFormatException() }
+
+        //Hash the password and save the user
+        user.password = passwordEncoder.encode(newPassword)
+        userRepository.save(user)
+    }
+
 }

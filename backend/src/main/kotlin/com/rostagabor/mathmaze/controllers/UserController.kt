@@ -1,6 +1,7 @@
 package com.rostagabor.mathmaze.controllers
 
 import com.rostagabor.mathmaze.data.User
+import com.rostagabor.mathmaze.requests.AccountPasswordResetRequest
 import com.rostagabor.mathmaze.requests.EmailRequest
 import com.rostagabor.mathmaze.requests.LoginRequest
 import com.rostagabor.mathmaze.requests.PasswordResetRequest
@@ -85,6 +86,21 @@ class UserController(private val userService: UserService) {
         return try {
             userService.resetPassword(passwordResetRequest.token, passwordResetRequest.password)
             ResponseEntity.ok().body("1")
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(e::class.simpleName)
+        }
+    }
+
+    /**
+     *   Resets a user's password in the account page.
+     */
+    @PostMapping("/account-password-reset")
+    fun accountResetPassword(@RequestBody accountPasswordResetRequest: AccountPasswordResetRequest): ResponseEntity<Any> {
+        return try {
+            val (email, newToken) = userService.regenerateTokenIfStillValid(accountPasswordResetRequest.token)
+
+            userService.accountResetPassword(email, accountPasswordResetRequest.oldPassword, accountPasswordResetRequest.newPassword)
+            ResponseEntity.ok().body(newToken)
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(e::class.simpleName)
         }
