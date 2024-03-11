@@ -1,6 +1,7 @@
 package com.rostagabor.mathmaze
 
 import com.rostagabor.mathmaze.core.ML
+import com.rostagabor.mathmaze.core.RecogniserConfiguration
 import com.rostagabor.mathmaze.data.Point
 import org.opencv.core.*
 import org.opencv.imgcodecs.Imgcodecs
@@ -10,72 +11,87 @@ import java.io.File
 object Recogniser {
 
     /**
-     *   The factor to make image brighter when loading. (Photo: 75.0)
-     */
-    private const val BRIGHTNESS = 0.0
-
-    /**
-     *   This ratio many pixels have to be nonzero in a line to be considered as an actual line across the image. (Scan: 0.97)
-     */
-    private const val LINE_FILL_LIMIT = 0.9
-
-    /**
-     *   The maximum step between lines to be considered as a part of the same block when determining lines across the image.
-     */
-    private const val LINES_MAX_STEP_BETWEEN = 3
-
-    /**
-     *   The minimum width of the found lines, everything with width less than this will be considered as "noise".
-     */
-    private const val LINES_MIN_WIDTH_TO_KEEP_FIRST = 5
-
-    /**
-     *   The minimum width a line has to have. Lines are made narrower until this width is reached.
-     */
-    private const val LINES_REDUCED_MIN_WIDTH = 5
-
-    /**
-     *   Noise limit for the processed numbers. Pixel with value above this limit is considered as part of the number.
-     */
-    private const val NOISE_LIMIT = 50.0
-
-
-    /**
      *   Opens and recognises a maze from an image.
      */
     @Throws(RuntimeException::class)
-    fun openAndRecogniseMaze(name: String = "maze1.jpg", width: Int = 11, height: Int = 11, endPoint: Point = Point(8, 10)) {
-        //Open the image
-        val image = openImage(name)
+    fun openAndRecogniseMaze(name: String = "maze1.jpg", width: Int = 11, height: Int = 11, endPoint: Point = Point(10, 10)) {
+        //Stores the recognised numbers and a boolean indicating if the tile is part of the path
+        var recognisedNumbers = Array(height) { Array(width) { "" } }
+        val path = arrayListOf<Point>()
 
-        //Find the maze in the image and rotate the image based on the maze
-        var contour = findLargestContour(image)
-        var result = rotateBasedOnContour(image, contour)
+        //We try different configurations
+        var shouldTryAgain: Boolean
+        val configIterator = RecogniserConfiguration.configs.iterator()
 
-        //Cut out the maze from the image
-        contour = findLargestContour(result)
-        result = cutoutContour(result, contour)
+        do {
+            //Get the next configuration
+            val config = configIterator.next()
+            println("Trying to recognise a maze with the following configuration: $config")
 
-        //Cut the maze into tiles
-        val tiles = cutMazeToTiles(result)
-        if (tiles.size != width * height) {
-            throw RuntimeException("The number of tiles is not correct: ${tiles.size} instead of ${width * height}")
-        }
+            //We should not try again unless an exception occurs
+            shouldTryAgain = false
 
-        //Process the tiles
-        for (i in tiles.indices) {
-            //Start and end tiles...
-            if (i == 0 || i == (endPoint.y * width + endPoint.x)) continue
+            //Try while handling exceptions
+            try {
+                //Open the image
+                var image = openImage(name, config.brightness)
 
-            //Process the tile
-            val number = processTile(tiles[i], i)
-            println("Tile $i: $number")
-        }
+                //Find the maze in the image and rotate the image based on the maze
+                var contour = findLargestContour(image)
+                image = rotateBasedOnContour(image, contour)
 
-        //Save it to a temporary file
-        val tempFile = File.createTempFile("temp", ".jpg")
-        println("Temporary file location: ${tempFile.absolutePath}")
-        Imgcodecs.imwrite(tempFile.absolutePath, result)
+                //Cut out the maze from the image
+                contour = findLargestContour(image)
+                image = cutoutContour(image, contour)
+
+                //Cut the maze into tiles
+                val tiles = cutMazeToTiles(image, config)
+                if (tiles.size != width * height) {
+                    throw RuntimeException("The number of tiles is not correct: ${tiles.size} instead of ${width * height}")
+                }
+
+                //Process the tiles
+                for (i in tiles.indices) {
+                    val p = Point(i % width, i / width)
+
+                    //Start and end tiles...
+                    if (i == 0 || p == endPoint) {
+                        recognisedNumbers[p.y][p.x] = ""
+                        path.add(p)
+                        continue
+                    }
+
+                    //Process the tile
+                    val (number, isMarkedAsPath) = processTile(tiles[i], config)
+                    println("Tile $p: $number, isMarkedAsPath: $isMarkedAsPath")
+
+                    //Save the data
+                    recognisedNumbers[p.y][p.x] = number
+                    if (isMarkedAsPath) {
+                        path.add(p)
+                    }
+                }
+
+                //Save it to a temporary file
+                val tempFile = File.createTempFile("temp", ".jpg")
+                println("Temporary file location: ${tempFile.absolutePath}")
+                Imgcodecs.imwrite(tempFile.absolutePath, image)
+            } catch (e: Exception) {
+                //Print the exception
+                println("An exception occurred: ${e.message}")
+
+                //If an exception occurred, we should try again with the next configuration
+                shouldTryAgain = true
+
+                //Clear the variables
+                recognisedNumbers = Array(height) { Array(width) { "" } }
+                path.clear()
+            }
+        } while (shouldTryAgain && configIterator.hasNext())
+
+        //Return the recognised numbers
+        println(recognisedNumbers.joinToString { it.joinToString() })
+        println(path.joinToString())
     }
 
 
@@ -83,7 +99,7 @@ object Recogniser {
      *   Opens an image in grayscale.
      */
     @Throws(RuntimeException::class)
-    private fun openImage(name: String): Mat {
+    private fun openImage(name: String, brightness: Double): Mat {
         val image = Imgcodecs.imread("src/main/resources/static/$name")
 
         if (image.empty()) {
@@ -95,10 +111,11 @@ object Recogniser {
         Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY)
 
         //Increase brightness
-        Core.convertScaleAbs(gray, gray, 1.0, BRIGHTNESS)
+        Core.convertScaleAbs(gray, gray, 1.0, brightness)
 
         return gray
     }
+
 
     /**
      *   Finds the largest contour in the image.
@@ -130,6 +147,7 @@ object Recogniser {
         return finalContours.maxByOrNull { Imgproc.contourArea(it) } ?: MatOfPoint()
     }
 
+
     /**
      *   Rotates the image based on the contour.
      */
@@ -137,7 +155,7 @@ object Recogniser {
     private fun rotateBasedOnContour(image: Mat, contour: MatOfPoint): Mat {
         //If contour is empty, return
         if (contour.empty()) {
-            throw RuntimeException("Contour is empty")
+            throw RuntimeException("Contour is empty for rotation")
         }
 
         //Get the rotated rectangle of the contour
@@ -156,6 +174,7 @@ object Recogniser {
         return rotatedImage
     }
 
+
     /**
      *   Cuts out the contour from the image.
      */
@@ -163,7 +182,7 @@ object Recogniser {
     private fun cutoutContour(image: Mat, contour: MatOfPoint): Mat {
         //If contour is empty, return
         if (contour.empty()) {
-            throw RuntimeException("Contour is empty")
+            throw RuntimeException("Contour is empty for cutting it out")
         }
 
         //Get the bounding rectangle of the largest contour
@@ -179,12 +198,12 @@ object Recogniser {
     /**
      *   Cuts the maze into tiles based on the edges.
      */
-    private fun cutMazeToTiles(maze: Mat): List<Mat> {
+    private fun cutMazeToTiles(maze: Mat, config: RecogniserConfiguration): List<Mat> {
         //Get the rows
-        val rows = findLines(maze, horizontal = true) { index, _ -> index % 2 == 0 }
+        val rows = findLines(maze, config, horizontal = true) { index, _ -> index % 2 == 0 }
 
         //Get the columns
-        val columns = findLines(maze, horizontal = false)
+        val columns = findLines(maze, config, horizontal = false)
 
         //Cut the maze into tiles
         val tiles = arrayListOf<Mat>()
@@ -200,7 +219,12 @@ object Recogniser {
     /**
      *   Finds the horizontal or vertical lines in the image and returns the processed indices.
      */
-    private fun findLines(image: Mat, horizontal: Boolean, filter: (Int, List<Int>) -> Boolean = { _, _ -> true }): List<Int> {
+    private fun findLines(
+        image: Mat,
+        config: RecogniserConfiguration,
+        horizontal: Boolean,
+        filter: (Int, List<Int>) -> Boolean = { _, _ -> true },
+    ): List<Int> {
         //Apply Gaussian blur to reduce noise
         val blurredImage = Mat()
         Imgproc.GaussianBlur(image, blurredImage, Size(3.0, 3.0), 0.0)
@@ -221,26 +245,30 @@ object Recogniser {
         val edgeList = mutableListOf<Int>()
         if (horizontal) {
             for (row in 0 until edges.rows()) {
-                if (Core.countNonZero(edges.row(row)) > edges.cols() * LINE_FILL_LIMIT) {
+                if (Core.countNonZero(edges.row(row)) > edges.cols() * config.lineFillLimit) {
                     edgeList.add(row)
                 }
             }
         } else {
             for (col in 0 until edges.cols()) {
-                if (Core.countNonZero(edges.col(col)) > edges.rows() * LINE_FILL_LIMIT) {
+                if (Core.countNonZero(edges.col(col)) > edges.rows() * config.lineFillLimit) {
                     edgeList.add(col)
                 }
             }
         }
 
         //Return the processed indices
-        return processLines(edgeList, filter)
+        return processLines(edgeList, config, filter)
     }
 
     /**
      *   Processes the lines of edges and returns pairs which can be used to cut out the inner parts of the grid.
      */
-    private fun processLines(numbers: List<Int>, filter: (Int, List<Int>) -> Boolean = { _, _ -> true }): List<Int> {
+    private fun processLines(
+        numbers: List<Int>,
+        config: RecogniserConfiguration,
+        filter: (Int, List<Int>) -> Boolean = { _, _ -> true }
+    ): List<Int> {
         val blocks = mutableListOf<List<Int>>()
         var currentBlock = mutableListOf<Int>()
 
@@ -249,40 +277,33 @@ object Recogniser {
             currentBlock.add(numbers[i])
 
             //Is the next number not a continuation of the current block?
-            if (i == numbers.lastIndex || numbers[i] + LINES_MAX_STEP_BETWEEN < numbers[i + 1]) {
+            if (i == numbers.lastIndex || numbers[i] + config.linesMaxStepBetween < numbers[i + 1]) {
                 blocks.add(currentBlock)
                 currentBlock = mutableListOf()
             }
         }
 
         //Make the blocks narrower and then return the number before and after the block
-        return blocks.asSequence().filter { it.size > LINES_MIN_WIDTH_TO_KEEP_FIRST }.map {
-            val removable = ((it.size - LINES_REDUCED_MIN_WIDTH) / 2).coerceAtLeast(0)
+        return blocks.asSequence().filter { it.size > config.linesMinWidthToKeepFirst }.map {
+            val removable = ((it.size - config.linesReducedMinWidth) / 2).coerceAtLeast(0)
             it.drop(removable).dropLast(removable)
         }.filterIndexed(filter).map { listOf(it.first() - 1, it.last() + 1) }.flatten().toList()
     }
 
 
     /**
-     *   Processes a tile and returns the number on it.
+     *   Processes a tile and returns the number on it and a boolean indicating if the tile is marked as part of the path.
      */
-    private fun processTile(tile: Mat, index: Int): String {
-        //Cut every tile into half vertically
-        val lowerHalfFrom = findLines(tile, horizontal = true).dropWhile { it < tile.height() / 4 }.take(2).let {
-            if (it.size >= 2) it[1] else tile.height() / 2
-        }
-        val lowerHalf = Mat(tile, Rect(0, lowerHalfFrom, tile.width(), tile.height() - lowerHalfFrom))
+    private fun processTile(tile: Mat, config: RecogniserConfiguration): Pair<String, Boolean> {
+        //Cut every tile into half horizontally
+        val (upperHalf, lowerHalf) = cutHalfByLine(tile, config, horizontal = true)
 
-        //Cut lowerHalf into half horizontally
-        val (numberLeftUntil, numberRightFrom) = findLines(lowerHalf, horizontal = false).dropWhile { it < lowerHalf.width() / 4 }.take(2).let {
-            if (it.size >= 2) it[0] to it[1] else lowerHalf.width() / 2 to lowerHalf.width() / 2
-        }
-        val numberLeft = Mat(lowerHalf, Rect(0, 0, numberLeftUntil, lowerHalf.height()))
-        val numberRight = Mat(lowerHalf, Rect(numberRightFrom, 0, lowerHalf.width() - numberRightFrom, lowerHalf.height()))
+        //Cut lowerHalf into half vertically
+        val (numberLeft, numberRight) = cutHalfByLine(lowerHalf, config, horizontal = false)
 
         //Process the images
-        val processedLeft = processImage(numberLeft)
-        val processedRight = processImage(numberRight)
+        val processedLeft = processImage(numberLeft, config.noiseLimit)
+        val processedRight = processImage(numberRight, config.noiseLimit)
 
         //Convert the images to float arrays
         val shiftedFloatLeft = matToFloatArray(processedLeft)
@@ -294,7 +315,7 @@ object Recogniser {
 
         //Prediction for the left image
         val left = if (leftIsANumber) {
-            print("$index left:")
+            print("left:")
             for (y in 0 until 28) {
                 for (x in 0 until 28) {
                     print(if (shiftedFloatLeft[y * 28 + x] > 50) "X" else " ")
@@ -309,7 +330,7 @@ object Recogniser {
 
         //Prediction for the right image
         val right = if (rightIsANumber) {
-            print("$index right:")
+            print("right:")
             for (y in 0 until 28) {
                 for (x in 0 until 28) {
                     print(if (shiftedFloatRight[y * 28 + x] > 50) "X" else " ")
@@ -318,17 +339,56 @@ object Recogniser {
             }
 
             ML.predict(shiftedFloatRight).toString()
+        } else ""
+
+        //Cut out the square from the upper half indicating if the tile is part of the path
+        val upperHalfWidth = upperHalf.width()
+        val pathSquareWidth = (upperHalfWidth * 15 / 100)
+        val pathSquareHeight = (upperHalf.height() * 30 / 100)
+        val pathSquarePart = Rect(upperHalfWidth - pathSquareWidth, 0, pathSquareWidth, pathSquareHeight)
+        val pathSquare = Mat(upperHalf, pathSquarePart)
+
+        //Calculate the average intensity of the square to determine if the tile is marked as part of the path
+        val isMarkedAsPath = Core.mean(pathSquare).`val`[0] < 200.0
+
+        return (left + right) to isMarkedAsPath
+    }
+
+    /**
+     *   Cuts the image into two halves based on the lines found in the image.
+     */
+    private fun cutHalfByLine(image: Mat, config: RecogniserConfiguration, horizontal: Boolean): Pair<Mat, Mat> {
+        val size = if (horizontal) image.height() else image.width()
+        val maxCuttingDifference = size / 10
+        val halfPoint = size / 2
+
+        //Find the lines and select that pair which is the closest to the half point
+        val notFoundCutPoint = (halfPoint - (maxCuttingDifference / 2)) to (halfPoint + (maxCuttingDifference / 2))
+        val (firstUntil, secondFrom) = findLines(image, config, horizontal).windowed(2).firstOrNull { (p0, p1) ->
+            halfPoint in (p0 + 1)..<p1 && p1 - p0 <= maxCuttingDifference
+        }?.let { it[0] to it[1] } ?: notFoundCutPoint
+
+        //First half
+        val first = if (horizontal) {
+            Mat(image, Rect(0, 0, image.width(), firstUntil))
         } else {
-            ""
+            Mat(image, Rect(0, 0, firstUntil, image.height()))
         }
 
-        return left + right
+        //Second half
+        val second = if (horizontal) {
+            Mat(image, Rect(0, secondFrom, image.width(), size - secondFrom))
+        } else {
+            Mat(image, Rect(secondFrom, 0, size - secondFrom, image.height()))
+        }
+
+        return first to second
     }
 
     /**
      *   Processes the image to be used as input for the neural network.
      */
-    private fun processImage(image: Mat): Mat {
+    private fun processImage(image: Mat, noiseLimit: Double): Mat {
         //Invert black and white
         Core.subtract(Mat(image.size(), CvType.CV_8U, Scalar(255.0)), image, image)
 
@@ -369,7 +429,7 @@ object Recogniser {
         Core.copyMakeBorder(dilatedImage, paddedImage, 4, 4, 4, 4, Core.BORDER_CONSTANT, Scalar(0.0, 0.0, 0.0))
 
         //Remove noise
-        Core.inRange(paddedImage, Scalar(NOISE_LIMIT), Scalar(255.0), paddedImage)
+        Core.inRange(paddedImage, Scalar(noiseLimit), Scalar(255.0), paddedImage)
 
         //Shift the image
         return shift(paddedImage)
