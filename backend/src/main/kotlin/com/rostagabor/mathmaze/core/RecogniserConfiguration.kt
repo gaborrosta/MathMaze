@@ -48,9 +48,13 @@ class RecogniserConfiguration(
          */
         val configs = listOf(
             RecogniserConfiguration(),
+            RecogniserConfiguration(lineFillLimit = 0.99),
             RecogniserConfiguration(lineFillLimit = 0.97),
+            RecogniserConfiguration(lineFillLimit = 0.95),
             RecogniserConfiguration(brightness = 75.0),
-            RecogniserConfiguration(brightness = 75.0, lineFillLimit = 0.97)
+            RecogniserConfiguration(brightness = 75.0, lineFillLimit = 0.99),
+            RecogniserConfiguration(brightness = 75.0, lineFillLimit = 0.97),
+            RecogniserConfiguration(brightness = 75.0, lineFillLimit = 0.95),
         )
 
     }

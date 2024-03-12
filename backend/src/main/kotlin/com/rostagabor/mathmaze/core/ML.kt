@@ -19,6 +19,7 @@ import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.jetbrains.kotlinx.dl.dataset.embedded.NUMBER_OF_CLASSES
 import org.jetbrains.kotlinx.dl.dataset.embedded.extractImages
 import org.jetbrains.kotlinx.dl.dataset.embedded.extractLabels
+import org.jetbrains.kotlinx.dl.impl.summary.logSummary
 import java.io.File
 
 /**
@@ -46,12 +47,12 @@ object ML {
     /**
      *   The number of epochs to train the model.
      */
-    private const val EPOCHS = 3
+    private const val EPOCHS = 10
 
     /**
      *   The number of images to train the model in one batch.
      */
-    private const val TRAINING_BATCH_SIZE = 1000
+    private const val TRAINING_BATCH_SIZE = 128
 
     /**
      *   The number of images to test the model in one batch.
@@ -160,8 +161,17 @@ object ML {
             metric = Metrics.ACCURACY,
         )
 
+        //Log the summary of the model
+        model.logSummary()
+
         //Train the model
-        model.fit(dataset = train, epochs = EPOCHS, batchSize = TRAINING_BATCH_SIZE)
+        model.fit(
+            trainingDataset = train,
+            validationDataset = test,
+            epochs = EPOCHS,
+            trainBatchSize = TRAINING_BATCH_SIZE,
+            validationBatchSize = TEST_BATCH_SIZE,
+        )
 
         //The model has been trained
         trained = true
