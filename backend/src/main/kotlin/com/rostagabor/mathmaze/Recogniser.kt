@@ -14,7 +14,7 @@ object Recogniser {
      *   Opens and recognises a maze from an image.
      */
     @Throws(RuntimeException::class)
-    fun openAndRecogniseMaze(name: String = "maze1.jpg", width: Int = 11, height: Int = 11, endPoint: Point = Point(10, 10)) {
+    fun openAndRecogniseMaze(name: String = "maze1.jpg", width: Int = 11, height: Int = 11, endPoint: Point = Point(10, 10), numberOfDigits: Int) {
         //Stores the recognised numbers and a boolean indicating if the tile is part of the path
         var recognisedNumbers = Array(height) { Array(width) { "" } }
         val path = arrayListOf<Point>()
@@ -62,7 +62,7 @@ object Recogniser {
                     }
 
                     //Process the tile
-                    val (number, isMarkedAsPath) = processTile(tiles[i], config)
+                    val (number, isMarkedAsPath) = processTile(tiles[i], config, numberOfDigits)
                     println("Tile $p: $number, isMarkedAsPath: $isMarkedAsPath")
 
                     //Save the data
@@ -294,52 +294,49 @@ object Recogniser {
     /**
      *   Processes a tile and returns the number on it and a boolean indicating if the tile is marked as part of the path.
      */
-    private fun processTile(tile: Mat, config: RecogniserConfiguration): Pair<String, Boolean> {
+    @Throws(RuntimeException::class)
+    private fun processTile(tile: Mat, config: RecogniserConfiguration, numberOfDigits: Int): Pair<String, Boolean> {
         //Cut every tile into half horizontally
         val (upperHalf, lowerHalf) = cutHalfByLine(tile, config, horizontal = true)
 
-        //Cut lowerHalf into half vertically
-        val (numberLeft, numberRight) = cutHalfByLine(lowerHalf, config, horizontal = false)
-
-        //Process the images
-        val processedLeft = processImage(numberLeft, config.noiseLimit)
-        val processedRight = processImage(numberRight, config.noiseLimit)
-
-        //Convert the images to float arrays
-        val shiftedFloatLeft = matToFloatArray(processedLeft)
-        val shiftedFloatRight = matToFloatArray(processedRight)
-
-        //Check if the images contain a number or empty
-        val leftIsANumber = shiftedFloatLeft.max() != 0F
-        val rightIsANumber = shiftedFloatRight.max() != 0F
-
-        //Prediction for the left image
-        val left = if (leftIsANumber) {
-            print("left:")
-            for (y in 0 until 28) {
-                for (x in 0 until 28) {
-                    print(if (shiftedFloatLeft[y * 28 + x] > 50) "X" else " ")
-                }
-                println()
-            }
-
-            ML.predict(shiftedFloatLeft).toString()
-        } else {
-            ""
+        //Cut lowerHalf into half or third vertically
+        val numbers = when (numberOfDigits) {
+            2 -> cutHalfByLine(lowerHalf, config, horizontal = false)
+            3 -> cutThirdByLine(lowerHalf, config)
+            else -> throw RuntimeException("Invalid number of digits: $numberOfDigits")
         }
 
-        //Prediction for the right image
-        val right = if (rightIsANumber) {
-            print("right:")
-            for (y in 0 until 28) {
-                for (x in 0 until 28) {
-                    print(if (shiftedFloatRight[y * 28 + x] > 50) "X" else " ")
-                }
-                println()
+        //The predicted number
+        var result = ""
+
+        //Process the numbers one by one
+        numbers.forEach { number ->
+            //Process the image
+            val processed = processImage(number, config.noiseLimit)
+
+            //Drop the image if it is almost empty
+            if (Core.countNonZero(processed) < 10) {
+                return@forEach
             }
 
-            ML.predict(shiftedFloatRight).toString()
-        } else ""
+            //Convert the image to float array
+            val shiftedFloat = matToFloatArray(processed)
+
+            //Check if the image contain a number or empty
+            val isANumber = shiftedFloat.max() != 0F
+
+            //Prediction for the image
+            if (isANumber) {
+                for (y in 0 until 28) {
+                    for (x in 0 until 28) {
+                        print(if (shiftedFloat[y * 28 + x] > 50) "X" else " ")
+                    }
+                    println()
+                }
+
+                result += ML.predict(shiftedFloat).toString()
+            }
+        }
 
         //Cut out the square from the upper half indicating if the tile is part of the path
         val upperHalfWidth = upperHalf.width()
@@ -351,13 +348,13 @@ object Recogniser {
         //Calculate the average intensity of the square to determine if the tile is marked as part of the path
         val isMarkedAsPath = Core.mean(pathSquare).`val`[0] < 200.0
 
-        return (left + right) to isMarkedAsPath
+        return result to isMarkedAsPath
     }
 
     /**
      *   Cuts the image into two halves based on the lines found in the image.
      */
-    private fun cutHalfByLine(image: Mat, config: RecogniserConfiguration, horizontal: Boolean): Pair<Mat, Mat> {
+    private fun cutHalfByLine(image: Mat, config: RecogniserConfiguration, horizontal: Boolean): List<Mat> {
         val size = if (horizontal) image.height() else image.width()
         val maxCuttingDifference = size / 10
         val halfPoint = size / 2
@@ -382,7 +379,39 @@ object Recogniser {
             Mat(image, Rect(secondFrom, 0, size - secondFrom, image.height()))
         }
 
-        return first to second
+        return listOf(first, second)
+    }
+
+    /**
+     *   Cuts the image into three parts based on the lines found in the image.
+     */
+    private fun cutThirdByLine(image: Mat, config: RecogniserConfiguration): List<Mat> {
+        val size = image.width()
+        val maxCuttingDifference = size / 10
+        val thirdPoint = size / 3
+        val twoThirdPoint = 2 * thirdPoint
+
+        //Find the lines and select those pairs which are the closest to the third points
+        val lines = findLines(image, config, horizontal = false)
+        val notFoundFirstCutPoint = (thirdPoint - (maxCuttingDifference / 2)) to (thirdPoint + (maxCuttingDifference / 2))
+        val notFoundSecondCutPoint = (twoThirdPoint - (maxCuttingDifference / 2)) to (twoThirdPoint + (maxCuttingDifference / 2))
+        val (firstUntil, secondFrom) = lines.windowed(2).firstOrNull { (p0, p1) ->
+            thirdPoint in (p0 + 1)..<p1 && p1 - p0 <= maxCuttingDifference
+        }?.let { it[0] to it[1] } ?: notFoundFirstCutPoint
+        val (secondUntil, thirdFrom) = lines.windowed(2).firstOrNull { (p0, p1) ->
+            twoThirdPoint in (p0 + 1)..<p1 && p1 - p0 <= maxCuttingDifference
+        }?.let { it[0] to it[1] } ?: notFoundSecondCutPoint
+
+        //First
+        val first = Mat(image, Rect(0, 0, firstUntil, image.height()))
+
+        //Second
+        val second = Mat(image, Rect(secondFrom, 0, secondUntil - secondFrom, image.height()))
+
+        //Third
+        val third = Mat(image, Rect(thirdFrom, 0, size - thirdFrom, image.height()))
+
+        return listOf(first, second, third)
     }
 
     /**
@@ -424,12 +453,26 @@ object Recogniser {
         val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, Size(2.0, 2.0))
         Imgproc.dilate(rescaledImage, dilatedImage, kernel)
 
+        //Remove noise
+        Core.inRange(dilatedImage, Scalar(noiseLimit), Scalar(255.0), dilatedImage)
+
+        //Count the non-zero pixels in a borderless image
+        val borderSize = 3
+        val nonZeroPixelsInInnerImage = Core.countNonZero(
+            Mat(
+                dilatedImage,
+                Rect(borderSize, borderSize, dilatedImage.width() - 2 * borderSize, dilatedImage.height() - 2 * borderSize)
+            )
+        )
+
+        //If the image is almost empty, return a 28x28 black image (it had content because of a border)
+        if (nonZeroPixelsInInnerImage < 30) {
+            return Mat(28, 28, CvType.CV_8U, Scalar(0.0))
+        }
+
         //Pad the image to size 28x28
         val paddedImage = Mat()
         Core.copyMakeBorder(dilatedImage, paddedImage, 4, 4, 4, 4, Core.BORDER_CONSTANT, Scalar(0.0, 0.0, 0.0))
-
-        //Remove noise
-        Core.inRange(paddedImage, Scalar(noiseLimit), Scalar(255.0), paddedImage)
 
         //Shift the image
         return shift(paddedImage)
