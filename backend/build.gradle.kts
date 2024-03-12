@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
 	id("org.springframework.boot") version "3.2.2"
@@ -68,4 +69,8 @@ tasks.getByName<Jar>("jar") {
 	manifest {
 		attributes["Main-Class"] = "com.rostagabor.mathmaze.MainKt"
 	}
+}
+
+tasks.getByName<BootJar>("bootJar") {
+	mainClass.set("com.rostagabor.mathmaze.MainKt")
 }
