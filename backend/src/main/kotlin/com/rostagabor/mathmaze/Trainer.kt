@@ -11,20 +11,18 @@ import java.io.IOException
 import java.io.InputStream
 
 /**
- *   This trains the Ml model and runs the local recogniser.
+ *   This trains the Ml model, saves it and runs the local recogniser.
  */
 fun main() {
     //Load OpenCV
     loadOpenCV()
 
-    //Train the model
-    ML.train()
+    //Train the model and save it
+    ML.trainAndSave()
 
     //Digitally filled, thin lines
-    R2.openAndRecogniseMaze(
+    openAndRecogniseMaze(
         name = "maze1.jpg",
-        widthInTiles = 11,
-        heightInTiles = 11,
         endPoint = Point(10, 10),
         numberOfDigits = 2,
         expected = ",1,,,,,,,,,,4,7,,,,,,,,,,0,1,,,,,,,,,,10,7,,,,,,,,,,4,1,,,,,,,,,,10,1,,,,,,,,,,10,9,,,4,10,4,6,6,6,10,6,9,,,2,,,,,,2,10,8,18,4,16,15,1,,,,4,,,,,,1,1,,,,14,,,,,,,,,,,",
@@ -58,10 +56,8 @@ fun main() {
     )
 
     //Digitally filled, thin lines, rotated +20 degrees
-    R2.openAndRecogniseMaze(
+    openAndRecogniseMaze(
         name = "maze2.jpg",
-        widthInTiles = 11,
-        heightInTiles = 11,
         endPoint = Point(10, 10),
         numberOfDigits = 2,
         expected = ",1,,,,,,,,,,4,7,,,,,,,,,,0,1,,,,,,,,,,10,7,,,,,,,,,,4,1,,,,,,,,,,10,1,,,,,,,,,,10,9,,,4,10,4,6,6,6,10,6,9,,,2,,,,,,2,10,8,18,4,16,15,1,,,,4,,,,,,1,1,,,,14,,,,,,,,,,,",
@@ -95,10 +91,8 @@ fun main() {
     )
 
     //Digitally filled, thick lines
-    R2.openAndRecogniseMaze(
+    openAndRecogniseMaze(
         name = "maze3.jpg",
-        widthInTiles = 11,
-        heightInTiles = 11,
         endPoint = Point(10, 10),
         numberOfDigits = 2,
         expected = ",1,13,7,7,7,,,,,,4,7,,,,,,,,,,0,,,,,,,,,,,10,7,3,1,1,,,,,,,4,,,,,,,,,,,10,,,,,,,,,,,10,9,,,4,10,4,6,6,6,10,6,,,,2,,,,,,2,10,8,18,4,16,,,,,,4,,,,,,,,,,,14,,,,,,,,,,,",
@@ -132,10 +126,8 @@ fun main() {
     )
 
     //Scanned, 150 dpi, low resolution
-    R2.openAndRecogniseMaze(
+    openAndRecogniseMaze(
         name = "scan1.jpg",
-        widthInTiles = 11,
-        heightInTiles = 11,
         endPoint = Point(8, 10),
         numberOfDigits = 2,
         expected = ",10,4,10,8,7,9,3,5,9,9,9,5,9,7,10,9,5,8,3,9,5,7,7,9,9,4,9,7,7,9,7,9,5,9,7,9,8,7,9,7,7,7,7,7,5,9,7,10,4,10,7,9,7,7,3,9,7,5,3,7,10,7,9,5,9,7,9,3,7,5,9,8,10,6,10,8,5,9,7,3,7,9,5,3,9,9,8,3,9,5,9,5,7,9,9,9,9,6,9,7,9,9,9,7,5,7,9,7,8,7,5,9,3,9,7,3,9,,8,6",
@@ -167,10 +159,8 @@ fun main() {
     )
 
     //Scanned, 300 dpi, low resolution
-    R2.openAndRecogniseMaze(
+    openAndRecogniseMaze(
         name = "scan2.jpg",
-        widthInTiles = 11,
-        heightInTiles = 11,
         endPoint = Point(8, 10),
         numberOfDigits = 2,
         expected = ",10,4,10,8,7,9,3,5,9,9,9,5,9,7,10,9,5,x,3,9,5,7,7,9,9,4,9,7,7,9,7,9,5,9,7,9,8,7,9,7,7,7,7,7,5,9,7,10,4,10,7,9,7,7,3,9,7,5,3,7,10,7,9,5,9,7,9,3,7,5,9,8,10,6,10,8,5,9,7,3,7,9,5,3,9,9,8,3,9,5,9,5,7,9,9,9,9,6,9,7,9,9,9,7,5,7,9,7,8,7,5,9,3,9,7,3,9,,8,6",
@@ -202,10 +192,8 @@ fun main() {
     )
 
     //Scanned, 300 dpi, low resolution
-    R2.openAndRecogniseMaze(
+    openAndRecogniseMaze(
         name = "scan3.jpg",
-        widthInTiles = 11,
-        heightInTiles = 11,
         endPoint = Point(8, 0),
         numberOfDigits = 3,
         expected = ",323,198,270,234,192,182,256,,195,255,228,289,234,225,289,143,209,289,165,285,323,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
@@ -227,10 +215,8 @@ fun main() {
     )
 
     //Scanned, 300 dpi, high resolution
-    R2.openAndRecogniseMaze(
+    openAndRecogniseMaze(
         name = "scan4.jpg",
-        widthInTiles = 11,
-        heightInTiles = 11,
         endPoint = Point(8, 10),
         numberOfDigits = 2,
         expected = ",10,4,10,8,7,9,3,5,9,9,9,5,9,7,10,9,5,x,3,9,5,7,7,9,9,4,9,7,7,9,7,9,5,9,7,9,8,7,9,7,7,7,7,7,5,9,7,10,4,10,7,9,7,7,3,9,7,5,3,7,10,7,9,5,9,7,9,3,7,5,9,8,10,6,10,8,5,9,7,3,7,9,5,3,9,9,8,3,9,5,9,5,7,9,9,9,9,6,9,7,9,9,9,7,5,7,9,7,8,7,5,9,3,9,7,3,9,,8,6",
@@ -262,10 +248,8 @@ fun main() {
     )
 
     //Scanned, 300 dpi, high resolution
-    R2.openAndRecogniseMaze(
+    openAndRecogniseMaze(
         name = "scan5.jpg",
-        widthInTiles = 11,
-        heightInTiles = 11,
         endPoint = Point(8, 0),
         numberOfDigits = 3,
         expected = ",323,198,270,234,192,182,256,,195,255,228,289,234,225,289,143,209,289,165,285,323,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,",
@@ -289,113 +273,110 @@ fun main() {
 
 
 /**
- *   This is just a helper object to open and recognise a maze from an image LOCALLY.
+ *   A custom implementation of the MultipartFile interface to be able to use a file directly.
  */
-object R2 {
+private class R2MultipartFile(private val file: File) : MultipartFile {
 
-    /**
-     *   A custom implementation of the MultipartFile interface to be able to use a file directly.
-     */
-    class R2MultipartFile(private val file: File) : MultipartFile {
+    override fun getName(): String = file.name
 
-        override fun getName(): String = file.name
+    override fun getOriginalFilename(): String = file.name
 
-        override fun getOriginalFilename(): String = file.name
+    override fun getContentType(): String? = null
 
-        override fun getContentType(): String? = null
+    override fun isEmpty(): Boolean = file.length() == 0L
 
-        override fun isEmpty(): Boolean = file.length() == 0L
+    override fun getSize(): Long = file.length()
 
-        override fun getSize(): Long = file.length()
+    override fun getBytes(): ByteArray = file.readBytes()
 
-        override fun getBytes(): ByteArray = file.readBytes()
+    @Throws(IOException::class)
+    override fun getInputStream(): InputStream = FileInputStream(file)
 
-        @Throws(IOException::class)
-        override fun getInputStream(): InputStream = FileInputStream(file)
-
-        @Throws(IOException::class)
-        override fun transferTo(dest: File) {
-            file.copyTo(dest, true)
-        }
-
+    @Throws(IOException::class)
+    override fun transferTo(dest: File) {
+        file.copyTo(dest, true)
     }
 
+}
 
-    /**
-     *   Opens and recognises a maze from an image.
-     */
-    @Throws(RuntimeException::class)
-    fun openAndRecogniseMaze(
-        name: String,
-        widthInTiles: Int,
-        heightInTiles: Int,
-        endPoint: Point,
-        numberOfDigits: Int,
-        expected: String,
-        expectedPath: List<Point>,
-    ) {
-        //Open and recognise the maze
-        val file = R2MultipartFile(File("src/main/resources/static/$name"))
-        val (numbers, path) = Recogniser.recogniseMaze(file, 0, widthInTiles, heightInTiles, endPoint, numberOfDigits)
 
-        //Flatten the numbers
-        val result = numbers.flatten()
+/**
+ *   Opens and recognises a maze from an image.
+ */
+private fun openAndRecogniseMaze(
+    name: String,
+    endPoint: Point,
+    numberOfDigits: Int,
+    expected: String,
+    expectedPath: List<Point>,
+) {
+    //Open and recognise the maze
+    val file = R2MultipartFile(File("src/main/resources/static/$name"))
+    val (numbers, path) = Recogniser.recogniseMaze(
+        uploadedFile = file,
+        rotation = 0,
+        widthInTiles = 11,
+        heightInTiles = 11,
+        endPoint = endPoint,
+        numberOfDigits = numberOfDigits,
+    )
 
-        //Counters
-        var countDigitOk = 0
-        var countNumberOk = 0
-        var countNotExpectedNumber = 0
-        var countNotExpectedDigit = 0
-        var digitsCount = 0
-        var numbersCount = 0
+    //Flatten the numbers
+    val result = numbers.flatten()
 
-        //Check the results
-        expected.split(",").forEachIndexed { i, expectedResult ->
-            if (expectedResult == "") {
-                if (result[i] != "") {
-                    countNotExpectedNumber++
+    //Counters
+    var countDigitOk = 0
+    var countNumberOk = 0
+    var countNotExpectedNumber = 0
+    var countNotExpectedDigit = 0
+    var digitsCount = 0
+    var numbersCount = 0
+
+    //Check the results
+    expected.split(",").forEachIndexed { i, expectedResult ->
+        if (expectedResult == "") {
+            if (result[i] != "") {
+                countNotExpectedNumber++
+            }
+        } else {
+            if (expectedResult != "x") {
+                numbersCount++
+                if (result[i] == expectedResult) {
+                    countNumberOk++
                 }
-            } else {
-                if (expectedResult != "x") {
-                    numbersCount++
-                    if (result[i] == expectedResult) {
-                        countNumberOk++
-                    }
 
-                    val paddedResult = result[i].padStart(3, '-')
-                    expectedResult.padStart(3, '-').forEachIndexed { index, c ->
-                        if (c == '-') {
-                            if (paddedResult[index] != '-') {
-                                countNotExpectedDigit++
-                            }
-                        } else {
-                            digitsCount++
-                            if (paddedResult[index] == c) {
-                                countDigitOk++
-                            }
+                val paddedResult = result[i].padStart(3, '-')
+                expectedResult.padStart(3, '-').forEachIndexed { index, c ->
+                    if (c == '-') {
+                        if (paddedResult[index] != '-') {
+                            countNotExpectedDigit++
+                        }
+                    } else {
+                        digitsCount++
+                        if (paddedResult[index] == c) {
+                            countDigitOk++
                         }
                     }
                 }
             }
         }
-
-        //Check the path
-        val notExpectedPath = path.filter { !expectedPath.contains(it) }
-        val expectedButNotPath = expectedPath.filter { !path.contains(it) }
-
-        //Print the results
-        println("--------------------")
-        println("Image: $name")
-        println("Recognised numbers: $result")
-        println("Recognised path: $path")
-        println("Number ok: $countNumberOk/$numbersCount ${countNumberOk / numbersCount.toFloat() * 100} %")
-        println("Digit ok: $countDigitOk/$digitsCount ${countDigitOk / digitsCount.toFloat() * 100} %")
-        println("Not expected number: $countNotExpectedNumber")
-        println("Not expected digit: $countNotExpectedDigit")
-        println("Not expected path: ${notExpectedPath.size}")
-        println("Expected but not path: ${expectedButNotPath.size}")
-        println("Path ok: ${notExpectedPath.isEmpty() && expectedButNotPath.isEmpty()}")
-        println("--------------------")
     }
 
+    //Check the path
+    val notExpectedPath = path.filter { !expectedPath.contains(it) }
+    val expectedButNotPath = expectedPath.filter { !path.contains(it) }
+
+    //Print the results
+    println("--------------------")
+    println("Image: $name")
+    println("Recognised numbers: $result")
+    println("Recognised path: $path")
+    println("Number ok: $countNumberOk/$numbersCount ${countNumberOk / numbersCount.toFloat() * 100} %")
+    println("Digit ok: $countDigitOk/$digitsCount ${countDigitOk / digitsCount.toFloat() * 100} %")
+    println("Not expected number: $countNotExpectedNumber")
+    println("Not expected digit: $countNotExpectedDigit")
+    println("Not expected path: ${notExpectedPath.size}")
+    println("Expected but not path: ${expectedButNotPath.size}")
+    println("Path ok: ${notExpectedPath.isEmpty() && expectedButNotPath.isEmpty()}")
+    println("--------------------")
 }

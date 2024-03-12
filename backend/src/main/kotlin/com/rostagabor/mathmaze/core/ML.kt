@@ -1,6 +1,7 @@
 package com.rostagabor.mathmaze.core
 
 import org.jetbrains.kotlinx.dl.api.core.Sequential
+import org.jetbrains.kotlinx.dl.api.core.WritingMode
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.initializer.Constant
 import org.jetbrains.kotlinx.dl.api.core.initializer.GlorotNormal
@@ -61,9 +62,9 @@ object ML {
 
 
     /**
-     *   States whether the model has been trained.
+     *   The directory where the model is saved.
      */
-    private var trained = false
+    private val modelDirectory: File = File("model")
 
 
     /**
@@ -148,9 +149,9 @@ object ML {
 
 
     /**
-     *   Train the model and return the accuracy on the test dataset.
+     *   Trains the model and saves it.
      */
-    fun train(): Double? {
+    fun trainAndSave() {
         //Split the dataset into training and testing datasets
         val (train, test) = dataset
 
@@ -173,17 +174,29 @@ object ML {
             validationBatchSize = TEST_BATCH_SIZE,
         )
 
-        //The model has been trained
-        trained = true
+        //Save the model
+        model.save(modelDirectory, writingMode = WritingMode.OVERRIDE)
+    }
 
-        //Evaluate the model on the test dataset
-        return model.evaluate(dataset = test, batchSize = TEST_BATCH_SIZE).metrics[Metrics.ACCURACY]
+    /**
+     *   Loads the weights of the model.
+     */
+    fun loadWeights() {
+        //Configure the model
+        model.compile(
+            optimizer = Adam(clipGradient = ClipGradientByValue(0.1f)),
+            loss = Losses.SOFT_MAX_CROSS_ENTROPY_WITH_LOGITS,
+            metric = Metrics.ACCURACY,
+        )
+
+        //Load the weights
+        model.loadWeights(modelDirectory)
     }
 
 
     /**
      *   Predicts the number on the image.
      */
-    fun predict(image: FloatArray): Int = if (trained) model.predict(image) else 0
+    fun predict(image: FloatArray): Int = model.predict(image)
 
 }
