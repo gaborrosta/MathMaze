@@ -24,7 +24,7 @@ object Recogniser {
         numberOfDigits: Int,
     ): Pair<List<List<String>>, List<Point>> {
         //Stores the recognised numbers and a boolean indicating if the tile is part of the path
-        var recognisedNumbers = Array(heightInTiles) { Array(widthInTiles) { "" } }
+        val recognisedNumbers = arrayListOf<String>()
         val path = arrayListOf<Point>()
 
         //We try different configurations
@@ -39,21 +39,27 @@ object Recogniser {
             //We should not try again unless an exception occurs
             shouldTryAgain = false
 
+            //Create variables to be able to release them
+            var image: Mat? = null
+            var tiles = listOf<Mat>()
+
             //Try while handling exceptions
             try {
                 //Open the image in grayscale
-                var image = openImage(uploadedFile, rotation, config.brightness)
+                image = openImage(uploadedFile, rotation, config.brightness)
 
                 //Find the maze in the image and rotate the image based on the maze
                 var contour = findLargestContour(image)
                 image = rotateBasedOnContour(image, contour)
+                contour.release()
 
                 //Cut out the maze from the image
                 contour = findLargestContour(image)
                 image = cutoutContour(image, contour)
+                contour.release()
 
                 //Cut the maze into tiles
-                val tiles = cutMazeToTiles(image, config)
+                tiles = cutMazeToTiles(image, config)
                 if (tiles.size != widthInTiles * heightInTiles) {
                     throw RuntimeException("The number of tiles is not correct: ${tiles.size} instead of ${widthInTiles * heightInTiles}")
                 }
@@ -64,16 +70,17 @@ object Recogniser {
 
                     //Start and end tiles...
                     if (i == 0 || p == endPoint) {
-                        recognisedNumbers[p.y][p.x] = ""
+                        recognisedNumbers.add("")
                         path.add(p)
                         continue
                     }
 
                     //Process the tile
                     val (number, isMarkedAsPath) = processTile(tiles[i], config, numberOfDigits)
+                    tiles[i].release()
 
                     //Save the data
-                    recognisedNumbers[p.y][p.x] = number
+                    recognisedNumbers.add(number)
                     if (isMarkedAsPath) {
                         path.add(p)
                     }
@@ -86,13 +93,19 @@ object Recogniser {
                 shouldTryAgain = true
 
                 //Clear the variables
-                recognisedNumbers = Array(heightInTiles) { Array(widthInTiles) { "" } }
+                recognisedNumbers.clear()
                 path.clear()
+            } finally {
+                image?.release()
+                tiles.forEach { it.release() }
             }
         } while (shouldTryAgain && configIterator.hasNext())
 
+        //OpenCV is not releasing the memory...
+        System.gc()
+
         //Return the result
-        return recognisedNumbers.map { it.toList() } to path
+        return recognisedNumbers.windowed(size = widthInTiles, step = widthInTiles) to path
     }
 
 
@@ -102,7 +115,9 @@ object Recogniser {
     @Throws(RuntimeException::class)
     private fun openImage(uploadedFile: MultipartFile, rotation: Int, brightness: Double): Mat {
         //Convert MultipartFile to Mat object
-        val image = Imgcodecs.imdecode(MatOfByte(*uploadedFile.bytes), Imgcodecs.IMREAD_UNCHANGED)
+        val matOfByte = MatOfByte(*uploadedFile.bytes)
+        val image = Imgcodecs.imdecode(matOfByte, Imgcodecs.IMREAD_UNCHANGED)
+        matOfByte.release()
 
         //Check if the image is empty
         if (image.empty()) {
@@ -110,15 +125,12 @@ object Recogniser {
         }
 
         //Convert the image to grayscale
-        var gray = Mat()
         if (image.channels() > 1) {
-            Imgproc.cvtColor(image, gray, Imgproc.COLOR_BGR2GRAY)
-        } else {
-            gray = image.clone()
+            Imgproc.cvtColor(image, image, Imgproc.COLOR_BGR2GRAY)
         }
 
         //Increase brightness
-        Core.convertScaleAbs(gray, gray, 1.0, brightness)
+        Core.convertScaleAbs(image, image, 1.0, brightness)
 
         //Rotate if needed
         return if (rotation != 0) {
@@ -128,11 +140,10 @@ object Recogniser {
                 270 -> Core.ROTATE_90_COUNTERCLOCKWISE
                 else -> throw RuntimeException("Invalid rotation value: $rotation")
             }
-            val rotatedImage = Mat()
-            Core.rotate(gray, rotatedImage, rotateCode)
-            rotatedImage
+            Core.rotate(image, image, rotateCode)
+            image
         } else {
-            gray
+            image
         }
     }
 
@@ -153,18 +164,25 @@ object Recogniser {
 
         //Fill contours
         Imgproc.drawContours(thresh, contours, -1, Scalar(255.0, 255.0, 255.0), -1)
+        contours.forEach { it.release() }
 
         //Morph open
         val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, Size(9.0, 9.0))
         val opening = Mat()
         Imgproc.morphologyEx(thresh, opening, Imgproc.MORPH_OPEN, kernel)
+        thresh.release()
+        kernel.release()
 
         //Find contours
         val finalContours = arrayListOf<MatOfPoint>()
         Imgproc.findContours(opening, finalContours, Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE)
+        opening.release()
 
         //Find the biggest rectangle contour
-        return finalContours.maxByOrNull { Imgproc.contourArea(it) } ?: MatOfPoint()
+        val max = finalContours.maxByOrNull { Imgproc.contourArea(it) } ?: MatOfPoint()
+        finalContours.forEach { if (it != max) it.release() }
+
+        return max
     }
 
 
@@ -188,10 +206,10 @@ object Recogniser {
         val rotationMatrix = Imgproc.getRotationMatrix2D(rotatedRect.center, angle, 1.0)
 
         //Apply the rotation to the entire image
-        val rotatedImage = Mat()
-        Imgproc.warpAffine(image, rotatedImage, rotationMatrix, image.size())
+        Imgproc.warpAffine(image, image, rotationMatrix, image.size())
+        rotationMatrix.release()
 
-        return rotatedImage
+        return image
     }
 
 
@@ -256,10 +274,7 @@ object Recogniser {
         } else {
             Imgproc.Sobel(blurredImage, edges, CvType.CV_16S, 1, 0)
         }
-
-        //Convert back to CV_8U
-        val absEdges = Mat()
-        Core.convertScaleAbs(edges, absEdges)
+        blurredImage.release()
 
         //Find the rows/columns that are almost entirely edges
         val edgeList = mutableListOf<Int>()
@@ -276,6 +291,7 @@ object Recogniser {
                 }
             }
         }
+        edges.release()
 
         //Return the processed indices
         return processLines(edgeList, config, filter)
@@ -325,6 +341,7 @@ object Recogniser {
             3 -> cutThirdByLine(lowerHalf, config)
             else -> throw RuntimeException("Invalid number of digits: $numberOfDigits")
         }
+        lowerHalf.release()
 
         //The predicted number
         var result = ""
@@ -333,6 +350,7 @@ object Recogniser {
         numbers.forEach { number ->
             //Process the image
             val processed = processImage(number, config.noiseLimit)
+            number.release()
 
             //Drop the image if it is almost empty
             if (Core.countNonZero(processed) < 10) {
@@ -341,6 +359,7 @@ object Recogniser {
 
             //Convert the image to float array
             val shiftedFloat = matToFloatArray(processed)
+            processed.release()
 
             //Check if the image contain a number or empty
             val isANumber = shiftedFloat.max() != 0F
@@ -360,6 +379,8 @@ object Recogniser {
 
         //Calculate the average intensity of the square to determine if the tile is marked as part of the path
         val isMarkedAsPath = Core.mean(pathSquare).`val`[0] < 200.0
+        upperHalf.release()
+        pathSquare.release()
 
         return result to isMarkedAsPath
     }
@@ -432,10 +453,12 @@ object Recogniser {
      */
     private fun processImage(image: Mat, noiseLimit: Double): Mat {
         //Invert black and white
-        Core.subtract(Mat(image.size(), CvType.CV_8U, Scalar(255.0)), image, image)
+        val inverter = Mat(image.size(), CvType.CV_8U, Scalar(255.0))
+        Core.subtract(inverter, image, image)
+        inverter.release()
 
         //Remove the white space
-        val borderlessImage = removeEmptyRowsAndColumns(image)
+        var borderlessImage = removeEmptyRowsAndColumns(image)
 
         //Find its longest dimension
         val height = borderlessImage.height()
@@ -444,6 +467,7 @@ object Recogniser {
 
         //If the image is empty, return a 28x28 black image
         if (width == 0 && height == 0) {
+            borderlessImage.release()
             return Mat(28, 28, CvType.CV_8U, Scalar(0.0))
         }
 
@@ -456,39 +480,46 @@ object Recogniser {
         //Make the image square
         val squareImage = Mat()
         Core.copyMakeBorder(borderlessImage, squareImage, top, bottom, left, right, Core.BORDER_CONSTANT, Scalar(0.0))
+        borderlessImage.release()
 
         //Rescale the image to 20x20
         val rescaledImage = Mat()
         Imgproc.resize(squareImage, rescaledImage, Size(20.0, 20.0))
+        squareImage.release()
 
         //Apply dilation
         val dilatedImage = Mat()
         val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, Size(2.0, 2.0))
         Imgproc.dilate(rescaledImage, dilatedImage, kernel)
+        rescaledImage.release()
+        kernel.release()
 
         //Remove noise with the help of a mask
         val mask = Mat()
         Core.inRange(dilatedImage, Scalar(noiseLimit), Scalar(255.0), mask)
         Core.bitwise_not(mask, mask)
         dilatedImage.setTo(Scalar(0.0), mask)
+        mask.release()
 
         //Count the non-zero pixels in a borderless image
         val borderSize = 3
-        val nonZeroPixelsInInnerImage = Core.countNonZero(
-            Mat(
-                dilatedImage,
-                Rect(borderSize, borderSize, dilatedImage.width() - 2 * borderSize, dilatedImage.height() - 2 * borderSize)
-            )
+        borderlessImage = Mat(
+            dilatedImage,
+            Rect(borderSize, borderSize, dilatedImage.width() - 2 * borderSize, dilatedImage.height() - 2 * borderSize)
         )
+        val nonZeroPixelsInInnerImage = Core.countNonZero(borderlessImage)
+        borderlessImage.release()
 
         //If the image is almost empty, return a 28x28 black image (it had content because of a border)
         if (nonZeroPixelsInInnerImage < 30) {
+            dilatedImage.release()
             return Mat(28, 28, CvType.CV_8U, Scalar(0.0))
         }
 
         //Pad the image to size 28x28
         val paddedImage = Mat()
         Core.copyMakeBorder(dilatedImage, paddedImage, 4, 4, 4, 4, Core.BORDER_CONSTANT, Scalar(0.0, 0.0, 0.0))
+        dilatedImage.release()
 
         //Shift the image
         return shift(paddedImage)
@@ -554,10 +585,10 @@ object Recogniser {
         m.put(1, 2, shiftY.toDouble())
 
         //Shift the image
-        val shiftedImage = Mat()
-        Imgproc.warpAffine(image, shiftedImage, m, Size(width.toDouble(), height.toDouble()))
+        Imgproc.warpAffine(image, image, m, Size(width.toDouble(), height.toDouble()))
+        m.release()
 
-        return shiftedImage
+        return image
     }
 
     /**
@@ -569,6 +600,8 @@ object Recogniser {
         val size = floatMat.rows() * floatMat.cols() * floatMat.channels()
         val floatArray = FloatArray(size)
         floatMat.get(0, 0, floatArray)
+        floatMat.release()
+
         return floatArray.map { it * 255 }.toFloatArray()
     }
 
