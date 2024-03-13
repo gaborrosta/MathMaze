@@ -275,7 +275,7 @@ fun main() {
 /**
  *   A custom implementation of the MultipartFile interface to be able to use a file directly.
  */
-private class R2MultipartFile(private val file: File) : MultipartFile {
+private class LocalMultipartFile(private val file: File) : MultipartFile {
 
     override fun getName(): String = file.name
 
@@ -311,7 +311,7 @@ private fun openAndRecogniseMaze(
     expectedPath: List<Point>,
 ) {
     //Open and recognise the maze
-    val file = R2MultipartFile(File("src/main/resources/static/$name"))
+    val file = LocalMultipartFile(File("src/main/resources/static/$name"))
     val (numbers, path) = Recogniser.recogniseMaze(
         uploadedFile = file,
         rotation = 0,

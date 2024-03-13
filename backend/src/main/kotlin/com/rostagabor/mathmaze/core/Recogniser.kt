@@ -466,8 +466,11 @@ object Recogniser {
         val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, Size(2.0, 2.0))
         Imgproc.dilate(rescaledImage, dilatedImage, kernel)
 
-        //Remove noise
-        Core.inRange(dilatedImage, Scalar(noiseLimit), Scalar(255.0), dilatedImage)
+        //Remove noise with the help of a mask
+        val mask = Mat()
+        Core.inRange(dilatedImage, Scalar(noiseLimit), Scalar(255.0), mask)
+        Core.bitwise_not(mask, mask)
+        dilatedImage.setTo(Scalar(0.0), mask)
 
         //Count the non-zero pixels in a borderless image
         val borderSize = 3
