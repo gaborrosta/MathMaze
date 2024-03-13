@@ -46,11 +46,13 @@ export default function CheckMaze() {
       setStep(1);
     })
     .catch(error => {
-      console.log(error); //TODO...
       setLoading(false);
 
       if (!error.response) {
         setError("error-unknown");
+        return;
+      } else if (error.response.status === 413) {
+        setError("error-file-too-large");
         return;
       }
 
@@ -62,7 +64,7 @@ export default function CheckMaze() {
           setError("error-invalid-rotation");
           break;
         case "CouldNotRecogniseMazeException":
-          setError("error-could-not-regonise-maze");
+          setError("error-could-not-recognise-maze");
           break;
         default:
           setError("error-unknown-form");
@@ -96,7 +98,6 @@ export default function CheckMaze() {
       setStep(2);
     })
     .catch(error => {
-      console.log(error); //TODO...
       setLoading(false);
 
       if (!error.response) {
