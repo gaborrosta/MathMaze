@@ -111,6 +111,8 @@ data class Maze(
             this["path"] = sendablePath
             this["even"] = pathTypeEven
             this["digits"] = numberOfDigits
+            this["location"] = location
+            this["description"] = description
         }
 
     /**
@@ -118,8 +120,6 @@ data class Maze(
      */
     val displayableDataObject: JsonObject
         get() = jsonObject.apply {
-            this["location"] = location
-            this["description"] = description
             this["numbersRangeStart"] = numbersRangeStart
             this["numbersRangeEnd"] = numbersRangeEnd
             this["operation"] = operation.ordinal

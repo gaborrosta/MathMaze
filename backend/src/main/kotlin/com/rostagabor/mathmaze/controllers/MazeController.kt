@@ -4,6 +4,7 @@ import com.beust.klaxon.JsonObject
 import com.rostagabor.mathmaze.requests.MazeCheckRequest
 import com.rostagabor.mathmaze.requests.MazeGenerationRequest
 import com.rostagabor.mathmaze.requests.MazeSaveRequest
+import com.rostagabor.mathmaze.requests.MazeUpdateRequest
 import com.rostagabor.mathmaze.services.MazeService
 import com.rostagabor.mathmaze.services.UserService
 import org.springframework.http.ResponseEntity
@@ -26,19 +27,23 @@ class MazeController(
     @PostMapping("/generate")
     fun generate(@RequestBody mazeGenerationRequest: MazeGenerationRequest): ResponseEntity<Any> {
         return try {
+            //Authentication status
             val (_, token) = userService.regenerateTokenIfStillValid(mazeGenerationRequest.token)
 
+            //Generate the maze
             val maze = mazeService.generateMaze(
-                mazeGenerationRequest.width,
-                mazeGenerationRequest.height,
-                mazeGenerationRequest.numbersRangeStart,
-                mazeGenerationRequest.numbersRangeEnd,
-                mazeGenerationRequest.operation,
-                mazeGenerationRequest.pathTypeEven,
-                mazeGenerationRequest.minLength,
-                mazeGenerationRequest.maxLength,
-                mazeGenerationRequest.discardedMazes,
+                width = mazeGenerationRequest.width,
+                height = mazeGenerationRequest.height,
+                numbersRangeStart = mazeGenerationRequest.numbersRangeStart,
+                numbersRangeEnd = mazeGenerationRequest.numbersRangeEnd,
+                operation = mazeGenerationRequest.operation,
+                pathTypeEven = mazeGenerationRequest.pathTypeEven,
+                minLength = mazeGenerationRequest.minLength,
+                maxLength = mazeGenerationRequest.maxLength,
+                discardedMazes = mazeGenerationRequest.discardedMazes,
             )
+
+            //Create the response
             ResponseEntity.ok().body(
                 JsonObject().apply {
                     this["maze"] = maze
@@ -57,9 +62,44 @@ class MazeController(
     @PostMapping("/save")
     fun save(@RequestBody mazeSaveRequest: MazeSaveRequest): ResponseEntity<Any> {
         return try {
+            //Authentication status
             val (email, token) = userService.regenerateTokenIfStillValid(mazeSaveRequest.token)
 
-            val maze = mazeService.saveMaze(email, mazeSaveRequest.mazeId)
+            //Save the maze
+            val (maze, locations) = mazeService.saveMaze(
+                email = email,
+                mazeId = mazeSaveRequest.mazeId,
+            )
+
+            //Create the response
+            ResponseEntity.ok().body(
+                JsonObject().apply {
+                    this["maze"] = maze
+                    this["locations"] = locations
+                    this["token"] = token
+                }
+            )
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(e::class.simpleName)
+        }
+    }
+
+
+    @PostMapping("/update")
+    fun update(@RequestBody mazeUpdateRequest: MazeUpdateRequest): ResponseEntity<Any> {
+        return try {
+            //Authentication status
+            val (email, token) = userService.regenerateTokenIfStillValid(mazeUpdateRequest.token)
+
+            //Update the maze
+            val maze = mazeService.updateMaze(
+                email = email,
+                mazeId = mazeUpdateRequest.mazeId,
+                description = mazeUpdateRequest.description ?: "",
+                location = mazeUpdateRequest.location,
+            )
+
+            //Create the response
             ResponseEntity.ok().body(
                 JsonObject().apply {
                     this["maze"] = maze
@@ -67,6 +107,7 @@ class MazeController(
                 }
             )
         } catch (e: Exception) {
+            e.printStackTrace()
             ResponseEntity.badRequest().body(e::class.simpleName)
         }
     }
@@ -83,9 +124,17 @@ class MazeController(
         @RequestParam("token") token: String?,
     ): ResponseEntity<Any> {
         return try {
+            //Authentication status
             val (_, newToken) = userService.regenerateTokenIfStillValid(token)
 
-            val recognisedMaze = mazeService.recogniseMaze(mazeId, image, rotation)
+            //Recognise the maze
+            val recognisedMaze = mazeService.recogniseMaze(
+                mazeId = mazeId,
+                image = image,
+                rotation = rotation,
+            )
+
+            //Create the response
             ResponseEntity.ok().body(
                 JsonObject().apply {
                     this["recognisedMaze"] = recognisedMaze
@@ -104,9 +153,19 @@ class MazeController(
     @PostMapping("/check")
     fun check(@RequestBody mazeCheckRequest: MazeCheckRequest): ResponseEntity<Any> {
         return try {
+            //Authentication status
             val (email, token) = userService.regenerateTokenIfStillValid(mazeCheckRequest.token)
 
-            val maze = mazeService.checkMaze(mazeCheckRequest.mazeId, mazeCheckRequest.data, mazeCheckRequest.path, mazeCheckRequest.nickname, email)
+            //Check the maze
+            val maze = mazeService.checkMaze(
+                mazeId = mazeCheckRequest.mazeId,
+                data = mazeCheckRequest.data,
+                path = mazeCheckRequest.path,
+                nickname = mazeCheckRequest.nickname,
+                email = email,
+            )
+
+            //Create the response
             ResponseEntity.ok().body(
                 JsonObject().apply {
                     this["checkedMaze"] = maze
@@ -125,12 +184,19 @@ class MazeController(
     @GetMapping("/getAll")
     fun getAll(@RequestParam token: String): ResponseEntity<Any> {
         return try {
+            //Authentication status
             val (email, newToken) = userService.regenerateTokenIfStillValid(token)
-            val mazes = mazeService.getAllMazes(email)
 
+            //Get all mazes
+            val (mazes, locations) = mazeService.getAllMazes(
+                email = email,
+            )
+
+            //Create the response
             ResponseEntity.ok().body(
                 JsonObject().apply {
                     this["mazes"] = mazes
+                    this["locations"] = locations
                     this["token"] = newToken
                 }
             )

@@ -1,6 +1,7 @@
 package com.rostagabor.mathmaze.core
 
 import com.rostagabor.mathmaze.data.Point
+import com.rostagabor.mathmaze.utils.CouldNotRecogniseMazeException
 import org.opencv.core.*
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
@@ -103,6 +104,11 @@ object Recogniser {
 
         //OpenCV is not releasing the memory...
         System.gc()
+
+        //If we tried every configuration and none of them worked, throw an exception
+        if (recognisedNumbers.isEmpty()) {
+            throw CouldNotRecogniseMazeException()
+        }
 
         //Return the result
         return recognisedNumbers.windowed(size = widthInTiles, step = widthInTiles) to path
