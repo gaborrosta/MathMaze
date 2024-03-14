@@ -413,7 +413,7 @@ export default function GenerateMaze() {
           </div>
         </Col>
       </Row>
-      <MazeModal data={maze} visible={modalVisible} setVisible={setModalVisible} />
+      <MazeModal data={maze} visible={modalVisible} setVisible={setModalVisible} locations={locations} />
     </>
   );
 }

@@ -6,6 +6,7 @@ import axios from "axios";
 import { TokenContext } from "../utils/TokenContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import MazeModal from "../components/MazeModal";
+import LocationList from "../components/LocationList";
 
 export default function Account() {
   const { i18n, t } = useTranslation();
@@ -59,6 +60,10 @@ export default function Account() {
       setLoading(false);
     });
   }, []);
+
+  const mazeChanged = (newMaze) => {
+    setMazes(mazes.map(maze => maze.id === newMaze.id ? newMaze : maze));
+  }
 
   const [formData, setFormData] = useState({
     oldPassword: "",
@@ -199,7 +204,9 @@ export default function Account() {
               <Row>
                 <Col xs={12} md={4}>
                   <div className="border p-3 m-2">
-                    <p>TODO...</p>
+                    <p>{t("account-locations")}</p>
+                    <LocationList locations={locations} onLocationChange={setSelectedLocation} />
+                    <Alert variant="info" className="mt-3">{t("account-locations-info")}</Alert>
                   </div>
                 </Col>
                 <Col xs={12} md={8}>
@@ -237,7 +244,7 @@ export default function Account() {
                 </Col>
               </Row>
             }
-            <MazeModal data={maze} visible={modalVisible} setVisible={closeModal} />
+            <MazeModal data={maze} visible={modalVisible} setVisible={closeModal} locations={locations} mazeChanged={mazeChanged} justCreated={false} />
           </Tab>
           <Tab eventKey="settings" title={t("account-settings")}>
             <Col>

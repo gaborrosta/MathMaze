@@ -65,7 +65,7 @@
     "maze-path-length": "The length of the path: {{length}}",
     "maze-generate-title": "Generate Maze",
     "maze-generate-info": "You can generate a maze with the desired options.",
-    "maze-generate-info-not-logged-in": "You are not logged in. You can still generate a maze, but you won't be able to save it to your collection.",
+    "maze-generate-info-not-logged-in": "You are not logged in. You can still generate a maze, but anyone will be able to solve it and you will not be able to see anyone's solutions.",
     "maze-generate-not-yet-generated-info": "You will see your maze here after you generate one.",
     "maze-width": "Maze width",
     "maze-generate-width-help": "Enter the desired width for the maze.",
@@ -173,5 +173,17 @@
     "maze-check-wrong": "Incorrect result",
     "maze-check-correct-path": "Correctly part of the path",
     "maze-check-wrong-path": "Not part of the path, but marked as such",
-    "maze-check-missed-path": "Part of the path, but not marked"
+    "maze-check-missed-path": "Part of the path, but not marked",
+    "maze-generated-not-logged-in": "You can download the maze now, but anyone can download it or solve online via the following link:",
+    "maze-can-edit": "Here you can edit the description of the maze, move it to a different folder, or edit the share settings.",
+    "description-help": "You can edit the description which will be visible to everyone who wants to solve your maze.",
+    "location": "Folder",
+    "account-locations": "Your folders",
+    "account-locations-info": "You can create folders to organise your mazes. You can move a maze to a folder or create a new folder in the maze managing popup. A folder will be automatically deleted when it becomes empty.",
+    "maze-save": "Save maze",
+    "maze-updated": "The maze has been updated.",
+    "error-invalid-description": "Invalid description. You cannot use special characters.",
+    "error-save-maze-user-not-found": "We could not find you in the database. Please log in again.",
+    "error-save-maze-invalid-id": "Invalid maze ID. Please try again.",
+    "error-save-maze-owner": "You are not the owner of this maze, so you cannot edit it."
 }

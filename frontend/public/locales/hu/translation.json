@@ -64,7 +64,7 @@
     "maze-path-length": "Az útvonal hossza: {{length}}",
     "maze-generate-title": "Labirintus készítése",
     "maze-generate-info": "Készíts egy labirintust a kívánt beállításokkal.",
-    "maze-generate-info-not-logged-in": "Nem vagy bejelentkezve. Így is készíthetsz egy labirintust, de nem fogod tudni elmenteni a gyűjteményedbe.",
+    "maze-generate-info-not-logged-in": "Nem vagy bejelentkezve. Így is készíthetsz egy labirintust, de bárki megoldhatja és nem fogod tudni megnézni senki megoldását.",
     "maze-generate-not-yet-generated-info": "Itt fog megjelenni a labirintusod, ha készítettél egyet.",
     "maze-width": "Labirintus szélessége",
     "maze-generate-width-help": "Add meg a kívánt szélességet.",
@@ -172,5 +172,17 @@
     "maze-check-wrong": "Hibás eredmény",
     "maze-check-correct-path": "Helyesen része az útvonalnak",
     "maze-check-wrong-path": "Nem része az útvonalnak, de annak lett jelölve",
-    "maze-check-missed-path": "Része az útvonalnak, de nem lett jelölve"
+    "maze-check-missed-path": "Része az útvonalnak, de nem lett jelölve",
+    "maze-generated-not-logged-in": "Letöltheted a labirintust most, de bárki letöltheti vagy online megoldhatja a következő linken:",
+    "maze-can-edit": "Itt szerkesztheted a labirintus leírását, áthelyezheted egy másik mappába, vagy szerkesztheted a megosztási beállításokat.",
+    "description-help": "Szerkesztheted a leírást, amely mindenki számára látható lesz, aki meg akarja oldani a labirintust.",
+    "location": "Mappa",
+    "account-locations": "Mappáid",
+    "account-locations-info": "Létrehozhatsz mappákat a labirintusok rendezéséhez. Labirintust áthelyezhezni egy mappába és mappát létrehozni a labirintust kezelő ablakban tudsz. Egy mappa automatikusan törlődik, amikor üressé válik.",
+    "maze-save": "Labirintus mentése",
+    "maze-updated": "A labirintus sikeresen frissítve lett.",
+    "error-invalid-description": "Érvénytelen leírás. Nem használhatsz speciális karaktereket.",
+    "error-save-maze-user-not-found": "Nem találhatunk az adatbázisban. Kérjük, jelentkezz be újra.",
+    "error-save-maze-invalid-id": "Érvénytelen labirintus azonosító. Kérjük, próbáld újra.",
+    "error-save-maze-owner": "Ez nem a Te labirintusod, így nem tudod szerkeszteni."
 }
