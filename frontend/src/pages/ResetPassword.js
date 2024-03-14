@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Form, Button, Alert } from "react-bootstrap";
-import { BASE_URL } from "../utils/constants";
+import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 
 export default function ResetPassword() {
@@ -53,7 +53,7 @@ export default function ResetPassword() {
     setIsRequestInProgress(true);
 
     //Send data
-    axios.post(`${BASE_URL}/users/password-request`, data, {
+    axios.post(`${BACKEND_URL}/users/password-request`, data, {
       headers: {
         "Content-Type": "application/json"
       }

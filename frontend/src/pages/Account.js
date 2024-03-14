@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Row, Col, Alert, Button, Card, Tabs, Tab, Form, InputGroup } from "react-bootstrap";
-import { BASE_URL } from "../utils/constants";
+import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 import { TokenContext } from "../utils/TokenContext";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -30,6 +30,9 @@ export default function Account() {
   const [modalVisible, setModalVisible] = useState(false);
   const [maze, setMaze] = useState("");
 
+  const [locations, setLocations] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState("/");
+
   const openModal = (newMaze) => {
     setMaze(newMaze);
     setModalVisible(true);
@@ -41,13 +44,14 @@ export default function Account() {
   };
 
   useEffect(() => {
-    axios.get(`${BASE_URL}/maze/getAll?token=${tokenRef.current}`)
+    axios.get(`${BACKEND_URL}/maze/getAll?token=${tokenRef.current}`)
     .then(response => {
       setTokenRef.current(response.data.token);
 
       setTimeout(() => {
         setLoading(false);
         setMazes(response.data.mazes);
+        setLocations(response.data.locations);
       }, 1000);
     })
     .catch(_ => {
@@ -140,7 +144,7 @@ export default function Account() {
     setIsRequestInProgress(true);
 
     //Send data
-    axios.post(`${BASE_URL}/users/account-password-reset`, data, {
+    axios.post(`${BACKEND_URL}/users/account-password-reset`, data, {
       headers: {
         "Content-Type": "application/json"
       }
@@ -200,7 +204,7 @@ export default function Account() {
                 </Col>
                 <Col xs={12} md={8}>
                   <div className="m-2">
-                    {mazes.map((maze, index) => (
+                  {mazes.filter(maze => maze.location === selectedLocation).map((maze, index) => (
                       <Card key={index} className={index < mazes.length - 1 ? "mb-3" : ""}>
                         <Card.Body>
                           <Card.Title>{t("maze-title")} #{maze.id}</Card.Title>

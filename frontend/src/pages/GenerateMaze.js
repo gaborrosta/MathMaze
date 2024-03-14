@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Row, Col, Alert, Form, Button } from "react-bootstrap";
 import MazeGrid from "../components/MazeGrid";
 import MazeModal from "../components/MazeModal";
-import { BASE_URL } from "../utils/constants";
+import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 import { TokenContext } from "../utils/TokenContext";
 
@@ -20,6 +20,7 @@ export default function GenerateMaze() {
   const isMultiplicationOrDivision = value => value === "MULTIPLICATION" || value === "DIVISION" || value === "BOTH_MULTIPLICATION_AND_DIVISION";
 
   const [maze, setMaze] = useState("");
+  const [locations, setLocations] = useState(null);
 
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -203,7 +204,7 @@ export default function GenerateMaze() {
     setIsRequestInProgress(true);
 
     //Send data
-    axios.post(`${BASE_URL}/maze/generate`, data, {
+    axios.post(`${BACKEND_URL}/maze/generate`, data, {
       headers: {
         "Content-Type": "application/json"
       }
@@ -256,7 +257,7 @@ export default function GenerateMaze() {
     setIsRequestInProgress(true);
 
     //Send data
-    axios.post(`${BASE_URL}/maze/save`, data, {
+    axios.post(`${BACKEND_URL}/maze/save`, data, {
       headers: {
         "Content-Type": "application/json"
       }
@@ -264,6 +265,7 @@ export default function GenerateMaze() {
     .then(response => {
       setSaveError("");
       setToken(response.data.token);
+      setLocations(response.data.locations);
       setMaze(response.data.maze);
       setModalVisible(true);
     })

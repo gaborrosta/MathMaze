@@ -3,7 +3,7 @@ import { useSearchParams  } from "react-router-dom"
 import Loading from "react-fullscreen-loading";
 import { useTranslation } from "react-i18next";
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
-import { BASE_URL } from "../utils/constants";
+import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 
 export default function SetPassword() {
@@ -47,7 +47,7 @@ export default function SetPassword() {
     } else {
       setTokenError("");
 
-      axios.get(`${BASE_URL}/users/password-validate?token=${token}`)
+      axios.get(`${BACKEND_URL}/users/password-validate?token=${token}`)
       .then(_ => {
         loadingDone();
       })
@@ -120,7 +120,7 @@ export default function SetPassword() {
     setIsRequestInProgress(true);
 
     //Send data
-    axios.post(`${BASE_URL}/users/password-reset`, data, {
+    axios.post(`${BACKEND_URL}/users/password-reset`, data, {
       headers: {
         "Content-Type": "application/json"
       }

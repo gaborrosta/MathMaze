@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Container, Modal } from "react-bootstrap";
 import Menu from "../components/Menu";
-import { BASE_URL } from "../utils/constants";
+import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 import { TokenContext } from "./TokenContext";
 
@@ -73,7 +73,7 @@ const Layout = () => {
     //Start a new timeout if there is a token
     if (token) {
       timeoutId.current = setTimeout(() => {
-        axios.get(`${BASE_URL}/users/check?token=${token}`)
+        axios.get(`${BACKEND_URL}/users/check?token=${token}`)
         .catch(_ => {
           expired();
         });

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { useNavigate, Link, useLocation } from "react-router-dom"
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
-import { BASE_URL } from "../utils/constants";
+import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 import { TokenContext } from "../utils/TokenContext";
 
@@ -72,7 +72,7 @@ export default function Login() {
     setIsRequestInProgress(true);
 
     //Send data
-    axios.post(`${BASE_URL}/users/login`, data, {
+    axios.post(`${BACKEND_URL}/users/login`, data, {
       headers: {
         "Content-Type": "application/json"
       }

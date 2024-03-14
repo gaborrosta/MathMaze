@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom"
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
-import { BASE_URL } from "../utils/constants";
+import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 import { TokenContext } from "../utils/TokenContext";
 
@@ -106,7 +106,7 @@ export default function Signup() {
     setIsRequestInProgress(true);
 
     //Send data
-    axios.post(`${BASE_URL}/users/register`, data, {
+    axios.post(`${BACKEND_URL}/users/register`, data, {
       headers: {
         "Content-Type": "application/json"
       }

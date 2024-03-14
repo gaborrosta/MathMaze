@@ -5,7 +5,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import CheckMazeUpload from "../components/CheckMazeUpload";
 import CheckMazeRecognise from "../components/CheckMazeRecognise";
 import CheckMazeResults from "../components/CheckMazeResults";
-import { BASE_URL } from "../utils/constants";
+import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 import { TokenContext } from "../utils/TokenContext";
 
@@ -33,7 +33,7 @@ export default function CheckMaze() {
 
     setMazeId(data.get("mazeId"));
 
-    axios.post(`${BASE_URL}/maze/recognise`, data, {
+    axios.post(`${BACKEND_URL}/maze/recognise`, data, {
       headers: {
         "Content-Type": "multipart/form-data"
       }
@@ -85,7 +85,7 @@ export default function CheckMaze() {
       path: data.path,
     }));
 
-    axios.post(`${BASE_URL}/maze/check`, data, {
+    axios.post(`${BACKEND_URL}/maze/check`, data, {
       headers: {
         "Content-Type": "application/json"
       }
