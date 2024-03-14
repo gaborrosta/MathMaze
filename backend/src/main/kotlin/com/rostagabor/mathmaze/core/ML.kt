@@ -48,7 +48,7 @@ object ML {
     /**
      *   The number of epochs to train the model.
      */
-    private const val EPOCHS = 15
+    private const val EPOCHS = 20
 
     /**
      *   The number of images to train the model in one batch.
