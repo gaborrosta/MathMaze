@@ -126,8 +126,7 @@ class MazeService(
 
         //Find the mazes
         val locations = if (email.isNotEmpty()) {
-            val mazes = mazeRepository.findByGeneratedByAndSaved(user)
-            mazes.mapTo(HashSet()) { it.location }.toList()
+            generateLocationsList(mazeRepository.findByGeneratedByAndSaved(user))
         } else {
             listOf()
         }
@@ -141,7 +140,13 @@ class MazeService(
      *   Updates a maze.
      */
     @Throws(Exception::class)
-    fun updateMaze(email: String, mazeId: Long, description: String, location: String): JsonObject {
+    fun updateMaze(email: String, mazeId: Long, description: String, location: String): Pair<JsonObject, List<String>> {
+        //Validate the description
+        validateDescription(description).let { if (!it) throw DescriptionInvalidFormatException() }
+
+        //Validate the location
+        validateLocation(location).let { if (!it) throw LocationInvalidFormatException() }
+
         //Find the user or the admin
         val user = userRepository.findByEmail(email) ?: throw UserNotFoundException()
 
@@ -155,7 +160,7 @@ class MazeService(
         mazeRepository.save(maze.copy(description = description, location = location))
 
         //Return the maze
-        return maze.displayableDataObject
+        return maze.displayableDataObject to generateLocationsList(mazeRepository.findByGeneratedByAndSaved(user))
     }
 
 
@@ -243,7 +248,42 @@ class MazeService(
         val mazes = mazeRepository.findByGeneratedByAndSaved(user)
 
         //Return the mazes
-        return mazes.map { it.displayableDataObject } to mazes.mapTo(HashSet()) { it.location }.toList()
+        return mazes.map { it.displayableDataObject } to generateLocationsList(mazes)
+    }
+
+
+    /**
+     *   Updates the location of mazes.
+     */
+    @Throws(Exception::class)
+    fun updateLocation(parentLocation: String, originalLocation: String, newLocation: String, email: String): Pair<List<JsonObject>, List<String>> {
+        //Validate the location
+        validateLocation("$parentLocation$originalLocation/").let { if (!it) throw LocationInvalidFormatException() }
+        validateLocation("$parentLocation$newLocation/").let { if (!it) throw LocationInvalidFormatException() }
+
+        //Find the user or the admin
+        val user = userRepository.findByEmail(email) ?: throw Exception()
+
+        //Find the mazes
+        val mazes = mazeRepository.findByGeneratedByAndSaved(user)
+
+        //Check if the new location is unique
+        val completeNewLocation = "$parentLocation$newLocation/"
+        val completeOriginalLocation = "$parentLocation$originalLocation/"
+        if (mazes.any { it.location == completeNewLocation }) throw LocationNotUniqueException()
+
+        //Check if the original location exists
+        if (mazes.none { it.location == completeOriginalLocation }) throw LocationNotFoundException()
+
+        //Update the location
+        mazes.forEach { maze ->
+            if (maze.location.startsWith(completeOriginalLocation)) {
+                mazeRepository.save(maze.copy(location = maze.location.replaceFirst(completeOriginalLocation, completeNewLocation)))
+            }
+        }
+
+        //Return the mazes
+        return mazes.map { it.displayableDataObject } to generateLocationsList(mazes)
     }
 
 }

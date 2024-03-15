@@ -7,5 +7,5 @@ class MazeUpdateRequest(
     val mazeId: Long,
     val description: String?,
     val location: String,
-    val token: String?,
+    val token: String,
 )

@@ -1,10 +1,7 @@
 package com.rostagabor.mathmaze.controllers
 
 import com.beust.klaxon.JsonObject
-import com.rostagabor.mathmaze.requests.MazeCheckRequest
-import com.rostagabor.mathmaze.requests.MazeGenerationRequest
-import com.rostagabor.mathmaze.requests.MazeSaveRequest
-import com.rostagabor.mathmaze.requests.MazeUpdateRequest
+import com.rostagabor.mathmaze.requests.*
 import com.rostagabor.mathmaze.services.MazeService
 import com.rostagabor.mathmaze.services.UserService
 import org.springframework.http.ResponseEntity
@@ -85,6 +82,9 @@ class MazeController(
     }
 
 
+    /**
+     *   Updates a maze.
+     */
     @PostMapping("/update")
     fun update(@RequestBody mazeUpdateRequest: MazeUpdateRequest): ResponseEntity<Any> {
         return try {
@@ -92,7 +92,7 @@ class MazeController(
             val (email, token) = userService.regenerateTokenIfStillValid(mazeUpdateRequest.token)
 
             //Update the maze
-            val maze = mazeService.updateMaze(
+            val (maze, locations) = mazeService.updateMaze(
                 email = email,
                 mazeId = mazeUpdateRequest.mazeId,
                 description = mazeUpdateRequest.description ?: "",
@@ -103,6 +103,7 @@ class MazeController(
             ResponseEntity.ok().body(
                 JsonObject().apply {
                     this["maze"] = maze
+                    this["locations"] = locations
                     this["token"] = token
                 }
             )
@@ -198,6 +199,37 @@ class MazeController(
                     this["mazes"] = mazes
                     this["locations"] = locations
                     this["token"] = newToken
+                }
+            )
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(e::class.simpleName)
+        }
+    }
+
+
+    /**
+     *   Updates the location of mazes.
+     */
+    @PostMapping("/update-location")
+    fun updateLocation(@RequestBody locationUpdateRequest: LocationUpdateRequest): ResponseEntity<Any> {
+        return try {
+            //Authentication status
+            val (email, token) = userService.regenerateTokenIfStillValid(locationUpdateRequest.token)
+
+            //Update the location
+            val (mazes, locations) = mazeService.updateLocation(
+                parentLocation = locationUpdateRequest.parentLocation,
+                originalLocation = locationUpdateRequest.originalLocation,
+                newLocation = locationUpdateRequest.newLocation,
+                email = email,
+            )
+
+            //Create the response
+            ResponseEntity.ok().body(
+                JsonObject().apply {
+                    this["mazes"] = mazes
+                    this["locations"] = locations
+                    this["token"] = token
                 }
             )
         } catch (e: Exception) {

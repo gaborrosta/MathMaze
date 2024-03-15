@@ -52,3 +52,34 @@ fun validateNickname(nickname: String): Boolean {
     val nicknameRegex = "^[A-Za-z0-9ÁÉÍÓÖŐÚÜŰáéíóöőúüű .-]{5,20}$".toRegex()
     return nicknameRegex.matches(nickname)
 }
+
+
+/**
+ *   Validates a description. The same regex is used in the frontend.
+ */
+fun validateDescription(description: String): Boolean {
+    val descriptionRegex = "^[A-Za-z0-9ÁÉÍÓÖŐÚÜŰáéíóöőúüű, .?!:-]{0,100}$".toRegex()
+    return descriptionRegex.matches(description)
+}
+
+
+/**
+ *   Validates a location. The same regex is used in the frontend.
+ */
+fun validateLocation(location: String): Boolean {
+    val locationRegex = "^[A-Za-z0-9ÁÉÍÓÖŐÚÜŰáéíóöőúüű, .?!:-]{1,20}$".toRegex()
+    val parts = location.split("/")
+
+    //First and last character must be a slash
+    if (location.first() != '/' || location.last() != '/') return false
+
+    //The inner parts must match the regex
+    for (part in parts.drop(1).dropLast(1)) {
+        if (!locationRegex.matches(part)) {
+            return false
+        }
+    }
+
+    //Fine
+    return true
+}
