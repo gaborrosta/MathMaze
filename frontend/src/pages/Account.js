@@ -1,12 +1,15 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Row, Col, Alert, Button, Card, Tabs, Tab, Form, InputGroup } from "react-bootstrap";
+import { Row, Col, Alert, Button, Card, Tabs, Tab, Form, InputGroup, Dropdown, Pagination } from "react-bootstrap";
+import { ArrowUp } from "react-bootstrap-icons";
+import ScrollToTop from "react-scroll-to-top";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 import { TokenContext } from "../utils/TokenContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import MazeModal from "../components/MazeModal";
 import LocationList from "../components/LocationList";
+import EditLocation from "../components/EditLocation";
 
 export default function Account() {
   const { i18n, t } = useTranslation();
@@ -31,6 +34,9 @@ export default function Account() {
   const [modalVisible, setModalVisible] = useState(false);
   const [maze, setMaze] = useState("");
 
+  const [editLocationModalVisible, setEditLocationModalVisible] = useState(false);
+  const [editLocation, setEditLocation] = useState("");
+
   const [locations, setLocations] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState("/");
 
@@ -43,6 +49,46 @@ export default function Account() {
     setMaze("");
     setModalVisible(false);
   };
+
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortedMazes, setSortedMazes] = useState(null);
+  const [pageNumbers, setPageNumbers] = useState([1]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [actualMazes, setActualMazes] = useState(null);
+
+  const handleSortOrderChange = useCallback((order) => {
+    if (!mazes) return;
+
+    let newSortedMazes;
+    if (order === "asc") {
+      newSortedMazes = [...mazes].filter(maze => maze.location === selectedLocation).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    } else {
+      newSortedMazes = [...mazes].filter(maze => maze.location === selectedLocation).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    const newPageNumbers = [];
+    for (let i = 1; i <= Math.ceil(newSortedMazes.length / 10); i++) {
+      newPageNumbers.push(i);
+    }
+
+    setActualMazes(newSortedMazes.slice(0, 10));
+    setCurrentPage(1);
+    setPageNumbers(newPageNumbers);
+    setSortedMazes(newSortedMazes);
+    setSortOrder(order);
+  }, [mazes, selectedLocation]);
+
+  const handelPageChange = useCallback((pageNumber) => {
+    setActualMazes(sortedMazes.slice((pageNumber - 1) * 10, pageNumber * 10));
+
+    setCurrentPage(pageNumber);
+  }, [sortedMazes]);
+
+  useEffect(() => {
+    if (mazes) {
+      handleSortOrderChange(sortOrder);
+    }
+  }, [mazes, handleSortOrderChange, sortOrder]);
 
   useEffect(() => {
     axios.get(`${BACKEND_URL}/maze/getAll?token=${tokenRef.current}`)
@@ -63,6 +109,22 @@ export default function Account() {
 
   const mazeChanged = (newMaze) => {
     setMazes(mazes.map(maze => maze.id === newMaze.id ? newMaze : maze));
+  }
+
+  const mazesChanged = (newMazes) => {
+    setMazes(newMazes);
+  }
+
+  const locationsChanged = (newLocations) => {
+    if (!newLocations.includes(selectedLocation)) {
+      setSelectedLocation("/");
+    }
+    setLocations(newLocations);
+  }
+
+  const onEditLocation = (location) => {
+    setEditLocation(location);
+    setEditLocationModalVisible(true);
   }
 
   const [formData, setFormData] = useState({
@@ -200,19 +262,41 @@ export default function Account() {
           <Tab eventKey="maze" title={t("account-mazes")}>
             {mazes && mazes.length === 0 && <Alert variant="info">{t("no-mazes")}</Alert>}
 
-            {mazes && mazes.length > 0 &&
+            {actualMazes && mazes.length > 0 &&
               <Row>
                 <Col xs={12} md={4}>
                   <div className="border p-3 m-2">
                     <p>{t("account-locations")}</p>
-                    <LocationList locations={locations} onLocationChange={setSelectedLocation} />
+                    <LocationList locations={locations} onLocationChange={setSelectedLocation} selectedLocation={selectedLocation} onEdit={onEditLocation} />
                     <Alert variant="info" className="mt-3">{t("account-locations-info")}</Alert>
                   </div>
                 </Col>
                 <Col xs={12} md={8}>
+                  <div className="d-flex justify-content-end m-2">
+                    <Dropdown onSelect={handleSortOrderChange}>
+                      <Dropdown.Toggle id="order">
+                        {t(`sort-order-${sortOrder}`)}
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item eventKey="asc">{t("sort-order-asc")}</Dropdown.Item>
+                        <Dropdown.Item eventKey="desc">{t("sort-order-desc")}</Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </div>
                   <div className="m-2">
-                  {mazes.filter(maze => maze.location === selectedLocation).map((maze, index) => (
-                      <Card key={index} className={index < mazes.length - 1 ? "mb-3" : ""}>
+                    {pageNumbers.length > 1 ? <>
+                      <Pagination className="justify-content-center">
+                        {pageNumbers
+                          .filter(num => num === 1 || num === pageNumbers.length || num === currentPage || num === currentPage - 1 || num === currentPage + 1)
+                          .map(num => (
+                            <Pagination.Item key={num} active={num === currentPage} onClick={() => handelPageChange(num)}>
+                              {num}
+                            </Pagination.Item>
+                          ))}
+                      </Pagination>
+                    </> : null}
+                    {actualMazes.map((maze, index) => (
+                      <Card key={index} className="mb-3">
                         <Card.Body>
                           <Card.Title>{t("maze-title")} #{maze.id}</Card.Title>
                           <div>
@@ -240,11 +324,23 @@ export default function Account() {
                         </Card.Body>
                       </Card>
                     ))}
+                    {pageNumbers.length > 1 ? <>
+                      <Pagination className="justify-content-center">
+                        {pageNumbers
+                          .filter(num => num === 1 || num === pageNumbers.length || num === currentPage || num === currentPage - 1 || num === currentPage + 1)
+                          .map(num => (
+                            <Pagination.Item key={num} active={num === currentPage} onClick={() => handelPageChange(num)}>
+                              {num}
+                            </Pagination.Item>
+                          ))}
+                      </Pagination>
+                    </> : null}
                   </div>
                 </Col>
               </Row>
             }
-            <MazeModal data={maze} visible={modalVisible} setVisible={closeModal} locations={locations} mazeChanged={mazeChanged} justCreated={false} />
+            <MazeModal data={maze} visible={modalVisible} setVisible={closeModal} locations={locations} mazeChanged={mazeChanged} locationsChanged={locationsChanged} />
+            <EditLocation location={editLocation} visible={editLocationModalVisible} setVisible={setEditLocationModalVisible} mazesChanged={mazesChanged} locationsChanged={locationsChanged} />
           </Tab>
           <Tab eventKey="settings" title={t("account-settings")}>
             <Col>
@@ -286,6 +382,7 @@ export default function Account() {
             </Col>
           </Tab>
         </Tabs>
+        <ScrollToTop smooth component={<ArrowUp />} className="yellow" />
       </>}
     </>
   );
