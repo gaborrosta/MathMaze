@@ -83,3 +83,12 @@ fun validateLocation(location: String): Boolean {
     //Fine
     return true
 }
+
+
+/**
+ *   Validates a passcode. The same regex is used in the frontend.
+ */
+fun validatePasscode(passcode: String): Boolean {
+    val passcodeRegex = "^[0-9]{8,20}\$".toRegex()
+    return passcode.isEmpty() || passcodeRegex.matches(passcode)
+}

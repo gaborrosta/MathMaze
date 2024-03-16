@@ -97,6 +97,8 @@ class MazeController(
                 mazeId = mazeUpdateRequest.mazeId,
                 description = mazeUpdateRequest.description ?: "",
                 location = mazeUpdateRequest.location,
+                isPrivate = mazeUpdateRequest.isPrivate,
+                passcode = mazeUpdateRequest.passcode,
             )
 
             //Create the response

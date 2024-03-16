@@ -122,16 +122,16 @@ class MazeService(
         val maze = mazeRepository.findById(mazeId).get()
 
         //Save the maze
-        mazeRepository.save(maze.copy(generatedBy = user, saved = true, createdAt = Instant.now()))
+        mazeRepository.save(maze.copy(generatedBy = user, saved = true, createdAt = Instant.now(), isPrivate = user.email != ADMIN_EMAIL_ADDRESS))
 
-        //Find the mazes
+        //Find the locations
         val locations = if (email.isNotEmpty()) {
             generateLocationsList(mazeRepository.findByGeneratedByAndSaved(user))
         } else {
             listOf()
         }
 
-        //Return the maze
+        //Return the maze with the locations
         return maze.jsonObject to locations
     }
 
@@ -140,12 +140,22 @@ class MazeService(
      *   Updates a maze.
      */
     @Throws(Exception::class)
-    fun updateMaze(email: String, mazeId: Long, description: String, location: String): Pair<JsonObject, List<String>> {
+    fun updateMaze(
+        email: String,
+        mazeId: Long,
+        description: String,
+        location: String,
+        isPrivate: Boolean,
+        passcode: String,
+    ): Pair<JsonObject, List<String>> {
         //Validate the description
         validateDescription(description).let { if (!it) throw DescriptionInvalidFormatException() }
 
         //Validate the location
         validateLocation(location).let { if (!it) throw LocationInvalidFormatException() }
+
+        //Validate the passcode
+        validatePasscode(passcode).let { if (!it) throw PasscodeInvalidFormatException() }
 
         //Find the user or the admin
         val user = userRepository.findByEmail(email) ?: throw UserNotFoundException()
@@ -157,9 +167,9 @@ class MazeService(
         if (maze.generatedBy != user) throw MazeOwnerException()
 
         //Save the maze
-        mazeRepository.save(maze.copy(description = description, location = location))
+        mazeRepository.save(maze.copy(description = description, location = location, isPrivate = isPrivate, passcode = passcode))
 
-        //Return the maze
+        //Return the maze with the locations
         return maze.displayableDataObject to generateLocationsList(mazeRepository.findByGeneratedByAndSaved(user))
     }
 
@@ -247,7 +257,7 @@ class MazeService(
         //Find the mazes
         val mazes = mazeRepository.findByGeneratedByAndSaved(user)
 
-        //Return the mazes
+        //Return the mazes with their locations
         return mazes.map { it.displayableDataObject } to generateLocationsList(mazes)
     }
 

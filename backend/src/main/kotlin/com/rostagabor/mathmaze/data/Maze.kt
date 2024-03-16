@@ -53,7 +53,13 @@ data class Maze(
     var createdAt: Instant = Instant.now(),
 
     @Column(name = "saved", nullable = false)
-    var saved: Boolean = false
+    var saved: Boolean = false,
+
+    @Column(name = "private", nullable = false)
+    var isPrivate: Boolean = true,
+
+    @Column(name = "passcode", nullable = false)
+    var passcode: String = ""
 ) {
 
     /**
@@ -113,6 +119,8 @@ data class Maze(
             this["digits"] = numberOfDigits
             this["location"] = location
             this["description"] = description
+            this["isPrivate"] = isPrivate
+            this["passcode"] = passcode
         }
 
     /**

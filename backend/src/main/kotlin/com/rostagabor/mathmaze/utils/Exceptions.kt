@@ -120,3 +120,8 @@ class LocationNotUniqueException : Exception()
  *   Exception for when a location is not found.
  */
 class LocationNotFoundException : Exception()
+
+/**
+ *   Exception for when a passcode is in an invalid format.
+ */
+class PasscodeInvalidFormatException : Exception()
