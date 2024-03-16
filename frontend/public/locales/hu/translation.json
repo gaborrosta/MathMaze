@@ -200,5 +200,16 @@
     "error-save-location-already-exists": "Ez a mappa már létezik. Kérjük, válassz másik nevet.",
     "error-save-location-not-found": "Nem található a szülő mappa. Kérjük, próbáld újra.",
     "sort-order-asc": "Legrégebbi elől",
-    "sort-order-desc": "Legújabb elől"
+    "sort-order-desc": "Legújabb elől",
+    "maze-visibility": "Láthatóság",
+    "maze-public": "A labirintus NYILVÁNOS.",
+    "maze-private": "A labirintus PRIVÁT.",
+    "maze-is-private-help": "Ha privát, akkor csak te tudod megoldani. Ellenkező esetben bárki meg tudja oldani, ha ismeri a belépési kódot.",
+    "maze-passcode": "Belépési kód",
+    "maze-passcode-help": "Ha beállítasz egy belépési kódot, az embereknek be kell írniuk azt a labirintus eléréséhez. 5-20 karakter hosszúnak kell lennie, és csak számokat tartalmazhat. Ha üres, akkor belépési kód nélkül hozzáférhetnek a labirintushoz.",
+    "error-save-maze-passcode-invalid-format": "Érvénytelen belépési kód. Kérjük, ellenőrizd a bevitt adatokat.",
+    "error-invalid-passcode": "A belépési kód nem felel meg a követelményeknek.",
+    "maze-public-info": "Bárki letöltheti vagy megoldhatja online a labirintust a következő linken:",
+    "maze-public-no-passcode": "Nincs belépési kód.",
+    "maze-public-passcode": "Belépési kód: {{passcode}}"
 }

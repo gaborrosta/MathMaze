@@ -201,5 +201,16 @@
     "error-save-location-already-exists": "This folder already exists. Please choose another name.",
     "error-save-location-not-found": "We could not find the parent folder. Please try again.",
     "sort-order-asc": "Oldest first",
-    "sort-order-desc": "Newest first"
+    "sort-order-desc": "Newest first",
+    "maze-visibility": "Visibility",
+    "maze-public": "The maze is PUBLIC.",
+    "maze-private": "The maze is PRIVATE.",
+    "maze-is-private-help": "If the maze is private, only you can solve it. Otherwise, anyone can solve it if they know the passcode.",
+    "maze-passcode": "Passcode",
+    "maze-passcode-help": "If you setup a passcode, people must be enter it to access the maze. It must be 5-20 characters long and can only contain numbers. If it is empty, they can access the maze without a passcode.",
+    "error-save-maze-passcode-invalid-format": "Invalid passcode. Please check your input.",
+    "error-invalid-passcode": "The passcode does not meet the requirements.",
+    "maze-public-info": "Anyone can download the maze or solve online via the following link:",
+    "maze-public-no-passcode": "No passcode is needed.",
+    "maze-public-passcode": "Passcode: {{passcode}}"
 }

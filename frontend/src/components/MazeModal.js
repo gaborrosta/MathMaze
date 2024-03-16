@@ -22,12 +22,15 @@ function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged }
   const [formData, setFormData] = useState({
     selectedLocation: actualData.location,
     description: actualData.description,
+    isPrivate: actualData.isPrivate,
+    passcode: actualData.passcode,
   });
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const [descriptionError, setDescriptionError] = useState("");
+  const [passcodeError, setPasscodeError] = useState("");
 
   const handleDescriptionChange = (e) => {
     const value = e.target.value;
@@ -45,9 +48,22 @@ function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged }
     setFormData({ ...formData, selectedLocation: location });
   }
 
+  const handlePasscodeChange = (e) => {
+    const value = e.target.value;
+    setFormData({ ...formData, passcode: value });
+
+    const regex = /^[0-9]{8,20}$/;
+    if (value && !regex.test(value)) {
+      setPasscodeError("error-invalid-passcode");
+    } else {
+      setPasscodeError("");
+    }
+  }
+
   useEffect(() => {
-    setIsSubmitDisabled(descriptionError || (formData.description === actualData.description && formData.selectedLocation === actualData.location));
-  }, [descriptionError, formData, actualData]);
+    setIsSubmitDisabled(descriptionError || passcodeError ||
+      (formData.description === actualData.description && formData.selectedLocation === actualData.location && formData.isPrivate === actualData.isPrivate && formData.passcode === actualData.passcode));
+  }, [descriptionError, passcodeError, formData, actualData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,8 +72,14 @@ function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged }
       mazeId: actualData.id,
       description: formData.description,
       location: formData.selectedLocation,
+      isPrivate: formData.isPrivate,
+      passcode: formData.isPrivate ? "" : formData.passcode,
       token: token,
     };
+
+    if (data.isPrivate) {
+      formData.passcode = "";
+    }
 
     setIsRequestInProgress(true);
 
@@ -106,6 +128,9 @@ function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged }
         case "LocationInvalidFormatException":
           setError("error-save-maze-location-invalid-format");
           break;
+        case "PasscodeInvalidFormatException":
+          setError("error-save-maze-passcode-invalid-format");
+          break;
         default:
           setError("error-unknown-form");
           break;
@@ -142,9 +167,15 @@ function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged }
         <hr />
         {token ?
           <>
+            {!actualData.isPrivate ? <>
+              <Alert variant="info">
+                {t("maze-public-info")} <Link to={"/solve-maze?id=" + actualData.id}>{FRONTEND_URL + "/solve-maze?id=" + actualData.id}</Link>
+                <br />
+                {actualData.passcode !== "" ? t("maze-public-passcode", { passcode: actualData.passcode } ) : t("maze-public-no-passcode")}
+              </Alert>
+              <hr />
+            </> : null}
             <p>{t("maze-can-edit")}</p>
-            {error && <Alert variant="danger">{t(error)}</Alert>}
-            {success && <Alert variant="success">{t(success)}</Alert>}
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3" controlId="description">
                 <Form.Label>{t("maze-description")}</Form.Label>
@@ -184,6 +215,36 @@ function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged }
                   <Button variant="primary" onClick={handleAddLocation} disabled={addButtonDisabled || isRequestInProgress}>{t("location-add-save")}</Button>
                 </Col>
               </Row>
+              <Form.Group className="mb-3" controlId="isPrivate">
+                <Form.Label>{t("maze-visibility")}</Form.Label>
+                <Form.Check
+                  type="switch"
+                  label={!formData.isPrivate ? t("maze-public") : t("maze-private")}
+                  checked={!formData.isPrivate}
+                  onChange={(e) => setFormData({ ...formData, isPrivate: !e.target.checked })}
+                  aria-describedby="isPrivateHelp"
+                />
+                <Form.Text id="isPrivateHelp" className="text-muted">
+                  {t("maze-is-private-help")}
+                </Form.Text>
+              </Form.Group>
+              {!formData.isPrivate ? <>
+                <Form.Group className="mb-3" controlId="passcode">
+                  <Form.Label>{t("maze-passcode")}</Form.Label>
+                  <Form.Control 
+                    type="text"
+                    value={formData.passcode}
+                    onChange={handlePasscodeChange}
+                    aria-describedby="passcodeHelp passcodeError"
+                  />
+                  <Form.Text id="passcodeHelp" className="text-muted">
+                    {t("maze-passcode-help")}
+                  </Form.Text>
+                  {passcodeError && <><br /><Form.Text className="text-danger">{t(passcodeError)}</Form.Text></>}
+                </Form.Group>
+              </> : null}
+              {error && <Alert variant="danger">{t(error)}</Alert>}
+              {success && <Alert variant="success">{t(success)}</Alert>}
               <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
                 {t("maze-save")}
               </Button>

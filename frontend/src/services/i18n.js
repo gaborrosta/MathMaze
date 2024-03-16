@@ -13,7 +13,7 @@ i18next
       escapeValue: false,
     },
     react: {
-      transKeepBasicHtmlNodesFor: ["b"],
+      transKeepBasicHtmlNodesFor: ["b", "i"],
     },
     nonExplicitSupportedLngs: true, //Allows "en-US" and "en-UK" to be implcitly supported
     load: "languageOnly",
