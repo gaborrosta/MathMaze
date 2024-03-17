@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Row, Col, Alert, Form, Button } from "react-bootstrap";
+import { ArrowUp } from "react-bootstrap-icons";
 import MazeGrid from "../components/MazeGrid";
 import MazeModal from "../components/MazeModal";
+import SolutionIDForm from "../components/SolutionIDForm";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 import { TokenContext } from "../utils/TokenContext";
+import ScrollToTop from "react-scroll-to-top";
 
 export default function GenerateMaze() {
   const { t } = useTranslation();
@@ -38,6 +41,9 @@ export default function GenerateMaze() {
     height: 11,
     numberType: "even",
     discardedMazes: [],
+    solution1: {},
+    solution2: {},
+    solution3: {},
   });
 
   const [error, setError] = useState("");
@@ -49,6 +55,9 @@ export default function GenerateMaze() {
   const [numberTypeError, setNumberTypeError] = useState("");
   const [minLengthError, setMinLengthError] = useState("");
   const [maxLengthError, setMaxLengthError] = useState("");
+  const [solution1Error, setSolution1Error] = useState("");
+  const [solution2Error, setSolution2Error] = useState("");
+  const [solution3Error, setSolution3Error] = useState("");
 
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
 
@@ -167,12 +176,14 @@ export default function GenerateMaze() {
   };
 
   useEffect(() => {
-    if (widthError || heightError || operationError || rangeError || numberTypeError || minLengthError || maxLengthError) {
+    if (widthError || heightError || operationError || rangeError || numberTypeError || minLengthError || maxLengthError
+      || solution1Error || solution2Error || solution3Error) {
       setIsSubmitDisabled(true);
     } else {
       setIsSubmitDisabled(false);
     }
-  }, [widthError, heightError, operationError, rangeError, numberTypeError, minLengthError, maxLengthError, formData]);
+  }, [widthError, heightError, operationError, rangeError, numberTypeError, minLengthError, maxLengthError,
+    solution1Error, solution2Error, solution3Error, formData]);
 
   const handleGenerateMaze = (e) => {
     e.preventDefault();
@@ -190,6 +201,9 @@ export default function GenerateMaze() {
       numbersRangeEnd: formData.numbersRangeEnd,
       pathTypeEven: formData.numberType === "even",
       discardedMazes: formData.discardedMazes,
+      solution1: formData.solution1,
+      solution2: formData.solution2,
+      solution3: formData.solution3,
       token: token,
     };
 
@@ -231,6 +245,18 @@ export default function GenerateMaze() {
           break;
         case "InvalidNumbersRangeException":
           setError("error-invalid-numbers-range");
+          break;
+        case "InvalidSolutionDataException":
+          setError("error-invalid-solution-data");
+          break;
+        case "NotFoundSolutionDataException":
+          setError("error-not-found-solution-data");
+          break;
+        case "NotCompatibleSolutionDataException":
+          setError("error-not-compatible-solution-data");
+          break;
+        case "MultipleSolutionDataException":
+          setError("error-multiple-solution-data");
           break;
         default:
           setError("error-unknown-form");
@@ -278,6 +304,12 @@ export default function GenerateMaze() {
       }, 1000);
     });
   };
+
+  const updateSolutionIDForm = (index, data) => {
+    let newFormData = { ...formData };
+    newFormData[`solution${index}`] = data;
+    setFormData(newFormData);
+  }
 
   return (
     <>
@@ -348,6 +380,13 @@ export default function GenerateMaze() {
                 {rangeError && <><br /><Form.Text className="text-danger">{t(rangeError)}</Form.Text></>}
               </Form.Group>
               <br />
+              <br />
+              <p>{t("maze-generate-generated-from-help")}</p>
+              <SolutionIDForm onErrorChange={setSolution1Error} onStateChange={updateSolutionIDForm} index={1}/>
+              <br />
+              <SolutionIDForm onErrorChange={setSolution2Error} onStateChange={updateSolutionIDForm} index={2}/>
+              <br />
+              <SolutionIDForm onErrorChange={setSolution3Error} onStateChange={updateSolutionIDForm} index={3}/>
               <hr />
               <Button variant="link" onClick={handleShowAdvancedClick}>
                 <span className={`mr-2 pr-2 arrow ${showAdvanced ? "rotate" : ""}`}>
@@ -414,6 +453,7 @@ export default function GenerateMaze() {
         </Col>
       </Row>
       <MazeModal data={maze} visible={modalVisible} setVisible={setModalVisible} locations={locations} />
+      <ScrollToTop smooth component={<ArrowUp />} className="yellow" />
     </>
   );
 }
