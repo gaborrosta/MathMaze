@@ -38,6 +38,11 @@ class MazeController(
                 minLength = mazeGenerationRequest.minLength,
                 maxLength = mazeGenerationRequest.maxLength,
                 discardedMazes = mazeGenerationRequest.discardedMazes,
+                solutions = listOf(
+                    mazeGenerationRequest.solution1,
+                    mazeGenerationRequest.solution2,
+                    mazeGenerationRequest.solution3,
+                ).filter { !it.isEmpty },
             )
 
             //Create the response

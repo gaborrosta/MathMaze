@@ -7,6 +7,7 @@ import com.rostagabor.mathmaze.data.*
 import com.rostagabor.mathmaze.repositories.MazeRepository
 import com.rostagabor.mathmaze.repositories.SolutionRepository
 import com.rostagabor.mathmaze.repositories.UserRepository
+import com.rostagabor.mathmaze.requests.SolutionIDForm
 import com.rostagabor.mathmaze.utils.*
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -38,6 +39,7 @@ class MazeService(
         minLength: Int,
         maxLength: Int,
         discardedMazes: List<Long>,
+        solutions: List<SolutionIDForm>,
     ): JsonObject {
         //Validate the dimensions of the maze
         validateMazeDimensions(width, height).let { if (!it) throw InvalidMazeDimensionException() }
@@ -50,26 +52,64 @@ class MazeService(
         validateNumbersRange(numbersRangeStart, numbersRangeEnd, operation).let { if (!it) throw InvalidNumbersRangeException() }
         val numbersRange = numbersRangeStart..numbersRangeEnd
 
+        //Validate the solutions
+        if (solutions.any { !it.isCorrect }) throw InvalidSolutionDataException()
+
+        //Find the solutions and check if they are compatible
+        val foundSolutions = solutions.mapTo(HashSet()) {
+            //Find the solution
+            val s = if (it.solutionId != null) {
+                solutionRepository.findById(it.solutionId).getOrNull() ?: throw NotFoundSolutionDataException()
+            } else {
+                if (it.nickname.isNullOrEmpty()) throw NotFoundSolutionDataException()
+                val m = mazeRepository.findById(it.mazeId ?: -1).getOrNull() ?: throw NotFoundSolutionDataException()
+                solutionRepository.findByMazeAndNickname(m, it.nickname) ?: throw NotFoundSolutionDataException()
+            }
+
+            //Check if the maze of the solution is compatible with the actual maze
+            if (s.maze.numbersRangeStart != numbersRangeStart || s.maze.numbersRangeEnd != numbersRangeEnd || s.maze.operation != operation)
+                throw NotCompatibleSolutionDataException()
+
+            //Return the solution
+            s
+        }.toList()
+
+        //Check if the same solution was referenced multiple times
+        if (foundSolutions.size != solutions.size) throw MultipleSolutionDataException()
+
         //Admin user
         val adminUser = userRepository.findByEmail(ADMIN_EMAIL_ADDRESS) ?: throw Exception()
 
-        //Check if there is a maze in the database with the same parameters
-        val foundMaze = mazeRepository.findByWidthAndHeightAndNumbersRangeStartAndNumbersRangeEndAndOperationAndPathTypeEvenAndSaved(
-            width = width,
-            height = height,
-            numbersRangeStart = numbersRangeStart,
-            numbersRangeEnd = numbersRangeEnd,
-            operation = operation,
-            pathTypeEven = pathTypeEven,
-        ).firstOrNull {
-            it.generatedBy == adminUser
-                    && it.mazeId !in discardedMazes
-                    && it.pathLength in lengthRange
-        }
+        //Check if there is a maze in the database with the same parameters IF no solution was referenced
+        val foundMaze = if (foundSolutions.isEmpty()) {
+            mazeRepository.findByWidthAndHeightAndNumbersRangeStartAndNumbersRangeEndAndOperationAndPathTypeEvenAndSaved(
+                width = width,
+                height = height,
+                numbersRangeStart = numbersRangeStart,
+                numbersRangeEnd = numbersRangeEnd,
+                operation = operation,
+                pathTypeEven = pathTypeEven,
+            ).firstOrNull {
+                it.generatedBy == adminUser
+                        && it.mazeId !in discardedMazes
+                        && it.pathLength in lengthRange
+            }
+        } else null
 
         //If there is a maze with the same parameters, return it
         if (foundMaze != null) {
             return foundMaze.jsonObject
+        }
+
+        //Check if any discarded maze was based on a solution
+        discardedMazes.forEach { mazeId ->
+            //Try to find the maze
+            val maze = mazeRepository.findById(mazeId).getOrNull()
+
+            //If there is a maze, and it was based on a solution, delete it
+            if (maze != null && (maze.basedOn1 != null || maze.basedOn2 != null || maze.basedOn3 != null)) {
+                mazeRepository.delete(maze)
+            }
         }
 
         //Generate the maze and the endpoint maximum 10 times to find a path that is in the range
@@ -85,8 +125,13 @@ class MazeService(
             maxRepeat--
         } while (path.size !in lengthRange && maxRepeat > 0)
 
+        //Extract mistakes from the solutions
+        val mustInclude = foundSolutions.flatMap {
+            listOf("") //TODO
+        }.distinct()
+
         //Populate the maze with numbers and operations
-        val maze = Generator.populateMazeWithNumbersAndOperations(booleanMaze, path, numbersRange, operation, pathTypeEven, endpoint)
+        val maze = Generator.populateMazeWithNumbersAndOperations(booleanMaze, path, numbersRange, operation, pathTypeEven, endpoint, mustInclude)
 
         //Save the maze
         val savedMaze = mazeRepository.save(
@@ -102,6 +147,9 @@ class MazeService(
                 pathTypeEven = pathTypeEven,
                 data = maze.flatten().joinToString(";"),
                 path = path.joinToString(";") { (x, y) -> "$x,$y" },
+                basedOn1 = foundSolutions.getOrNull(0),
+                basedOn2 = foundSolutions.getOrNull(1),
+                basedOn3 = foundSolutions.getOrNull(2),
             )
         )
 

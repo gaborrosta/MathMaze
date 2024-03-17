@@ -110,6 +110,7 @@ object Generator {
         operation: OperationType,
         pathTypeEven: Boolean,
         endpoint: Point,
+        mustInclude: List<String>, //TODO
     ): List<List<String>> {
         //Maze size
         val width = maze[0].size

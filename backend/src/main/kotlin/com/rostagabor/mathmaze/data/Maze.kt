@@ -59,7 +59,19 @@ data class Maze(
     var isPrivate: Boolean = true,
 
     @Column(name = "passcode", nullable = false)
-    var passcode: String = ""
+    var passcode: String = "",
+
+    @ManyToOne(targetEntity = Solution::class)
+    @JoinColumn(name = "based_on_1", nullable = true)
+    var basedOn1: Solution? = null,
+
+    @ManyToOne(targetEntity = Solution::class)
+    @JoinColumn(name = "based_on_2", nullable = true)
+    var basedOn2: Solution? = null,
+
+    @ManyToOne(targetEntity = Solution::class)
+    @JoinColumn(name = "based_on_3", nullable = true)
+    var basedOn3: Solution? = null,
 ) {
 
     /**

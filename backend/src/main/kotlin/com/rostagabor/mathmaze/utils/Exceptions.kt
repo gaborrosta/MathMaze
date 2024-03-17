@@ -63,6 +63,26 @@ class InvalidPathRangeException : Exception()
  */
 class InvalidNumbersRangeException : Exception()
 
+/**
+ *   Exception for when the given SolutionIDForm is not correct.
+ */
+class InvalidSolutionDataException : Exception()
+
+/**
+ *   Exception for when a solution is not found based on the given SolutionIDForm.
+ */
+class NotFoundSolutionDataException : Exception()
+
+/**
+ *   Exception for when the maze of a solution is not compatible with the maze.
+ */
+class NotCompatibleSolutionDataException : Exception()
+
+/**
+ *   Exception for when a solution is referenced multiple times.
+ */
+class MultipleSolutionDataException : Exception()
+
 
 /**
  *   Exception for when a maze is not found with the given id.

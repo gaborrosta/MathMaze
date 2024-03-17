@@ -10,6 +10,12 @@ import org.springframework.data.jpa.repository.JpaRepository
 interface SolutionRepository : JpaRepository<Solution, Long> {
 
     /**
+     *   Finds a solution by maze and nickname.
+     */
+    fun findByMazeAndNickname(maze: Maze, nickname: String): Solution?
+
+
+    /**
      *   Checks if a solution exists by nickname and maze.
      */
     fun existsByMazeAndNickname(maze: Maze, nickname: String): Boolean
