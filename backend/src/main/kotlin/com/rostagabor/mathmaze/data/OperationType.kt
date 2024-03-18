@@ -43,4 +43,20 @@ enum class OperationType {
     val involvesProduct: Boolean
         get() = this == MULTIPLICATION || this == DIVISION || this == BOTH_MULTIPLICATION_AND_DIVISION
 
+
+    companion object {
+
+        /**
+         *   Creates an operation type from a string.
+         */
+        fun from(operation: String) = when (operation.split(" ")[1]) {
+            "+" -> ADDITION
+            "-" -> SUBTRACTION
+            "*" -> MULTIPLICATION
+            "/" -> DIVISION
+            else -> throw IllegalArgumentException("Invalid operation type: $operation")
+        }
+
+    }
+
 }

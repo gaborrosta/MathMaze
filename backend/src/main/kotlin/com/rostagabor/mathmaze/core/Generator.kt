@@ -1,5 +1,6 @@
 package com.rostagabor.mathmaze.core
 
+import com.rostagabor.mathmaze.data.MustIncludeTile
 import com.rostagabor.mathmaze.data.OperationType
 import com.rostagabor.mathmaze.data.Point
 import java.util.*
@@ -110,8 +111,11 @@ object Generator {
         operation: OperationType,
         pathTypeEven: Boolean,
         endpoint: Point,
-        mustInclude: List<String>, //TODO
+        mustInclude: List<MustIncludeTile>,
     ): List<List<String>> {
+        //The "must include" operations
+        val unusedMustIncludes = ArrayList(mustInclude)
+
         //Maze size
         val width = maze[0].size
         val height = maze.size
@@ -143,23 +147,48 @@ object Generator {
                     //Get the next operation
                     val isFirstTypeOfOperation = (if (isPartOfPath) pathOperations else mazeOperations).next()
 
-                    //Generate the operation
-                    val (new, savable) = if (operation.involvesProduct) {
-                        generateProductOperation(
-                            multiplication = isFirstTypeOfOperation,
-                            possibleValues = possibleValues,
-                            pathTypeEven = pathTypeEven,
-                            isPartOfPath = isPartOfPath,
-                            neighbours = p.neighboursInRange(width, height).map { (x, y) -> neighbours[y][x] },
-                        )
+                    //Get the neighbours
+                    val neighboursList = p.neighboursInRange(width, height).map { (x, y) -> neighbours[y][x] }
+
+                    //Check if we are on the path or near it
+                    val foundOperationIndex = if (isPartOfPath || p.neighboursInRange(width, height).any { it in path }) {
+                        //Find the wanted operation type
+                        val wantedOperation = if (operation.involvesProduct) {
+                            if (isFirstTypeOfOperation) OperationType.MULTIPLICATION else OperationType.DIVISION
+                        } else {
+                            if (isFirstTypeOfOperation) OperationType.ADDITION else OperationType.SUBTRACTION
+                        }
+
+                        //Find the operation
+                        unusedMustIncludes.indexOfFirst { it.check(pathTypeEven, isPartOfPath, wantedOperation, neighboursList) }
+                    } else -1
+
+                    //If we found an operation, use it, otherwise generate a new one
+                    val (new, savable) = if (foundOperationIndex != -1) {
+                        //Remove the operation from the list
+                        val (number1, number2, result, _, o) = unusedMustIncludes.removeAt(foundOperationIndex)
+
+                        //Return the operation
+                        o to Triple(number1, number2, result)
                     } else {
-                        generateSumOperation(
-                            addition = isFirstTypeOfOperation,
-                            numbersRange = numbersRange,
-                            pathTypeEven = pathTypeEven,
-                            isPartOfPath = isPartOfPath,
-                            neighbours = p.neighboursInRange(width, height).map { (x, y) -> neighbours[y][x] },
-                        )
+                        //Generate the operation
+                        if (operation.involvesProduct) {
+                            generateProductOperation(
+                                multiplication = isFirstTypeOfOperation,
+                                possibleValues = possibleValues,
+                                pathTypeEven = pathTypeEven,
+                                isPartOfPath = isPartOfPath,
+                                neighbours = neighboursList,
+                            )
+                        } else {
+                            generateSumOperation(
+                                addition = isFirstTypeOfOperation,
+                                numbersRange = numbersRange,
+                                pathTypeEven = pathTypeEven,
+                                isPartOfPath = isPartOfPath,
+                                neighbours = neighboursList,
+                            )
+                        }
                     }
 
                     //Save the operation to the neighbours array

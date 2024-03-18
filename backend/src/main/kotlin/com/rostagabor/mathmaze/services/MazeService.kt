@@ -126,9 +126,7 @@ class MazeService(
         } while (path.size !in lengthRange && maxRepeat > 0)
 
         //Extract mistakes from the solutions
-        val mustInclude = foundSolutions.flatMap {
-            listOf("") //TODO
-        }.distinct()
+        val mustInclude = foundSolutions.flatMap { it.getIncorrectResults() }.distinct()
 
         //Populate the maze with numbers and operations
         val maze = Generator.populateMazeWithNumbersAndOperations(booleanMaze, path, numbersRange, operation, pathTypeEven, endpoint, mustInclude)

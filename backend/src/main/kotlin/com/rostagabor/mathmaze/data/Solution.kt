@@ -49,9 +49,9 @@ data class Solution @JvmOverloads constructor(
 
 
     /**
-     *   Creates the JSON representation of the solution compared to the actual solution.
+     *   Processes the solution compared to the actual solution.
      */
-    fun createResultsObject(userType: UserType): JsonObject {
+    private fun processResults(userType: UserType): Pair<List<List<JsonObject>>, JsonObject> {
         val mazeData = maze.sendableData
         val mazePath = maze.sendablePath
         val userPath = sendablePath
@@ -97,7 +97,7 @@ data class Solution @JvmOverloads constructor(
                         "-" -> leftNumber.toInt() - rightNumber.toInt()
                         "*" -> leftNumber.toInt() * rightNumber.toInt()
                         "/" -> leftNumber.toInt() / rightNumber.toInt()
-                        else -> throw Exception()
+                        else -> throw IllegalArgumentException("Invalid operation type: $operation")
                     }
 
                     //Check if the user's result is correct
@@ -132,7 +132,15 @@ data class Solution @JvmOverloads constructor(
             this["userType"] = userType.name
         }
 
-        //Whole data
+        return data to info
+    }
+
+    /**
+     *   Creates the JSON representation of the solution compared to the actual solution.
+     */
+    fun createResultsObject(userType: UserType): JsonObject {
+        val (data, info) = processResults(userType)
+
         return JsonObject().apply {
             this["info"] = info
             this["data"] = data
@@ -140,6 +148,25 @@ data class Solution @JvmOverloads constructor(
             this["height"] = maze.height
             this["start"] = Point.START.toList()
             this["end"] = maze.endPoint.toList()
+        }
+    }
+
+    /**
+     *   Gets the incorrect results.
+     */
+    fun getIncorrectResults(): List<MustIncludeTile> {
+        val (data, _) = processResults(UserType.ADMIN)
+
+        return data.flatMap { row ->
+            //Filter the incorrect results
+            row.filter { it["result"] != it["expectedResult"] }.map {
+                val operation = it["operation"] as String
+                val numbers = operation.split(" ").let { l -> listOf(l[0].toInt(), l[2].toInt()) }
+                val expectedResult = it["expectedResult"] as Int
+                val operationType = OperationType.from(operation)
+
+                MustIncludeTile(numbers[0], numbers[1], expectedResult, operationType, operation)
+            }
         }
     }
 
