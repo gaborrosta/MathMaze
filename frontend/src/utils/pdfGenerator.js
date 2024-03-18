@@ -2,7 +2,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { FRONTEND_URL } from "../utils/constants";
 
-export default function pdfGenerator(data, t) {
+export default async function pdfGenerator(data, t) {
   //DPI and scale factor
   const dpi = 150;
   const scaleFactor = dpi / 96;
@@ -87,6 +87,7 @@ export default function pdfGenerator(data, t) {
 
   //Create the full page
   const container = document.createElement("div");
+  container.style.width = "1350px";
   container.appendChild(title);
   container.appendChild(mazeId);
   container.appendChild(explanationTop);
@@ -96,57 +97,80 @@ export default function pdfGenerator(data, t) {
   //Scale the container
   container.style.transform = `scale(${scaleFactor})`;
   container.style.transformOrigin = "top left";
+  
+  //Create the root (this will contain container)
+  let root = document.createElement("div");
+  root.style.position = "absolute";
+  root.style.left = 0;
+  root.style.right = 0;
+  root.style.top = 0;
+  root.style.height = "auto";
+  root.style.margin = "auto";
+  root.style.backgroundColor = "white";
+  root.appendChild(container);
 
-  //Add the container to the document
-  document.body.appendChild(container);
+  //Create the overlay (this will contain root)
+  const overlay = document.createElement("div");
+  overlay.position = "fixed";
+  overlay.zIndex = 1000;
+  overlay.left = 0;
+  overlay.right = 0;
+  overlay.bottom = 0;
+  overlay.top = 0;
+  overlay.backgroundColor = "rgba(0,0,0,0.8)";
+  overlay.style.opacity = 0;
+  overlay.appendChild(root);
+
+  //Add the overlay to the document
+  document.body.appendChild(overlay);
 
   //Create the PDF
-  html2canvas(container, { scale: scaleFactor }).then(canvas => {
-    //Remove the container from the document
-    document.body.removeChild(container);
+  const canvas = await html2canvas(container, { scale: scaleFactor })
 
-    //Convert the canvas to a blob
-    canvas.toBlob(blob => {
-      //Create a URL for the blob
-      const url = URL.createObjectURL(blob);
+  //Remove the overlay from the document
+  document.body.removeChild(overlay);
 
-      //Create the PDF
-      const pdf = new jsPDF("p", "mm", "a4");
+  //Convert the canvas to a blob
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/jpeg", 0.95));
 
-      //Get the page width and height
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
+  //Create a URL for the blob
+  const url = URL.createObjectURL(blob);
 
-      //Set the margins
-      const marginX = 10;
-      const marginYTop = 20;
-      const marginYBottom = 20;
+  //Create the PDF
+  const pdf = new jsPDF("p", "mm", "a4");
 
-      //Calculate available width and height considering the margins
-      const availableWidth = pageWidth - 2 * marginX;
-      const availableHeight = pageHeight - marginYTop - marginYBottom;
+  //Get the page width and height
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
 
-      //Calculate the ratio to fit the image in the available space
-      const widthRatio = availableWidth / canvas.width;
-      const heightRatio = availableHeight / canvas.height;
-      const ratio = widthRatio > heightRatio ? heightRatio : widthRatio;
+  //Set the margins
+  const marginX = 10;
+  const marginYTop = 20;
+  const marginYBottom = 20;
 
-      //Calculate the new width and height
-      const canvasWidth = canvas.width * ratio;
-      const canvasHeight = canvas.height * ratio;
+  //Calculate available width and height considering the margins
+  const availableWidth = pageWidth - 2 * marginX;
+  const availableHeight = pageHeight - marginYTop - marginYBottom;
 
-      //Calculate the position of the image
-      const imageX = (pageWidth - canvasWidth) / 2;
-      const imageY = marginYTop;
+  //Calculate the ratio to fit the image in the available space
+  const widthRatio = availableWidth / canvas.width;
+  const heightRatio = availableHeight / canvas.height;
+  const ratio = widthRatio > heightRatio ? heightRatio : widthRatio;
 
-      //Add the image to the PDF
-      pdf.addImage(url, "JPEG", imageX, imageY, canvasWidth, canvasHeight);
+  //Calculate the new width and height
+  const canvasWidth = canvas.width * ratio;
+  const canvasHeight = canvas.height * ratio;
 
-      //Save the PDF
-      pdf.save(t("maze-title") + " #" + data.id + ".pdf");
+  //Calculate the position of the image
+  const imageX = (pageWidth - canvasWidth) / 2;
+  const imageY = marginYTop;
 
-      //Revoke the URL
-      URL.revokeObjectURL(url);
-    }, "image/jpeg", 0.95);
-  });
+  //Add the image to the PDF
+  pdf.addImage(url, "JPEG", imageX, imageY, canvasWidth, canvasHeight);
+
+  //Save the PDF
+  pdf.save(t("maze-title") + " #" + data.id + ".pdf");
+
+  //Revoke the URL
+  URL.revokeObjectURL(url);
 };

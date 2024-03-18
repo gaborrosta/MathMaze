@@ -157,13 +157,23 @@ function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged }
     setAddButtonDisabled(!regex.test(newLocation) || actualLocations.includes(parentLocation + newLocation + "/"));
   }, [parentLocation, newLocation, actualLocations]);
 
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleClick = async () => {
+    setIsGenerating(true);
+    await pdfGenerator(actualData, t);
+    setIsGenerating(false);
+  };
+
   return (
     <>
       <Modal.Header closeButton>
         <Modal.Title>{t("maze-title")} #{actualData.id}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Button onClick={() => pdfGenerator(actualData, t)}>{t("maze-generated-download-pdf")}</Button>
+        <Button onClick={handleClick} disabled={isGenerating}>
+          {t("maze-generated-download-pdf")}
+        </Button>
         <hr />
         {token ?
           <>
