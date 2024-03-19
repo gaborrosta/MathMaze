@@ -92,5 +92,9 @@ body {
 	transform: rotate(90deg);
 }
 
+.icon:hover {
+	border-width: 3px !important;
+}
+
 //Import Bootstrap
 @import '~bootstrap/scss/bootstrap';

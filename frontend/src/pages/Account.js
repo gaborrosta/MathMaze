@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Row, Col, Alert, Button, Card, Tabs, Tab, Form, InputGroup, Dropdown, Pagination } from "react-bootstrap";
-import { ArrowUp } from "react-bootstrap-icons";
+import { ArrowUp, X } from "react-bootstrap-icons";
 import ScrollToTop from "react-scroll-to-top";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
@@ -10,6 +10,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import MazeModal from "../components/MazeModal";
 import LocationList from "../components/LocationList";
 import EditLocation from "../components/EditLocation";
+import AccountSolutionsTab from "../components/AccountSolutionsTab";
 
 export default function Account() {
   const { i18n, t } = useTranslation();
@@ -248,6 +249,55 @@ export default function Account() {
     });
   }
 
+  const [key, setKey] = useState("maze");
+  const [solutionsTabs, setSolutionsTabs] = useState([]);
+  const [downloadedSolutions, setDownloadedSolutions] = useState({});
+  const [downloadError, setDownloadError] = useState("");
+
+  const addSolutionTab = (id) => {
+    if (!solutionsTabs.includes(id)) {
+      setSolutionsTabs([...solutionsTabs, id]);
+    }
+
+    if (!downloadedSolutions[id]) {
+      axios.get(`${BACKEND_URL}/maze/getSolutions?token=${token}&mazeId=${id}`)
+      .then(response => {
+        setTimeout(() => {
+          setToken(response.data.token);
+          setDownloadedSolutions({ ...downloadedSolutions, [id]: { data: response.data.solutions, selectedOption: null, selectedIndex: -1 }});
+        }, 1000);
+      })
+      .catch(error => {
+        if (!error.response) {
+          setDownloadError("error-unknown");
+          return;
+        }
+  
+        switch (error.response.data) {
+          case "InvalidMazeIdException":
+            setDownloadError("error-save-maze-invalid-id");
+            break;
+          case "MazeOwnerException":
+            setDownloadError("error-account-maze-owner");
+            break;
+          default:
+            setDownloadError("error-unknown");
+            break;
+        }
+      });
+    }
+
+    window.scrollTo({top: 0, left: 0, behavior: "instant" });
+    setKey(id);
+  };
+
+  const removeSolutionTab = (id) => {
+    setSolutionsTabs(solutionsTabs.filter(tab => tab !== id));
+    if (key === id) {
+      setKey("maze");
+    }
+  };
+
   return (
     <>
       <center>
@@ -258,7 +308,18 @@ export default function Account() {
       {error && <Alert variant="danger">{t(error)}</Alert>}
 
       {loading ? <LoadingSpinner /> : error ? null : <>
-        <Tabs defaultActiveKey="maze" id="profile-tab" className="mb-3">
+        {solutionsTabs.length > 0 && 
+          <div className="text-end">
+            <Button className="mb-3" onClick={() => {
+              setKey("maze");
+              setSolutionsTabs([]);
+              setDownloadedSolutions({});
+            }}>
+              {t("account-close-opened-solutions")}
+            </Button>
+          </div>
+        }
+        <Tabs id="profile-tab" className="mb-3" activeKey={key} onSelect={(k) => setKey(k)}>
           <Tab eventKey="maze" title={t("account-mazes")}>
             {mazes && mazes.length === 0 && <Alert variant="info">{t("no-mazes")}</Alert>}
 
@@ -312,6 +373,10 @@ export default function Account() {
                                 <p>{t("maze-generate-path-type")}: {maze.pathTypeEven ? t("maze-generate-path-type-even") : t("maze-generate-path-type-odd")}</p>
                               </Col>
                             </Row>
+                            <div className="mb-3">
+                              <p>{t("maze-solved-by", { count: maze.solved, number: maze.solved })}</p>
+                              {maze.solved > 0 && <Button variant="primary" onClick={() => addSolutionTab(maze.id)}>{t("maze-check-solutions", { count: maze.solved })}</Button>}
+                            </div>
                             <Row>
                               <Col>
                                 <Button variant="primary" onClick={() => openModal(maze)}>{t("maze-edit-details")}</Button>
@@ -381,6 +446,27 @@ export default function Account() {
               </Form>
             </Col>
           </Tab>
+          {solutionsTabs.map(tab => (
+            <Tab 
+              eventKey={tab}
+              title={
+                <div>
+                  {t("account-solution-for-maze-tab", { id: tab })}
+                  <X className="ms-2 border icon" size={22}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeSolutionTab(tab);
+                    }}
+                  />
+                </div>
+              } 
+              key={tab}
+            >
+              <AccountSolutionsTab data={downloadedSolutions[tab]} error={downloadError} updateData={(newData) => {
+                setDownloadedSolutions({ ...downloadedSolutions, [tab]: newData});
+              }} />
+            </Tab>
+          ))}
         </Tabs>
         <ScrollToTop smooth component={<ArrowUp />} className="yellow" />
       </>}

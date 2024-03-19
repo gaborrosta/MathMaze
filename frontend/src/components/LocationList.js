@@ -41,7 +41,7 @@ export default function LocationList({ locations, selectedLocation, onLocationCh
           >
             {displayableLocation}
             {(location !== "/" && onEdit) && (
-              <Pencil onClick={(event) => {
+              <Pencil className="p-1 border icon" size={22} onClick={(event) => {
                 event.stopPropagation();
                 onEdit([split.slice(0,-2).join("/") + "/", displayableLocation.slice(0, -1)]);
               }} />

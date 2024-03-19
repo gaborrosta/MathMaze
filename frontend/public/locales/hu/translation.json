@@ -160,6 +160,7 @@
     "maze-check-info-admin": "A helyes és a saját megoldásaidat alább láthatod. Ezt a labirintust egy nem bejelentkezett felhasználó generálta, de a következő adatokkal hivatkozhatsz a megoldásodra:<1><2>Megoldás ID: <b>{{solutionId}}</b></2><2>Labirintus ID: <b>{{mazeId}}</b></2><2>Becenév: <b>{{nickname}}</b></2></1>Kérjük, jegyezd fel ezeket az adatokat, mert nem fogod tudni őket újra megnézni.",
     "maze-check-info-me": "A helyes és a saját megoldásaidat alább láthatod. Ezeket a profilodban is láthatod, mivel te generáltad ezt a labirintust. Azonban a következő adatokkal hivatkozhatsz a megoldásodra:<1><2>Megoldás ID: <b>{{solutionId}}</b></2><2>Labirintus ID: <b>{{mazeId}}</b></2><2>Becenév: <b>{{nickname}}</b></2></1>",
     "maze-check-info-not-admin": "A helyes és a saját megoldásaidat alább láthatod. A felhasználó, aki ezt a labirintust generálta, megnézheti a megoldásodat. A következő adatokkal hivatkozhatsz a megoldásodra:<1><2>Megoldás ID: <b>{{solutionId}}</b></2><2>Labirintus ID: <b>{{mazeId}}</b></2><2>Becenév: <b>{{nickname}}</b></2></1>Kérjük, jegyezd fel ezeket az adatokat, mert nem fogod tudni őket újra megnézni.",
+    "maze-check-solved-at": "Megoldás beküldve: {{date}}",
     "maze-check-result-type-computations": "Műveletek eredményei",
     "maze-check-result-type-path": "Útvonal",
     "maze-check-expected-result": "Várt eredmény",
@@ -212,6 +213,7 @@
     "maze-public-info": "Bárki letöltheti vagy megoldhatja online a labirintust a következő linken:",
     "maze-public-no-passcode": "Nincs belépési kód.",
     "maze-public-passcode": "Belépési kód: {{passcode}}",
+    "maze-private-info": "Csak te tudod megoldani a labirintust. A következő linken oldhatod meg online:",
     "maze-generate-generated-from-help": "Felhasználhatsz maximum 3 korábban megoldott labirintust a hibás műveletek gyakorlására. Ezeknek ugyanolyan műveletből és tartományból kell állniuk, mint amilyen ez lesz. Meg kell adnod a Megoldás ID-t vagy a Labirintus ID-t a használt becenévvel együtt.",
     "maze-generate-select-option": "Válassz egy opciót",
     "maze-generate-select-option-solution-id": "Tudom a Megoldás ID-t",
@@ -229,5 +231,15 @@
     "error-invalid-solution-data": "Kérlek ellenőrizd, hogy minden megoldási adatot helyesen töltöttél-e ki.",
     "error-not-found-solution-data": "Nem találtunk meg minden megoldást, amit használni szeretnél. Kérlek ellenőrizd az adatokat.",
     "error-not-compatible-solution-data": "Legalább egy megoldás, amit használni szeretnél, nem kompatibilis ezzel a labirintussal. Kérlek ellenőrizd a megoldásokat és a beállításokat.",
-    "error-multiple-solution-data": "Ugyanazt a megoldást szeretnéd többször is használni. Kérlek ellenőrizd az adatokat."
+    "error-multiple-solution-data": "Ugyanazt a megoldást szeretnéd többször is használni. Kérlek ellenőrizd az adatokat.",
+    "maze-solved-by_one": "{{ number }} ember oldotta meg.",
+    "maze-solved-by_other": "{{ number }} ember oldotta meg.",
+    "maze-solved-by-info_one": "Ezt a labirintust {{ number }} ember oldotta meg. Itt láthatod a megoldását.",
+    "maze-solved-by-info_other": "Ezt a labirintust {{ number }} ember oldotta meg. Csak egy megoldást láthatsz egyszerre, kérlek válassz megoldást becenév szerint.",
+    "maze-check-solutions_one": "Megoldás ellenőrzése",
+    "maze-check-solutions_other": "Megoldások ellenőrzése",
+    "account-close-opened-solutions": "Megnyitott megoldások bezárása",
+    "account-solution-for-maze-tab": "Labirintus #{{id}} megoldásai",
+    "account-solution-dropdown": "Válassz egy becenevet",
+    "error-account-maze-owner": "Ez nem a Te labirintusod, így nem tudod megnézni a megoldásokat."
 }

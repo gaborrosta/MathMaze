@@ -183,10 +183,19 @@ function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged }
                 <br />
                 {actualData.passcode !== "" ? t("maze-public-passcode", { passcode: actualData.passcode } ) : t("maze-public-no-passcode")}
               </Alert>
-              <hr />
-            </> : null}
+            </> : <>
+              <Alert variant="info">
+                {t("maze-private-info")} <Link to={"/solve-maze?id=" + actualData.id}>{FRONTEND_URL + "/solve-maze?id=" + actualData.id}</Link>
+              </Alert>
+            </>}
+            <hr />
             <p>{t("maze-can-edit")}</p>
             <Form onSubmit={handleSubmit}>
+              {error && <Alert variant="danger">{t(error)}</Alert>}
+              {success && <Alert variant="success">{t(success)}</Alert>}
+              <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
+                {t("maze-save")}
+              </Button>
               <Form.Group className="mb-3" controlId="description">
                 <Form.Label>{t("maze-description")}</Form.Label>
                 <Form.Control 
@@ -253,11 +262,6 @@ function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged }
                   {passcodeError && <><br /><Form.Text className="text-danger">{t(passcodeError)}</Form.Text></>}
                 </Form.Group>
               </> : null}
-              {error && <Alert variant="danger">{t(error)}</Alert>}
-              {success && <Alert variant="success">{t(success)}</Alert>}
-              <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
-                {t("maze-save")}
-              </Button>
             </Form>
           </>
         :
