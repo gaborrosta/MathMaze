@@ -72,6 +72,9 @@ data class Maze(
     @ManyToOne(targetEntity = Solution::class)
     @JoinColumn(name = "based_on_3", nullable = true)
     var basedOn3: Solution? = null,
+
+    @OneToMany(mappedBy = "maze", cascade = [CascadeType.ALL])
+    val solutions: List<Solution> = listOf()
 ) {
 
     /**
@@ -146,6 +149,7 @@ data class Maze(
             this["pathTypeEven"] = pathTypeEven
             this["pathLength"] = pathLength
             this["createdAt"] = createdAt.toEpochMilli()
+            this["solved"] = solutions.size
         }
 
 }

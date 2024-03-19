@@ -51,7 +51,7 @@ data class Solution @JvmOverloads constructor(
     /**
      *   Processes the solution compared to the actual solution.
      */
-    private fun processResults(userType: UserType): Pair<List<List<JsonObject>>, JsonObject> {
+    private fun processResults(userType: UserType?): Pair<List<List<JsonObject>>, JsonObject> {
         val mazeData = maze.sendableData
         val mazePath = maze.sendablePath
         val userPath = sendablePath
@@ -129,7 +129,12 @@ data class Solution @JvmOverloads constructor(
             this["solutionId"] = solutionId
             this["mazeId"] = maze.mazeId
             this["nickname"] = nickname
-            this["userType"] = userType.name
+
+            if (userType != null) {
+                this["userType"] = userType.name
+            } else {
+                this["solvedAt"] = solvedAt.toEpochMilli()
+            }
         }
 
         return data to info
@@ -138,7 +143,7 @@ data class Solution @JvmOverloads constructor(
     /**
      *   Creates the JSON representation of the solution compared to the actual solution.
      */
-    fun createResultsObject(userType: UserType): JsonObject {
+    fun createResultsObject(userType: UserType? = null): JsonObject {
         val (data, info) = processResults(userType)
 
         return JsonObject().apply {
@@ -155,7 +160,7 @@ data class Solution @JvmOverloads constructor(
      *   Gets the incorrect results.
      */
     fun getIncorrectResults(): List<MustIncludeTile> {
-        val (data, _) = processResults(UserType.ADMIN)
+        val (data, _) = processResults(null)
 
         return data.flatMap { row ->
             //Filter the incorrect results
