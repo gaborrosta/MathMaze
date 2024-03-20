@@ -241,5 +241,6 @@
     "account-close-opened-solutions": "Megnyitott megoldások bezárása",
     "account-solution-for-maze-tab": "Labirintus #{{id}} megoldásai",
     "account-solution-dropdown": "Válassz egy becenevet",
-    "error-account-maze-owner": "Ez nem a Te labirintusod, így nem tudod megnézni a megoldásokat."
+    "error-account-maze-owner": "Ez nem a Te labirintusod, így nem tudod megnézni a megoldásokat.",
+    "maze-solve-title": "Labirintus megoldása"
 }

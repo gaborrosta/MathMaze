@@ -16,7 +16,7 @@ const SessionExpired = {
 const Layout = () => {
   const { t } = useTranslation();
 
-  const [token, setToken] = useState(sessionStorage.getItem("token"));
+  const [token, setToken] = useState(sessionStorage.getItem("token") || "");
   const prevTokenRef = useRef();
   const logoutRef = useRef(false);
   const [sessionExpired, setSessionExpired] = useState(SessionExpired.NO);

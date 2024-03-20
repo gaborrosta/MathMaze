@@ -242,5 +242,6 @@
     "account-close-opened-solutions": "Close opened solutions",
     "account-solution-for-maze-tab": "Solutions for Maze #{{id}}",
     "account-solution-dropdown": "Select a nickname",
-    "error-account-maze-owner": "You are not the owner of this maze, so you cannot see the solutions."
+    "error-account-maze-owner": "You are not the owner of this maze, so you cannot see the solutions.",
+    "maze-solve-title": "Solve Maze"
 }

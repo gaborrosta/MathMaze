@@ -13,6 +13,7 @@ import ResetPassword from "./pages/ResetPassword";
 import SetNewPassword from "./pages/SetNewPassword";
 import GenerateMaze from "./pages/GenerateMaze";
 import CheckMaze from "./pages/CheckMaze";
+import SolveMaze from "./pages/SolveMaze";
 import Account from "./pages/Account";
 import NoPage from "./pages/NoPage";
 import AuthChecker from "./utils/AuthChecker";
@@ -71,6 +72,10 @@ export default function App() {
               {
                 path: "check-maze",
                 Component: CheckMaze,
+              },
+              {
+                path: "solve-maze",
+                Component: SolveMaze,
               },
               {
                 path: "account",
