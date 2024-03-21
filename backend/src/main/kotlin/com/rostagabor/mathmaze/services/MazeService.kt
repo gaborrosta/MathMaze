@@ -203,7 +203,7 @@ class MazeService(
         //Validate the passcode
         validatePasscode(passcode).let { if (!it) throw PasscodeInvalidFormatException() }
 
-        //Find the user or the admin
+        //Find the user
         val user = userRepository.findByEmail(email) ?: throw UserNotFoundException()
 
         //Find the maze
@@ -217,6 +217,37 @@ class MazeService(
 
         //Return the maze with the locations
         return maze.displayableDataObject to generateLocationsList(mazeRepository.findByGeneratedByAndSaved(user))
+    }
+
+
+    /**
+     *   Opens a maze or asks for the passcode.
+     */
+    @Throws(Exception::class)
+    fun openMaze(mazeId: Long, email: String): JsonObject {
+        //Find the maze
+        val maze = mazeRepository.findById(mazeId).getOrNull() ?: throw InvalidMazeIdException()
+
+        //Find the user
+        val user = userRepository.findByEmail(email)
+
+        //Some conditions
+        val isLoggedIn = user != null
+        val isMazePrivate = maze.isPrivate
+        val isMazeGeneratedByUser = maze.generatedBy == user
+        val isMazeProtected = maze.passcode.isNotEmpty()
+
+        //Return the appropriate response
+        return when {
+            //The is owned by the user OR it is totally public, then return the maze
+            (isLoggedIn && isMazeGeneratedByUser) || (!isMazePrivate && !isMazeProtected) -> maze.displayableDataObject
+
+            //The maze is not private, then ask for the passcode
+            !isMazePrivate -> JsonObject().apply { this["passcode"] = true }
+
+            //We have a problem...
+            else -> throw InvalidMazeIdException()
+        }
     }
 
 

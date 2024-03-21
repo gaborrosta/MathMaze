@@ -121,6 +121,31 @@ class MazeController(
     }
 
 
+    @GetMapping("/open")
+    fun open(@RequestParam mazeId: Long, @RequestParam token: String?): ResponseEntity<Any> {
+        return try {
+            //Authentication status
+            val (email, newToken) = userService.regenerateTokenIfStillValid(token)
+
+            //Open the maze
+            val maze = mazeService.openMaze(
+                mazeId = mazeId,
+                email = email,
+            )
+
+            //Create the response
+            ResponseEntity.ok().body(
+                JsonObject().apply {
+                    this["maze"] = maze
+                    this["token"] = newToken
+                }
+            )
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(e::class.simpleName)
+        }
+    }
+
+
     /**
      *   Recognises a maze in an image.
      */
