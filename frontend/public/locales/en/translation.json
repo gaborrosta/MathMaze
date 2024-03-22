@@ -243,5 +243,12 @@
     "account-solution-for-maze-tab": "Solutions for Maze #{{id}}",
     "account-solution-dropdown": "Select a nickname",
     "error-account-maze-owner": "You are not the owner of this maze, so you cannot see the solutions.",
-    "maze-solve-title": "Solve Maze"
+    "maze-solve-title": "Solve Maze",
+    "maze-solve-info": "You can download a maze from this page or solve it online. You have to enter the ID of the maze and if there is a passcode, you have to enter it too.",
+    "maze-solve-id-help": "Enter the ID of the maze you want to solve",
+    "maze-solve-submit-id": "Save Maze ID",
+    "maze-solve-passcode-help": "Enter the passcode for the maze",
+    "maze-solve-submit-passcode": "Save passcode",
+    "error-invalid-passcode-solve": "Invalid passcode. Please check your input.",
+    "error-invalid-maze-id-or-private": "The Maze ID is invalid or the maze is private. Please check your input."
 }

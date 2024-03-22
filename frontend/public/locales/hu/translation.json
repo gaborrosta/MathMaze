@@ -242,5 +242,12 @@
     "account-solution-for-maze-tab": "Labirintus #{{id}} megoldásai",
     "account-solution-dropdown": "Válassz egy becenevet",
     "error-account-maze-owner": "Ez nem a Te labirintusod, így nem tudod megnézni a megoldásokat.",
-    "maze-solve-title": "Labirintus megoldása"
+    "maze-solve-title": "Labirintus megoldása",
+    "maze-solve-info": "Ezen az oldalon letölthetsz egy labirintust vagy megoldhatod online. Meg kell adnod a labirintus ID-ját, és ha van belépési kód, akkor azt is meg kell adnod.",
+    "maze-solve-id-help": "Írd be a megoldani kívánt labirintus ID-ját",
+    "maze-solve-submit-id": "Labirintus ID mentése",
+    "maze-solve-passcode-help": "Írd meg a labirintus belépési kódját",
+    "maze-solve-submit-passcode": "Belépési kód mentése",
+    "error-invalid-passcode-solve": "Érvénytelen belépési kód. Kérjük, ellenőrizd az adatokat.",
+    "error-invalid-maze-id-or-private": "A labirintus ID érvénytelen vagy a labirintus privát. Kérjük, ellenőrizd az adatokat."
 }
