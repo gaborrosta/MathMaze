@@ -112,9 +112,9 @@ data class Maze(
 
 
     /**
-     *   Basic JSON representation of the maze.
+     *   A JSON representation of the maze. Used when displaying a recognised maze.
      */
-    val basicJsonObject: JsonObject
+    val jsonWhenRecognised: JsonObject
         get() = JsonObject().apply {
             this["id"] = mazeId
             this["width"] = width
@@ -124,10 +124,21 @@ data class Maze(
         }
 
     /**
-     *   The JSON representation of the maze to display as an actual maze.
+     *   A JSON representation of the maze. Used when solving a maze.
      */
-    val jsonObject: JsonObject
-        get() = basicJsonObject.apply {
+    val jsonForSolving: JsonObject
+        get() = jsonWhenRecognised.apply {
+            this["data"] = sendableData
+            this["path"] = sendablePath
+            this["even"] = pathTypeEven
+            this["digits"] = numberOfDigits
+        }
+
+    /**
+     *   A JSON representation of the maze. Used when generated or saved a maze.
+     */
+    val jsonWhenGeneratedOrSaved: JsonObject
+        get() = jsonWhenRecognised.apply {
             this["data"] = sendableData
             this["path"] = sendablePath
             this["even"] = pathTypeEven
@@ -139,10 +150,10 @@ data class Maze(
         }
 
     /**
-     *   The JSON representation of the maze to display in the profile page.
+     *   A JSON representation of the maze. Used when displaying a maze in the profile page.
      */
-    val displayableDataObject: JsonObject
-        get() = jsonObject.apply {
+    val jsonForProfile: JsonObject
+        get() = jsonWhenGeneratedOrSaved.apply {
             this["numbersRangeStart"] = numbersRangeStart
             this["numbersRangeEnd"] = numbersRangeEnd
             this["operation"] = operation.ordinal

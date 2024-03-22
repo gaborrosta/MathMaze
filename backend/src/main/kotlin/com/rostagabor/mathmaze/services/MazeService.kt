@@ -98,7 +98,7 @@ class MazeService(
 
         //If there is a maze with the same parameters, return it
         if (foundMaze != null) {
-            return foundMaze.jsonObject
+            return foundMaze.jsonWhenGeneratedOrSaved
         }
 
         //Check if any discarded maze was based on a solution
@@ -152,7 +152,7 @@ class MazeService(
         )
 
         //Return the maze
-        return savedMaze.jsonObject
+        return savedMaze.jsonWhenGeneratedOrSaved
     }
 
 
@@ -178,7 +178,7 @@ class MazeService(
         }
 
         //Return the maze with the locations
-        return maze.jsonObject to locations
+        return maze.jsonWhenGeneratedOrSaved to locations
     }
 
 
@@ -216,15 +216,15 @@ class MazeService(
         mazeRepository.save(maze.copy(description = description, location = location, isPrivate = isPrivate, passcode = passcode))
 
         //Return the maze with the locations
-        return maze.displayableDataObject to generateLocationsList(mazeRepository.findByGeneratedByAndSaved(user))
+        return maze.jsonForProfile to generateLocationsList(mazeRepository.findByGeneratedByAndSaved(user))
     }
 
 
     /**
-     *   Opens a maze or asks for the passcode.
+     *   Opens a maze or asks for the passcode or returns an error.
      */
     @Throws(Exception::class)
-    fun openMaze(mazeId: Long, email: String): JsonObject {
+    fun openMaze(mazeId: Long, passcode: String?, email: String): JsonObject {
         //Find the maze
         val maze = mazeRepository.findById(mazeId).getOrNull() ?: throw InvalidMazeIdException()
 
@@ -235,15 +235,15 @@ class MazeService(
         val isLoggedIn = user != null
         val isMazePrivate = maze.isPrivate
         val isMazeGeneratedByUser = maze.generatedBy == user
-        val isMazeProtected = maze.passcode.isNotEmpty()
+        val isMazeProtected = maze.passcode.isNotEmpty() && maze.passcode != passcode
 
         //Return the appropriate response
         return when {
             //The is owned by the user OR it is totally public, then return the maze
-            (isLoggedIn && isMazeGeneratedByUser) || (!isMazePrivate && !isMazeProtected) -> maze.displayableDataObject
+            (isLoggedIn && isMazeGeneratedByUser) || (!isMazePrivate && !isMazeProtected) -> maze.jsonForSolving
 
             //The maze is not private, then ask for the passcode
-            !isMazePrivate -> JsonObject().apply { this["passcode"] = true }
+            !isMazePrivate -> JsonObject().apply { this["passcode"] = false }
 
             //We have a problem...
             else -> throw InvalidMazeIdException()
@@ -273,7 +273,7 @@ class MazeService(
         )
 
         //Return the maze
-        return maze.basicJsonObject.apply {
+        return maze.jsonWhenRecognised.apply {
             this["data"] = recognisedNumbers
             this["path"] = recognisedPath
         }
@@ -335,7 +335,7 @@ class MazeService(
         val mazes = mazeRepository.findByGeneratedByAndSaved(user)
 
         //Return the mazes with their locations
-        return mazes.map { it.displayableDataObject } to generateLocationsList(mazes)
+        return mazes.map { it.jsonForProfile } to generateLocationsList(mazes)
     }
 
 
@@ -389,7 +389,7 @@ class MazeService(
         }
 
         //Return the mazes
-        return mazes.map { it.displayableDataObject } to generateLocationsList(mazes)
+        return mazes.map { it.jsonForProfile } to generateLocationsList(mazes)
     }
 
 }

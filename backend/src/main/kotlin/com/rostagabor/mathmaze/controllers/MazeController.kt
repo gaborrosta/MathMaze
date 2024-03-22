@@ -121,8 +121,11 @@ class MazeController(
     }
 
 
+    /**
+     *   Opens a maze.
+     */
     @GetMapping("/open")
-    fun open(@RequestParam mazeId: Long, @RequestParam token: String?): ResponseEntity<Any> {
+    fun open(@RequestParam mazeId: Long, @RequestParam passcode: String?, @RequestParam token: String?): ResponseEntity<Any> {
         return try {
             //Authentication status
             val (email, newToken) = userService.regenerateTokenIfStillValid(token)
@@ -130,6 +133,7 @@ class MazeController(
             //Open the maze
             val maze = mazeService.openMaze(
                 mazeId = mazeId,
+                passcode = passcode,
                 email = email,
             )
 
