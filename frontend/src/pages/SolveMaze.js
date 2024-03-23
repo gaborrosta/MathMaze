@@ -1,11 +1,13 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import { useSearchParams  } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Form, Button, Alert, Row, Col } from "react-bootstrap";
+import pdfGenerator from "../utils/pdfGenerator";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 import { TokenContext } from "../utils/TokenContext";
 import LoadingSpinner from "../components/LoadingSpinner";
+import MazeOnlineSolve from "../components/MazeOnlineSolve";
 
 export default function SolveMaze() {
   const { t } = useTranslation();
@@ -31,7 +33,9 @@ export default function SolveMaze() {
   const [checkedMazeId, setCheckedMazeId] = useState("");
   const [checkedPasscode, setCheckedPasscode] = useState("");
 
-  const [mazeData, setMazeData] = useState({});
+  const [maze, setMazeData] = useState({});
+
+  const [showOnline, setShowOnline] = useState(false);
 
   const loadingDone = () => {
     setTimeout(() => {
@@ -39,7 +43,7 @@ export default function SolveMaze() {
     }, 1000);
   }
 
-  const checkMaze = (mazeId, passcode) => {
+  const checkMaze = useCallback((mazeId, passcode) => {
     setLoading(true);
     setMazeIdError("");
     setMazeIdFormError("");
@@ -83,7 +87,7 @@ export default function SolveMaze() {
           break;
       }
     });
-  }
+  }, [token, setToken]);
 
   useEffect(() => {
     const id = params.get("id");
@@ -94,7 +98,7 @@ export default function SolveMaze() {
       setMazeIdError("");
       checkMaze(id);
     }
-  }, [params]);
+  }, [params, checkMaze]);
 
   const handleMazeIdChange = (e) => {
     setMazeId(e.target.value);
@@ -111,7 +115,15 @@ export default function SolveMaze() {
     } else {
       setIsSubmitDisabled(false);
     }
-  }, [mazeId, mazeIdError, passcode, passcodeError]);
+  }, [checkedMazeId, mazeId, mazeIdError, passcode, passcodeError]);
+
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleClick = async () => {
+    setIsGenerating(true);
+    await pdfGenerator(maze, t);
+    setIsGenerating(false);
+  };
 
   return (
     <>
@@ -121,7 +133,7 @@ export default function SolveMaze() {
       <p>{t("maze-solve-info")}</p>
 
       {loading ? <LoadingSpinner /> : <>
-        {(!params.get("id") && !checkedMazeId || mazeIdFormError) && <>
+        {((!params.get("id") && !checkedMazeId) || mazeIdFormError) && <>
           {mazeIdFormError && <Alert variant="danger">{t(mazeIdFormError)}</Alert>}
           <Form.Group controlId="mazeId">
             <Form.Label>{t("maze-check-id-label")}</Form.Label>
@@ -135,7 +147,7 @@ export default function SolveMaze() {
           <Button disabled={isSubmitDisabled} onClick={() => checkMaze(mazeId)} className="mb-3">{t("maze-solve-submit-id")}</Button>
         </>}
 
-        {(Object.keys(mazeData).length !== 0 && mazeData.passcode === false && !checkedPasscode) && <>
+        {(Object.keys(maze).length !== 0 && maze.passcode === false && !checkedPasscode) && <>
           {passcodeFormError && <Alert variant="danger">{t(passcodeFormError)}</Alert>}
           <Form.Group controlId="passcode">
             <Form.Label>{t("maze-passcode")}</Form.Label>
@@ -148,8 +160,47 @@ export default function SolveMaze() {
           <Button disabled={isSubmitDisabled} onClick={() => checkMaze(checkedMazeId, passcode)} className="mb-3">{t("maze-solve-submit-passcode")}</Button>
         </>}
 
-        {Object.keys(mazeData).length !== 0 && !mazeData.hasOwnProperty("passcode") && <>
-          hi
+        {Object.keys(maze).length !== 0 && !maze.hasOwnProperty("passcode") && <>
+          <Alert variant="info">
+          <div>
+            <Row className="mb-1">
+              <Col xs={12} md={3}>
+                {t("maze-check-id-label")}: {maze.id}
+              </Col>
+              <Col xs={12} md={3}>
+                {t("maze-size", { height: maze.height, width: maze.width })}
+              </Col>
+              <Col xs={12} md={3}>
+                {t("maze-length-of-the-path", { length: maze.pathLength })}
+              </Col>
+              <Col xs={12} md={3}>
+                {t("maze-generate-path-type")}: {maze.pathTypeEven ? t("maze-generate-path-type-even") : t("maze-generate-path-type-odd")}
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <p>{t("maze-description")}: {maze.description ? maze.description : "-"}</p>
+              </Col>
+            </Row>
+          </div>
+          </Alert>
+          <Row>
+            <Col className="mx-auto text-center" xs={12} md={6}>
+              <Button className="mb-3" onClick={handleClick} disabled={isGenerating}>
+                {t("maze-generated-download-pdf")}
+              </Button>
+
+              {!showOnline && <>
+                <p>{t("or")}</p>
+
+                <Button onClick={() => setShowOnline(true)}>
+                  {t("maze-solve-online")}
+                </Button>
+              </>}
+            </Col>
+          </Row>
+
+          {showOnline && <MazeOnlineSolve data={maze} />}
         </>}
       </>}
     </>

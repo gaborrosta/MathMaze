@@ -250,5 +250,7 @@
     "maze-solve-passcode-help": "Enter the passcode for the maze",
     "maze-solve-submit-passcode": "Save passcode",
     "error-invalid-passcode-solve": "Invalid passcode. Please check your input.",
-    "error-invalid-maze-id-or-private": "The Maze ID is invalid or the maze is private. Please check your input."
+    "error-invalid-maze-id-or-private": "The Maze ID is invalid or the maze is private. Please check your input.",
+    "or": "OR",
+    "maze-solve-online": "Solve online"
 }

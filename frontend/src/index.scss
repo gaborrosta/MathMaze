@@ -12,6 +12,11 @@ body {
 	font-weight: bold;
 }
 
+.path {
+	background-color: #7d141d50;
+	font-style: italic;
+}
+
 .maze {
 	display: grid;
 	border: 3px solid black;
@@ -21,6 +26,12 @@ body {
 	border: 1px solid black;
 	position: relative;
 	padding-top: 100%;
+}
+
+.maze-cell-solving {
+	border: 1px solid black;
+	position: relative;
+	height: 100%;
 }
 
 .maze-cell-corner {

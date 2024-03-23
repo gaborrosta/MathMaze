@@ -249,5 +249,7 @@
     "maze-solve-passcode-help": "Írd meg a labirintus belépési kódját",
     "maze-solve-submit-passcode": "Belépési kód mentése",
     "error-invalid-passcode-solve": "Érvénytelen belépési kód. Kérjük, ellenőrizd az adatokat.",
-    "error-invalid-maze-id-or-private": "A labirintus ID érvénytelen vagy a labirintus privát. Kérjük, ellenőrizd az adatokat."
+    "error-invalid-maze-id-or-private": "A labirintus ID érvénytelen vagy a labirintus privát. Kérjük, ellenőrizd az adatokat.",
+    "or": "VAGY",
+    "maze-solve-online": "Megoldás online"
 }
