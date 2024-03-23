@@ -132,6 +132,8 @@ data class Maze(
             this["path"] = sendablePath
             this["even"] = pathTypeEven
             this["digits"] = numberOfDigits
+            this["pathLength"] = pathLength
+            this["pathTypeEven"] = pathTypeEven
         }
 
     /**
