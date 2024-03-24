@@ -8,6 +8,7 @@ import axios from "axios";
 import { TokenContext } from "../utils/TokenContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import MazeOnlineSolve from "../components/MazeOnlineSolve";
+import CheckMazeResults from "../components/CheckMazeResults";
 
 export default function SolveMaze() {
   const { t } = useTranslation();
@@ -124,6 +125,63 @@ export default function SolveMaze() {
     await pdfGenerator(maze, t);
     setIsGenerating(false);
   };
+  
+  const [nickname, setNickname] = useState("");
+  const [sentMaze, setSentMaze] = useState(null);
+  const [sentPath, setSentPath] = useState(null);
+  const [nicknameError, setNicknameError] = useState("");
+  const [checkData, setCheckData] = useState(null);
+
+  const handleSubmit = async (data) => {
+    setLoading(true);
+
+    data["token"] = token;
+
+    setNickname(data.nickname);
+    setSentMaze(data.data);
+    setSentPath(data.path);
+
+    axios.post(`${BACKEND_URL}/maze/check`, data, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+    .then(response => {
+      loadingDone();
+      setNicknameError("");
+      setToken(response.data.token);
+      setCheckData(response.data.checkedMaze);
+    })
+    .catch(error => {
+      loadingDone();
+
+      if (!error.response) {
+        setNicknameError("error-unknown");
+        return;
+      }
+
+      switch (error.response.data) {
+        case "NicknameInvalidFormatException":
+          setNicknameError("error-nickname-invalid-format");
+          break;
+        case "NicknameNotUniqueException":
+          setNicknameError("error-nickname-not-unique");
+          break;
+        case "InvalidMazeIdException":
+          setNicknameError("error-invalid-maze-id");
+          break;
+        case "InvalidPathException":
+          setNicknameError("error-invalid-path");
+          break;
+        case "InvalidMazeDimensionException":
+          setNicknameError("error-invalid-maze-dimension");
+          break;
+        default:
+          setNicknameError("error-unknown-form");
+          break;
+      }
+    });
+  }
 
   return (
     <>
@@ -160,7 +218,7 @@ export default function SolveMaze() {
           <Button disabled={isSubmitDisabled} onClick={() => checkMaze(checkedMazeId, passcode)} className="mb-3">{t("maze-solve-submit-passcode")}</Button>
         </>}
 
-        {Object.keys(maze).length !== 0 && !maze.hasOwnProperty("passcode") && <>
+        {(Object.keys(maze).length !== 0 && !maze.hasOwnProperty("passcode")) && <>
           <Alert variant="info">
           <div>
             <Row className="mb-1">
@@ -200,7 +258,8 @@ export default function SolveMaze() {
             </Col>
           </Row>
 
-          {showOnline && <MazeOnlineSolve data={maze} />}
+          {(showOnline && !checkData) && <MazeOnlineSolve data={maze} submitError={nicknameError} initialNickname={nickname} handleSubmit={handleSubmit} initialPath={sentPath} initialMaze={sentMaze} />}
+          {checkData && <CheckMazeResults data={checkData} />}
         </>}
       </>}
     </>

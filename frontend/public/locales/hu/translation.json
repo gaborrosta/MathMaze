@@ -251,5 +251,18 @@
     "error-invalid-passcode-solve": "Érvénytelen belépési kód. Kérjük, ellenőrizd az adatokat.",
     "error-invalid-maze-id-or-private": "A labirintus ID érvénytelen vagy a labirintus privát. Kérjük, ellenőrizd az adatokat.",
     "or": "VAGY",
-    "maze-solve-online": "Megoldás online"
+    "maze-solve-online": "Megoldás online",
+    "maze-solve-online-legend-keys": "Jelmagyarázat és vezérlés",
+    "maze-solve-online-selected": "Kiválasztott mező",
+    "maze-solve-online-path": "Kiválasztott útvonal",
+    "maze-solve-online-keys": "Vezérlés:",
+    "maze-solve-online-keys-move": "<1>Mozgatás</1>: <1>Nyilak</1>",
+    "maze-solve-online-keys-edit": "<1>Szerkesztés</1>: <1>Szóköz</1>",
+    "maze-solve-online-keys-save": "<1>Mentés</1>: <1>Enter</1>",
+    "maze-solve-online-keys-mark": "<1>Útvonal jelölése</1>: <1>X</1>",
+    "maze-solve-online-keys-mouse": "A cellát <1>kattintással</1> is kiválaszthatod, <1>dupla kattintással</1> megjelölheted.",
+    "maze-solve-online-instructions": "Utasítások",
+    "maze-solve-online-info1": "Csak a labirintus egy részét látod, és meg kell találnod az utat a célig a műveletek elvégzése alapján a <b>{{type}}</b> eredményeket követve. Az út hossza {{length}} mező.",
+    "maze-solve-online-info2": "Írd be az eredményeidet és jelöld meg az utat. Ezután adj meg egy becenevet és mentsd el a megoldásod.",
+    "maze-solve-online-not-number": "Nem szám!"
 }

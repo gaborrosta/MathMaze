@@ -1,15 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Form, Button, Alert } from "react-bootstrap";
+import { Form, Alert } from "react-bootstrap";
+import NicknameForm from "./NicknameForm";
 
 export default function CheckMazeUpload({ data, handleSubmit, initialNickname }) {
   const { t } = useTranslation();
 
   const [mazeData, setMazeData] = useState(data.data);
   const [pathData, setPathData] = useState(data.path.map(coord => ({x: coord.x, y: coord.y})));
-
-  const [nickname, setNickname] = useState(initialNickname || "");
-  const [nicknameError, setNicknameError] = useState("");
 
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
 
@@ -29,43 +27,14 @@ export default function CheckMazeUpload({ data, handleSubmit, initialNickname })
     });
   };
 
-  const handleNicknameChange = (e) => {
-    const value = e.target.value;
-    setNickname(value);
-    const regex = /^[A-Za-z0-9ÁÉÍÓÖŐÚÜŰáéíóöőúüű .-]{5,20}$/;
-
-    if (!regex.test(value)) {
-      setNicknameError(t("error-invalid-nickname"));
-    } else {
-      setNicknameError("");
-    }
-  };
-
-  useEffect(() => {
-    if (!nickname || nicknameError) {
-      setIsSubmitDisabled(true);
-    } else {
-      setIsSubmitDisabled(false);
-    }
-  }, [nickname, nicknameError]);
-
-  const handleFormSubmit = () => {
+  const handleFormSubmit = (nickname) => {
     handleSubmit({ mazeId: data.id, data: mazeData, path: pathData, nickname: nickname });
   };
 
   return (
     <>
       <Alert variant="info">{t("maze-check-recognised-but-ai-make-mistake")}</Alert>
-      <Form.Group controlId="nickname">
-        <Form.Label>{t("maze-check-recognised-nickname")}</Form.Label>
-        <Form.Control name="nickname" type="text" value={nickname} onChange={handleNicknameChange} aria-describedby="nicknameHelp nicknameError" />
-        <Form.Text id="nicknameHelp" className="text-muted">
-          {t("maze-check-recognised-nickname-help")}
-        </Form.Text>
-        {nicknameError && <><br /><Form.Text className="text-danger">{t(nicknameError)}</Form.Text></>}
-      </Form.Group>
-      <br />
-      <Button disabled={isSubmitDisabled} onClick={handleFormSubmit} className="mb-3">{t("maze-check-recognised-check")}</Button>
+      <NicknameForm initialNickname={initialNickname} isSubmitDisabled={isSubmitDisabled} setIsSubmitDisabled={setIsSubmitDisabled} handleSubmit={handleFormSubmit} />
 
       <div className="maze" style={{gridTemplateColumns: `repeat(${data.width}, 1fr)`, minWidth: `${75 * data.width}px`}}>
         {Array.from({length: data.height}).map((_, i) => (
