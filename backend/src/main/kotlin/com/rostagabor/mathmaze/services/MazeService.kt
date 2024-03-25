@@ -93,6 +93,7 @@ class MazeService(
                 it.generatedBy == adminUser
                         && it.mazeId !in discardedMazes
                         && it.pathLength in lengthRange
+                        && it.basedOn1 == null && it.basedOn2 == null && it.basedOn3 == null
             }
         } else null
 
@@ -297,8 +298,11 @@ class MazeService(
         //Validate the path
         if (Point.START !in path || maze.endPoint !in path) throw InvalidPathException()
 
-        //Validate the data
+        //Validate the size
         if (data.size != maze.height || data.any { it.size != maze.width }) throw InvalidMazeDimensionException()
+
+        //Validate the data
+        if (data.flatten().any { it != "" && (it.toIntOrNull() == null || it.toInt() <= 0) }) throw NotNumberInMazeException()
 
         //Save the solution
         val solution = solutionRepository.save(

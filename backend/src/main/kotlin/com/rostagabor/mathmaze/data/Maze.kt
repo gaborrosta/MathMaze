@@ -132,7 +132,7 @@ data class Maze(
             this["path"] = sendablePath
             this["even"] = pathTypeEven
             this["digits"] = numberOfDigits
-            this["pathLength"] = pathLength
+            this["pathLength"] = pathLength - 2
             this["pathTypeEven"] = pathTypeEven
         }
 
@@ -160,7 +160,7 @@ data class Maze(
             this["numbersRangeEnd"] = numbersRangeEnd
             this["operation"] = operation.ordinal
             this["pathTypeEven"] = pathTypeEven
-            this["pathLength"] = pathLength
+            this["pathLength"] = pathLength - 2
             this["createdAt"] = createdAt.toEpochMilli()
             this["solved"] = solutions.size
         }

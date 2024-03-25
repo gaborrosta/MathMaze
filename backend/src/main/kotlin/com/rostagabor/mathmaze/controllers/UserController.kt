@@ -117,7 +117,7 @@ class UserController(private val userService: UserService) {
             if (newToken.isEmpty()) {
                 ResponseEntity.badRequest().body("1")
             } else {
-                ResponseEntity.ok().body("1")
+                ResponseEntity.ok().body(newToken)
             }
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(e::class.simpleName)
