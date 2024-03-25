@@ -2,11 +2,11 @@ import React, { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Modal, Form, Button, Alert, Row, Col } from "react-bootstrap";
-import pdfGenerator from "../utils/pdfGenerator";
 import LocationList from "./LocationList";
 import { BACKEND_URL, FRONTEND_URL } from "../utils/constants";
 import axios from "axios";
 import { TokenContext } from "../utils/TokenContext";
+import PDFButtons from "./PDFButtons";
 
 function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged }) {
   const { t } = useTranslation();
@@ -157,23 +157,13 @@ function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged }
     setAddButtonDisabled(!regex.test(newLocation) || actualLocations.includes(parentLocation + newLocation + "/"));
   }, [parentLocation, newLocation, actualLocations]);
 
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  const handleClick = async () => {
-    setIsGenerating(true);
-    await pdfGenerator(actualData, t);
-    setIsGenerating(false);
-  };
-
   return (
     <>
       <Modal.Header closeButton>
         <Modal.Title>{t("maze-title")} #{actualData.id}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Button onClick={handleClick} disabled={isGenerating}>
-          {t("maze-generated-download-pdf")}
-        </Button>
+        <PDFButtons actualData={actualData} t={t} />
         <hr />
         {token ?
           <>

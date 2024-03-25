@@ -74,6 +74,7 @@
     "maze-generate-operation-type-help": "Válasszd ki, hogy milyen műveletekből álljon a labirintus.",
     "maze-generate-range": "Tartomány",
     "maze-generate-range-help": "Add meg a kívánt tartományt a számokhoz.",
+    "maze-generate-previous-mazes-options": "Korábbi labirintusok használata",
     "maze-generate-advanced-options": "Haladó beállítások",
     "maze-generate-path-type": "Útvonal típusa",
     "maze-generate-path-type-even": "Páros mezők",
@@ -125,7 +126,9 @@
     "pdf-check-solution": "A labirintust könnyedén ellenőrizheted, ha lefényképezed vagy beszkennelled és feltöltöd a MathMaze weboldalra: <i>{{url}}/check-maze</i>.",
     "pdf-copyright": "Ezt a labirintust a MathMaze készítette és a MathMaze tulajdona. További labirintust generálhatsz itt: <i>{{url}}</i>.",
     "maze-generated-use": "Szeretném használni ezt a labirintust",
-    "maze-generated-download-pdf": "Labirintus letöltése PDF formátumban",
+    "maze-generated-download-pdf-explanation": "A labirintust A4-es vagy A3-as méretben töltheted le. Ha a labirintus nagy, érdemes lehet A3-as méretben letölteni, azonban ne felejtsd el, hogy be is kell majd szkennelned.",
+    "maze-generated-download-pdf-a4": "Labirintus letöltése PDF formátumban A4-es méretben",
+    "maze-generated-download-pdf-a3": "Labirintus letöltése PDF formátumban A3-as méretben",
     "no-mazes": "Nincs még egy labirintusod sem.",
     "maze-description": "Leírás",
     "maze-size": "Méret: {{height}} (magasság) x {{width}} (szélesség)",
@@ -169,6 +172,8 @@
     "maze-check-summary": "Összefoglaló:",
     "maze-check-legend": "Jelmagyarázat:",
     "maze-check-correct-correct-path": "Helyes eredmény és helyesen az útvonal része",
+    "maze-check-path-found": "Sikeresen megtaláltad az útvonalat!",
+    "maze-check-path-not-found": "Sajnos nem sikerült megtalálnod az útvonalat.",
     "maze-check-correct": "Helyes eredmény",
     "maze-check-wrong": "Hibás eredmény",
     "maze-check-correct-path": "Helyesen része az útvonalnak",
@@ -264,5 +269,6 @@
     "maze-solve-online-instructions": "Utasítások",
     "maze-solve-online-info1": "Csak a labirintus egy részét látod, és meg kell találnod az utat a célig a műveletek elvégzése alapján a <b>{{type}}</b> eredményeket követve. Az út hossza {{length}} mező.",
     "maze-solve-online-info2": "Írd be az eredményeidet és jelöld meg az utat. Ezután adj meg egy becenevet és mentsd el a megoldásod.",
-    "maze-solve-online-not-number": "Nem szám!"
+    "maze-solve-online-not-number": "Nem szám!",
+    "error-not-number-in-maze": "Kérlek, ellenőrizd a labirintust, mert legalább egy mezőben nem szám található."
 }

@@ -132,7 +132,7 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
       <Col>
         <div>
           <h2>{t("maze-solve-online-instructions")}</h2>
-          <p><Trans i18nKey="maze-solve-online-info1" values={{ type: data.even ? t("pdf-path-even") : t("pdf-path-odd"), length: data.path.length - 2 }}> <b> </b></Trans><br />{t("maze-solve-online-info2")}</p>
+          <p><Trans i18nKey="maze-solve-online-info1" values={{ type: data.even ? t("pdf-path-even") : t("pdf-path-odd"), length: data.path.length }}> <b> </b></Trans><br />{t("maze-solve-online-info2")}</p>
           <p>{t("pdf-good-luck")}</p>
 
           {submitError && <Alert variant="danger">{t(submitError)}</Alert>}

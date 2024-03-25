@@ -2,13 +2,14 @@ import React, { useEffect, useState, useContext, useCallback } from "react";
 import { useSearchParams  } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Form, Button, Alert, Row, Col } from "react-bootstrap";
-import pdfGenerator from "../utils/pdfGenerator";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 import { TokenContext } from "../utils/TokenContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import MazeOnlineSolve from "../components/MazeOnlineSolve";
 import CheckMazeResults from "../components/CheckMazeResults";
+import PDFButtons from "../components/PDFButtons";
+import TokenRefresher from "../utils/TokenRefresher";
 
 export default function SolveMaze() {
   const { t } = useTranslation();
@@ -117,14 +118,6 @@ export default function SolveMaze() {
       setIsSubmitDisabled(false);
     }
   }, [checkedMazeId, mazeId, mazeIdError, passcode, passcodeError]);
-
-  const [isGenerating, setIsGenerating] = useState(false);
-
-  const handleClick = async () => {
-    setIsGenerating(true);
-    await pdfGenerator(maze, t);
-    setIsGenerating(false);
-  };
   
   const [nickname, setNickname] = useState("");
   const [sentMaze, setSentMaze] = useState(null);
@@ -175,6 +168,9 @@ export default function SolveMaze() {
           break;
         case "InvalidMazeDimensionException":
           setNicknameError("error-invalid-maze-dimension");
+          break;
+        case "NotNumberInMazeException":
+          setNicknameError("error-not-number-in-maze");
           break;
         default:
           setNicknameError("error-unknown-form");
@@ -244,9 +240,7 @@ export default function SolveMaze() {
           </Alert>
           <Row>
             <Col className="mx-auto text-center" xs={12} md={6}>
-              <Button className="mb-3" onClick={handleClick} disabled={isGenerating}>
-                {t("maze-generated-download-pdf")}
-              </Button>
+              <PDFButtons actualData={maze} t={t} />
 
               {!showOnline && <>
                 <p>{t("or")}</p>
@@ -258,7 +252,12 @@ export default function SolveMaze() {
             </Col>
           </Row>
 
-          {(showOnline && !checkData) && <MazeOnlineSolve data={maze} submitError={nicknameError} initialNickname={nickname} handleSubmit={handleSubmit} initialPath={sentPath} initialMaze={sentMaze} />}
+          {(showOnline && !checkData) && 
+          <>
+            <MazeOnlineSolve data={maze} submitError={nicknameError} initialNickname={nickname} handleSubmit={handleSubmit} initialPath={sentPath} initialMaze={sentMaze} />
+            <TokenRefresher token={token} setToken={setToken} />
+          </>
+          }
           {checkData && <CheckMazeResults data={checkData} />}
         </>}
       </>}

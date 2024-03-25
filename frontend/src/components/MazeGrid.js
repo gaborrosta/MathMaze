@@ -43,7 +43,7 @@ export default function MazeGrid({ data, disabled, save, saveError, setSaveError
           </ToggleButton>
 
           <p>
-            {t("maze-path-length", { length: data.path.length - 2 })}
+            {t("maze-path-length", { length: data.path.length })}
           </p>
         </Col>
 

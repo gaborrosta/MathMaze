@@ -8,6 +8,7 @@ import CheckMazeResults from "../components/CheckMazeResults";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 import { TokenContext } from "../utils/TokenContext";
+import TokenRefresher from "../utils/TokenRefresher";
 
 export default function CheckMaze() {
   const { t } = useTranslation();
@@ -121,6 +122,9 @@ export default function CheckMaze() {
         case "InvalidMazeDimensionException":
           setError("error-invalid-maze-dimension");
           break;
+        case "NotNumberInMazeException":
+          setError("error-not-number-in-maze");
+          break;
         default:
           setError("error-unknown-form");
           break;
@@ -140,7 +144,10 @@ export default function CheckMaze() {
           {error && <Alert variant="danger">{t(error)}</Alert>}
 
           {step === 0 && <CheckMazeUpload handleSubmit={handleSubmit1} initialId={mazeId}/>}
-          {step === 1 && <CheckMazeRecognise data={recognisedData} handleSubmit={handleSubmit2} initialNickname={nickname} />}
+          {step === 1 && <>
+            <TokenRefresher token={token} setToken={setToken} />
+            <CheckMazeRecognise data={recognisedData} handleSubmit={handleSubmit2} initialNickname={nickname} />
+          </>}
           {step === 2 && <CheckMazeResults data={checkData} />}
         </>
       )}

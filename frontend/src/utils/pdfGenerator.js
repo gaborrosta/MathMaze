@@ -2,7 +2,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { FRONTEND_URL } from "../utils/constants";
 
-export default async function pdfGenerator(data, t) {
+export default async function pdfGenerator(data, t, size) {
   //DPI and scale factor
   const dpi = 150;
   const scaleFactor = dpi / 96;
@@ -75,7 +75,7 @@ export default async function pdfGenerator(data, t) {
 
   //Create the explanation text for the top
   const explanationTop = document.createElement("p");
-  explanationTop.innerHTML = t("pdf-explanation", { type: data.even ? t("pdf-path-even") : t("pdf-path-odd"), length: data.path.length - 2 })
+  explanationTop.innerHTML = t("pdf-explanation", { type: data.even ? t("pdf-path-even") : t("pdf-path-odd"), length: data.path.length })
     + "<br><br>" + t("pdf-good-luck") + "<br><br>" + t("pdf-check-solution", { url: FRONTEND_URL });
   explanationTop.style.fontSize = "2rem";
   explanationTop.style.textAlign = "left";
@@ -87,7 +87,7 @@ export default async function pdfGenerator(data, t) {
 
   //Create the full page
   const container = document.createElement("div");
-  container.style.width = "1350px";
+  container.style.width = (size === "A4") ? "1350px" : "3000px";
   container.appendChild(title);
   container.appendChild(mazeId);
   container.appendChild(explanationTop);
@@ -137,7 +137,7 @@ export default async function pdfGenerator(data, t) {
   const url = URL.createObjectURL(blob);
 
   //Create the PDF
-  const pdf = new jsPDF("p", "mm", "a4");
+  const pdf = new jsPDF("p", "mm", (size === "A4") ? "a4" : "a3");
 
   //Get the page width and height
   const pageWidth = pdf.internal.pageSize.getWidth();

@@ -26,9 +26,14 @@ export default function GenerateMaze() {
   const [locations, setLocations] = useState(null);
 
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showPreviousMazesOptions, setShowPreviousMazesOptions] = useState(false);
 
   const handleShowAdvancedClick = () => {
     setShowAdvanced(!showAdvanced);
+  };
+
+  const handleShowPreviousMazesOptionsClick = () => {
+    setShowPreviousMazesOptions(!showPreviousMazesOptions);
   };
 
   const [formData, setFormData] = useState({
@@ -379,14 +384,23 @@ export default function GenerateMaze() {
                 </Form.Text>
                 {rangeError && <><br /><Form.Text className="text-danger">{t(rangeError)}</Form.Text></>}
               </Form.Group>
-              <br />
-              <br />
-              <p>{t("maze-generate-generated-from-help")}</p>
-              <SolutionIDForm onErrorChange={setSolution1Error} onStateChange={updateSolutionIDForm} index={1}/>
-              <br />
-              <SolutionIDForm onErrorChange={setSolution2Error} onStateChange={updateSolutionIDForm} index={2}/>
-              <br />
-              <SolutionIDForm onErrorChange={setSolution3Error} onStateChange={updateSolutionIDForm} index={3}/>
+              <hr />
+              <Button variant="link" onClick={handleShowPreviousMazesOptionsClick}>
+                <span className={`mr-2 pr-2 arrow ${showPreviousMazesOptions ? "rotate" : ""}`}>
+                  &#9654;
+                </span>
+                {t("maze-generate-previous-mazes-options")}
+              </Button>
+              {showPreviousMazesOptions && (
+                <>
+                  <p>{t("maze-generate-generated-from-help")}</p>
+                  <SolutionIDForm onErrorChange={setSolution1Error} onStateChange={updateSolutionIDForm} index={1}/>
+                  <br />
+                  <SolutionIDForm onErrorChange={setSolution2Error} onStateChange={updateSolutionIDForm} index={2}/>
+                  <br />
+                  <SolutionIDForm onErrorChange={setSolution3Error} onStateChange={updateSolutionIDForm} index={3}/>
+                </>
+              )}
               <hr />
               <Button variant="link" onClick={handleShowAdvancedClick}>
                 <span className={`mr-2 pr-2 arrow ${showAdvanced ? "rotate" : ""}`}>

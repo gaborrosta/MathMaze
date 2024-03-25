@@ -41,6 +41,7 @@ export default function CheckMazeResults({ data }) {
           <li>{t("maze-check-correct")}: <b>{data.info.correct}</b></li>
           <li>{t("maze-check-wrong")}: <b>{data.info.incorrect}</b></li>
           <br />
+          <li><b>{(data.info.missedPath === 0 && data.info.wrongPath === 0) ? t("maze-check-path-found") : t("maze-check-path-not-found")}</b></li>
           <li>{t("maze-check-correct-path")}: <b>{data.info.correctPath}</b></li>
           <li>{t("maze-check-missed-path")}: <b>{data.info.missedPath}</b></li>
           <li>{t("maze-check-wrong-path")}: <b>{data.info.wrongPath}</b></li>
