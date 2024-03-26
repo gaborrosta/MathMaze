@@ -22,7 +22,7 @@
     "signup-email-error": "Kérjük, adj meg egy valódi e-mail címet.",
     "password": "Jelszó",
     "signup-password-placeholder": "Válassz egy jelszót",
-    "signup-password-help": "A jelszónak 8-20 karakter hosszúnak kell lennie, tartalmaznia kell betűket, számokat és speciális karaktereket (@$!%*#?&).",
+    "signup-password-help": "A jelszónak 8-20 karakter hosszúnak kell lennie, tartalmaznia kell kis- és nagybetűket, számokat és speciális karaktereket (a magyar ékezetes betűk is annak számítanak.).",
     "signup-password-error": "A jelszó nem felel meg a feltételeknek.",
     "signup-confirm-password": "Jelszó megerősítése",
     "signup-confirm-password-placeholder": "Írd be újra a jelszavad",

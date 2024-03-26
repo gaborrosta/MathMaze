@@ -73,7 +73,7 @@ export default function SetPassword() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   
     if (e.target.name === "password") {
-      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,20}$/;
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W)[A-Za-z\d\W]{8,20}$/;
       if (e.target.value) {
         if (!passwordRegex.test(e.target.value)) {
           setPasswordError("signup-password-error");
