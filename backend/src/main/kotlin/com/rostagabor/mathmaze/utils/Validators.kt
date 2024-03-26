@@ -22,7 +22,7 @@ fun validateEmail(email: String): Boolean {
  *   Validates a password. The same regex is used in the frontend.
  */
 fun validatePassword(password: String): Boolean {
-    val passwordRegex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$".toRegex()
+    val passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*\\W)[A-Za-z\\d\\W]{8,20}$".toRegex()
     return passwordRegex.matches(password)
 }
 
