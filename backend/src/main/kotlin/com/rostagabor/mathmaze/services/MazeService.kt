@@ -173,7 +173,7 @@ class MazeService(
 
         //Find the locations
         val locations = if (email.isNotEmpty()) {
-            generateLocationsList(mazeRepository.findByGeneratedByAndSaved(user))
+            generateLocationsList(mazeRepository.findByGeneratedByAndSaved(user).map { it.location })
         } else {
             listOf()
         }
@@ -217,7 +217,7 @@ class MazeService(
         mazeRepository.save(maze.copy(description = description, location = location, isPrivate = isPrivate, passcode = passcode))
 
         //Return the maze with the locations
-        return maze.jsonForProfile to generateLocationsList(mazeRepository.findByGeneratedByAndSaved(user))
+        return maze.jsonForProfile to generateLocationsList(mazeRepository.findByGeneratedByAndSaved(user).map { it.location })
     }
 
 
@@ -339,7 +339,7 @@ class MazeService(
         val mazes = mazeRepository.findByGeneratedByAndSaved(user)
 
         //Return the mazes with their locations
-        return mazes.map { it.jsonForProfile } to generateLocationsList(mazes)
+        return mazes.map { it.jsonForProfile } to generateLocationsList(mazes.map { it.location })
     }
 
 
@@ -393,7 +393,7 @@ class MazeService(
         }
 
         //Return the mazes
-        return mazes.map { it.jsonForProfile } to generateLocationsList(mazes)
+        return mazes.map { it.jsonForProfile } to generateLocationsList(mazes.map { it.location })
     }
 
 }
