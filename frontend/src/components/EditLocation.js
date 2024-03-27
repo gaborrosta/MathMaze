@@ -130,7 +130,7 @@ function EditLocationContent({ location, mazesChanged, locationsChanged }) {
 
 export default function EditLocation({ location, visible, setVisible, mazesChanged, locationsChanged }) {
   return (
-    <Modal show={visible} onHide={() => setVisible(false)} backdrop="static">
+    <Modal show={visible} onHide={() => setVisible(false)}>
       {visible && <EditLocationContent location={location} mazesChanged={mazesChanged} locationsChanged={locationsChanged} />}
     </Modal>
   );

@@ -8,10 +8,8 @@ import axios from "axios";
 import { TokenContext } from "../utils/TokenContext";
 import PDFButtons from "./PDFButtons";
 
-function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged }) {
+function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged, token, setToken }) {
   const { t } = useTranslation();
-
-  const { token, setToken } = useContext(TokenContext);
 
   const [actualData, setActualData] = useState(mazeData);
   const [actualLocations, setActualLocations] = useState(locations);
@@ -265,9 +263,11 @@ function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged }
 }
 
 export default function MazeModal({ data, visible, setVisible, locations, mazeChanged, locationsChanged }) {
+  const { token, setToken } = useContext(TokenContext);
+
   return (
-    <Modal show={visible} onHide={() => setVisible(false)} backdrop="static">
-      {visible && <MazeModalContent mazeData={data} locations={locations} mazeChanged={mazeChanged} locationsChanged={locationsChanged} />}
+    <Modal show={visible} onHide={() => setVisible(false)} backdrop={!token ? "static" : true}>
+      {visible && <MazeModalContent mazeData={data} locations={locations} mazeChanged={mazeChanged} locationsChanged={locationsChanged} token={token} setToken={setToken} />}
     </Modal>
   );
 }
