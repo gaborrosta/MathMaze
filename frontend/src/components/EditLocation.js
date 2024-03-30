@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Modal, Form, Button, Alert, Row, Col } from "react-bootstrap";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
-import { TokenContext } from "../utils/TokenContext";
+import TokenContext from "../utils/TokenContext";
 
 function EditLocationContent({ location, mazesChanged, locationsChanged }) {
   const { t } = useTranslation();

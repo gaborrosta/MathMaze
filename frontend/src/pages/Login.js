@@ -4,7 +4,7 @@ import { useNavigate, Link, useLocation } from "react-router-dom"
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
-import { TokenContext } from "../utils/TokenContext";
+import TokenContext from "../utils/TokenContext";
 
 export default function Login() {
   const { t } = useTranslation();

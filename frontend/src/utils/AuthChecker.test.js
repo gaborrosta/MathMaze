@@ -5,8 +5,8 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { toBeInTheDocument } from "@testing-library/jest-dom";
-import { TokenContext } from "./TokenContext";
 import { MemoryRouter  } from "react-router-dom";
+import TokenContext from "./TokenContext";
 import AuthChecker from "./AuthChecker";
 
 //Mock the Navigate component from react-router-dom

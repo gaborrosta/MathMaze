@@ -7,7 +7,7 @@ import CheckMazeRecognise from "../components/CheckMazeRecognise";
 import CheckMazeResults from "../components/CheckMazeResults";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
-import { TokenContext } from "../utils/TokenContext";
+import TokenContext from "../utils/TokenContext";
 import TokenRefresher from "../utils/TokenRefresher";
 
 export default function CheckMaze() {

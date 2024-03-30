@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Form, Button, Alert, Row, Col } from "react-bootstrap";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
-import { TokenContext } from "../utils/TokenContext";
+import TokenContext from "../utils/TokenContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import MazeOnlineSolve from "../components/MazeOnlineSolve";
 import CheckMazeResults from "../components/CheckMazeResults";

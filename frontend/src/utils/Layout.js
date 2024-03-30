@@ -5,7 +5,7 @@ import { Container, Modal } from "react-bootstrap";
 import Menu from "../components/Menu";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
-import { TokenContext } from "./TokenContext";
+import TokenContext from "./TokenContext";
 
 const SessionExpired = {
   NO: -1,

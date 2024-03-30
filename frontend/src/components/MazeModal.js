@@ -5,7 +5,7 @@ import { Modal, Form, Button, Alert, Row, Col } from "react-bootstrap";
 import LocationList from "./LocationList";
 import { BACKEND_URL, FRONTEND_URL } from "../utils/constants";
 import axios from "axios";
-import { TokenContext } from "../utils/TokenContext";
+import TokenContext from "../utils/TokenContext";
 import PDFButtons from "./PDFButtons";
 
 function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged, token, setToken }) {

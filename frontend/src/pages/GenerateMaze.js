@@ -7,7 +7,7 @@ import MazeModal from "../components/MazeModal";
 import SolutionIDForm from "../components/SolutionIDForm";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
-import { TokenContext } from "../utils/TokenContext";
+import TokenContext from "../utils/TokenContext";
 import ScrollToTop from "react-scroll-to-top";
 
 export default function GenerateMaze() {

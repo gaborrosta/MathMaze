@@ -5,7 +5,7 @@ import { ArrowUp, X } from "react-bootstrap-icons";
 import ScrollToTop from "react-scroll-to-top";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
-import { TokenContext } from "../utils/TokenContext";
+import TokenContext from "../utils/TokenContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import MazeModal from "../components/MazeModal";
 import LocationList from "../components/LocationList";

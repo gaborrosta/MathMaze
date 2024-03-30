@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Container, Nav, Navbar, Form} from "react-bootstrap";
-import { TokenContext } from "../utils/TokenContext";
+import TokenContext from "../utils/TokenContext";
 
 export default function Menu() {
   const { i18n, t } = useTranslation();
