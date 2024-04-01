@@ -89,6 +89,7 @@ const Layout = () => {
 
   return (
     <TokenContext.Provider value={{ token, setToken, logout }}>
+      {/* eslint-disable-next-line jsx-a11y/no-distracting-elements */}
       <marquee behavior="scroll" direction="left"><b>{t("website-under-construction")}</b></marquee>
       <Menu />
       <Container>
