@@ -89,6 +89,7 @@ const Layout = () => {
 
   return (
     <TokenContext.Provider value={{ token, setToken, logout }}>
+      <marquee behavior="scroll" direction="left"><b>{t("website-under-construction")}</b></marquee>
       <Menu />
       <Container>
         <Outlet />

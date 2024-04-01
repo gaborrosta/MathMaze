@@ -131,6 +131,7 @@
     "maze-generated-download-pdf-a3": "Labirintus letöltése PDF formátumban A3-as méretben",
     "no-mazes": "Nincs még egy labirintusod sem.",
     "maze-description": "Leírás",
+    "maze-generated-by": "Készítette: {{username}}",
     "maze-size": "Méret: {{height}} (magasság) x {{width}} (szélesség)",
     "maze-length-of-the-path": "Útvonal hossza: {{length}}",
     "maze-created-at": "Készítve: {{date}}",
@@ -270,5 +271,7 @@
     "maze-solve-online-info1": "Csak a labirintus egy részét látod, és meg kell találnod az utat a célig a műveletek elvégzése alapján a <b>{{type}}</b> eredményeket követve. Az út hossza {{length}} mező.",
     "maze-solve-online-info2": "Írd be az eredményeidet és jelöld meg az utat. Ezután adj meg egy becenevet és mentsd el a megoldásod.",
     "maze-solve-online-not-number": "Nem szám!",
-    "error-not-number-in-maze": "Kérlek, ellenőrizd a labirintust, mert legalább egy mezőben nem szám található."
+    "error-not-number-in-maze": "Kérlek, ellenőrizd a labirintust, mert legalább egy mezőben nem szám található.",
+    "website-under-construction": "A weboldal még nincs kész, ezért a megjelenített szövegek nem véglegesek, tartalmazhatnak hibákat vagy elírásokat.",
+    "webpage-under-construction": "A weboldal ezen oldala még nincs kész."
 }

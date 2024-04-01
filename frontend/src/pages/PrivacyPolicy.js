@@ -11,7 +11,8 @@ const PrivacyPolicy = () => {
       <center>
         <h1>{t("privacy-policy-title")}</h1>
       </center>
-      <p>TODO...</p>
+      {/* TODO... */}
+      <b>{t("webpage-under-construction")}</b><br /><br />
     </>
   );
 }

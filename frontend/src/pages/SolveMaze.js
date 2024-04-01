@@ -236,9 +236,14 @@ export default function SolveMaze() {
                 <p>{t("maze-description")}: {maze.description ? maze.description : "-"}</p>
               </Col>
             </Row>
+            <Row>
+              <Col>
+                <p>{t("maze-generated-by", { username: maze.user })}</p>
+              </Col>
+            </Row>
           </div>
           </Alert>
-          <Row>
+          <Row className="mb-3">
             <Col className="mx-auto text-center" xs={12} md={6}>
               <PDFButtons actualData={maze} t={t} />
 

@@ -12,7 +12,8 @@ const Help = () => {
       <center>
         <h1>{t("help-title")}</h1>
       </center>
-      <p>TODO...</p>
+      {/* TODO... */}
+      <b>{t("webpage-under-construction")}</b><br /><br />
       <Trans i18nKey="help-privacy-terms-link">You can read our <Link to="/privacy-policy">Privacy Policy</Link> and our <Link to="/terms-and-conditions">Terms and Conditions</Link>.</Trans>
     </>
   );

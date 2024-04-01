@@ -75,9 +75,10 @@ export default async function pdfGenerator(data, t, size) {
 
   //Create the explanation text for the top
   const explanationTop = document.createElement("p");
-  explanationTop.innerHTML = t("pdf-explanation", { type: data.even ? t("pdf-path-even") : t("pdf-path-odd"), length: data.path.length })
-    + "<br><br>" + t("pdf-good-luck") + "<br><br>" + t("pdf-check-solution", { url: FRONTEND_URL });
-  explanationTop.style.fontSize = "2rem";
+  explanationTop.innerHTML = t("pdf-explanation", { type: data.pathTypeEven ? t("pdf-path-even") : t("pdf-path-odd"), length: data.pathLength })
+    + "<br><br>" + t("maze-description") + ": " + (data.description ? data.description : "-")
+    + "<br>" + t("maze-generated-by", { username: data.user })
+    + "<br><br>" + t("pdf-good-luck") + "<br><br>" + t("pdf-check-solution", { url: FRONTEND_URL });  explanationTop.style.fontSize = "2rem";
   explanationTop.style.textAlign = "left";
 
   //Create the explanation text for the bottom

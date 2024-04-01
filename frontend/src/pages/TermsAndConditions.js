@@ -11,7 +11,8 @@ const TermsAndConditions = () => {
       <center>
         <h1>{t("terms-and-conditions-title")}</h1>
       </center>
-      <p>TODO...</p>
+      {/* TODO... */}
+      <b>{t("webpage-under-construction")}</b><br /><br />
     </>
   );
 }

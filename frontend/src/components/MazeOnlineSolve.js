@@ -11,6 +11,8 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
   const mazeRef = useRef(null);
   const inputRef = useRef(null);
 
+  const [mazeSize, setMazeSize] = useState(0);
+
   const [selectedCell, setSelectedCell] = useState({x: 0, y: 0});
   const [gridShift, setGridShift] = useState({x: 0, y: 0});
   const [isInputActive, setIsInputActive] = useState(false);
@@ -27,7 +29,7 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
   useEffect(() => {
     mazeRef.current.scrollIntoView({ behavior: "smooth" });
     document.getElementById("cell-0-0").focus();
-  }, []);
+  }, [mazeRef, mazeSize]);
 
   useEffect(() => {
     if (isInputActive && inputRef.current) {
@@ -127,20 +129,32 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
     handleSubmit({ mazeId: data.id, data: grid, path: path, nickname: nickname });
   };
 
+  useEffect(() => {
+    const updateCellSize = () => {
+      const minDimension = Math.max(Math.min(window.innerWidth, window.innerHeight, 800), 75 * GRID_WINDOW_SIZE);
+      setMazeSize((minDimension / GRID_WINDOW_SIZE + 1) * GRID_WINDOW_SIZE);
+    };
+
+    updateCellSize();
+    window.addEventListener("resize", updateCellSize);
+
+    return () => window.removeEventListener("resize", updateCellSize);
+  }, []);
+
   return (
-    <Row>
+    <Row className="mb-3">
       <Col>
         <div>
           <h2>{t("maze-solve-online-instructions")}</h2>
-          <p><Trans i18nKey="maze-solve-online-info1" values={{ type: data.even ? t("pdf-path-even") : t("pdf-path-odd"), length: data.path.length }}> <b> </b></Trans><br />{t("maze-solve-online-info2")}</p>
+          <p><Trans i18nKey="maze-solve-online-info1" values={{ type: data.pathTypeEven ? t("pdf-path-even") : t("pdf-path-odd"), length: data.pathLength }}> <b> </b></Trans><br />{t("maze-solve-online-info2")}</p>
           <p>{t("pdf-good-luck")}</p>
 
           {submitError && <Alert variant="danger">{t(submitError)}</Alert>}
           <NicknameForm initialNickname={initialNickname} isSubmitDisabled={isSubmitDisabled} setIsSubmitDisabled={setIsSubmitDisabled} handleSubmit={handleFormSubmit} />
         </div>
       </Col>
-      <Col xs={{ order: "last" }} lg={{ order: 0 }} xxl={{ order: "last" }} >
-        <div ref={mazeRef} className="maze mb-3" style={{width: "100vw", height: "100vh", maxWidth: "100vh", maxHeight: "100vw", gridTemplateColumns: `repeat(${GRID_WINDOW_SIZE}, 1fr)`}}>
+      <Col xs={{ order: "last" }} lg={{ order: 0 }}>
+        <div ref={mazeRef} className="maze mb-3" style={{ width: `${mazeSize}px`, height: `${mazeSize}px`, gridTemplateColumns: `repeat(${GRID_WINDOW_SIZE}, 1fr)`}}>
           {Array.from({length: GRID_WINDOW_SIZE}).map((_, i) => (
             Array.from({length: GRID_WINDOW_SIZE}).map((__, j) => {
               const actualX = gridShift.x + j;
