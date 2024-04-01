@@ -145,6 +145,7 @@ data class Maze(
             this["path"] = sendablePath
             this["digits"] = numberOfDigits
             this["pathLength"] = pathLength - 2
+            this["pathTypeEven"] = pathTypeEven
             this["location"] = location
             this["description"] = description
             this["isPrivate"] = isPrivate
