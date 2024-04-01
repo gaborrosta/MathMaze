@@ -205,7 +205,7 @@ object Generator {
      *   Generates a list of type of operations.
      */
     private fun generateOperationList(length: Int, operation: OperationType): Iterator<Boolean> {
-        val secondOperationCount = if (operation.isMixed) length / 2 else if (!operation.firsOperation) length else 0
+        val secondOperationCount = if (operation.isMixed) length / 2 else if (!operation.firstOperation) length else 0
         return (List(length - secondOperationCount) { true } + List(secondOperationCount) { false }).shuffled().iterator()
     }
 

@@ -130,10 +130,10 @@ data class Maze(
         get() = jsonWhenRecognised.apply {
             this["data"] = sendableData
             this["path"] = sendablePath
-            this["even"] = pathTypeEven
             this["digits"] = numberOfDigits
             this["pathLength"] = pathLength - 2
             this["pathTypeEven"] = pathTypeEven
+            this["user"] = generatedBy.username
         }
 
     /**
@@ -143,12 +143,13 @@ data class Maze(
         get() = jsonWhenRecognised.apply {
             this["data"] = sendableData
             this["path"] = sendablePath
-            this["even"] = pathTypeEven
             this["digits"] = numberOfDigits
+            this["pathLength"] = pathLength - 2
             this["location"] = location
             this["description"] = description
             this["isPrivate"] = isPrivate
             this["passcode"] = passcode
+            this["user"] = generatedBy.username
         }
 
     /**

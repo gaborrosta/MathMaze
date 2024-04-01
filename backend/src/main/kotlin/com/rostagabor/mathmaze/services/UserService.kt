@@ -47,7 +47,7 @@ class UserService(
         }
 
         try {
-            userRepository.save(User(username = "MathMaze", email = ADMIN_EMAIL_ADDRESS, password = passwordEncoder.encode(adminPassword)))
+            userRepository.save(User(username = "MathMaze Admin", email = ADMIN_EMAIL_ADDRESS, password = passwordEncoder.encode(adminPassword)))
             println("Admin user was created successfully.")
         } catch (e: Exception) {
             e.printStackTrace()

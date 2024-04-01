@@ -28,7 +28,7 @@ enum class OperationType {
     /**
      *   Checks if the first operation is addition or multiplication.
      */
-    val firsOperation: Boolean
+    val firstOperation: Boolean
         get() = this == ADDITION || this == MULTIPLICATION
 
     /**
