@@ -1,22 +1,30 @@
+//Font Family
 @import url('https://fonts.googleapis.com/css2?family=Zilla+Slab&display=swap');
-
 $font-family-base: 'Zilla Slab', serif;
+
+//Primary color
 $primary: #7d141d;
+
 
 body {
 	overflow-y: scroll;
 }
+
 
 .yellow {
 	background-color: rgba(254, 223, 25, 0.8) !important; // #fedf19;
 	font-weight: bold;
 }
 
+
+//Style for online solver
 .path {
 	background-color: #7d141d50;
 	font-style: italic;
 }
 
+
+//Styles for maze grid
 .maze {
 	display: grid;
 	border: 3px solid black;
@@ -73,6 +81,7 @@ body {
 }
 
 
+//Styles for solution
 .correct {
 	background-color: lightgreen;
 }
@@ -94,18 +103,23 @@ body {
 }
 
 
+//Styles for generating maze
 .arrow {
 	display: inline-block;
 	transition: transform 0.3s;
 	padding-right: 0.5rem;
 }
+
 .rotate {
 	transform: rotate(90deg);
 }
 
+
+//Style for profile
 .icon:hover {
 	border-width: 3px !important;
 }
+
 
 //Import Bootstrap
 @import '~bootstrap/scss/bootstrap';

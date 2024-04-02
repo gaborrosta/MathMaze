@@ -18,13 +18,22 @@ import Account from "./pages/Account";
 import NoPage from "./pages/NoPage";
 import AuthChecker from "./utils/AuthChecker";
 
+/**
+ * App is the root component of the application.
+ * It sets up the routing for the application and renders the appropriate page component based on the current route.
+ * It also sets the language of the document.
+ *
+ * @returns {React.Element} The App component.
+ */
 export default function App() {
   const { i18n } = useTranslation();
 
+  //Set the language of the document whenever the language changes.
   useEffect(() => {
     document.documentElement.lang = i18n.resolvedLanguage;
   }, [i18n.resolvedLanguage]);
 
+  //Render the application.
   return (
     <React.StrictMode>
       <React.Suspense fallback={<Loading loading background="#fedf19" loaderColor="#7d141d" />}></React.Suspense>
