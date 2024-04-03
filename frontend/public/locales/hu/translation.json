@@ -213,7 +213,7 @@
     "maze-private": "A labirintus PRIVÁT.",
     "maze-is-private-help": "Ha privát, akkor csak te tudod megoldani. Ellenkező esetben bárki meg tudja oldani, ha ismeri a belépési kódot.",
     "maze-passcode": "Belépési kód",
-    "maze-passcode-help": "Ha beállítasz egy belépési kódot, az embereknek be kell írniuk azt a labirintus eléréséhez. 5-20 karakter hosszúnak kell lennie, és csak számokat tartalmazhat. Ha üres, akkor belépési kód nélkül hozzáférhetnek a labirintushoz.",
+    "maze-passcode-help": "Ha beállítasz egy belépési kódot, az embereknek be kell írniuk azt a labirintus eléréséhez. 8-20 karakter hosszúnak kell lennie, és csak számokat tartalmazhat. Ha üres, akkor belépési kód nélkül hozzáférhetnek a labirintushoz.",
     "error-save-maze-passcode-invalid-format": "Érvénytelen belépési kód. Kérjük, ellenőrizd az adatokat.",
     "error-invalid-passcode": "A belépési kód nem felel meg a követelményeknek.",
     "maze-public-info": "Bárki letöltheti vagy megoldhatja online a labirintust a következő linken:",

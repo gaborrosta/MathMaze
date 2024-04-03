@@ -15,7 +15,7 @@ import { Form, Button } from "react-bootstrap";
  * @param {Object} props.initialData - An object containing the initial form data. The keys should match the keys in validationSchema. Example: `{ name: "", email: "" }`
  * @param {Object} props.validationSchema - An object containing the validation schema for the form. The keys should match the keys in initialData. Each value should be an object with the following properties:
  *   - required: A boolean indicating whether the field is required.
- *   - regex: A regular expression to validate the field. Example: `new RegExp(/^[\w-.]+@([\w-]+.)+[\w-]{2,4}$/)`
+ *   - regex: A regular expression to validate the field. Example: `new RegExp(/^[\w-.]+@([\w-]+.)+[\w-]{2,4}$/)` or `new RegExp(/.* /)` for any value (remove the space).
  *   - regexError: The key of the error message to display if the field does not match the regex. Example: `"email-error"`
  *   - customCheck: An optional function to perform additional validation on the field. It receives the current form data and should return an object containing a key if there is an error.`
  * @param {Function} props.form - The function to render the form fields. It receives the following parameters:
@@ -91,19 +91,22 @@ export default function BaseForm ({ onSubmit, initialData, validationSchema, for
 
   //Handle form field changes
   const handleChange = (event) => {
+    //Get the name, value of the field
+    let { name, value } = event.target;
+
     //Update the form data
-    const newFormData = { ...formData, [event.target.name]: event.target.value };
+    const newFormData = { ...formData, [name]: value };
     setFormData(newFormData);
 
     //Update the field errors
     const newFieldErrors = { ...fieldErrors };
 
     //Validate the field
-    const fieldSchema = validationSchema[event.target.name];
-    if (!fieldSchema.regex.test(event.target.value)) {
-      newFieldErrors[event.target.name] = fieldSchema.regexError;
+    const fieldSchema = validationSchema[name];
+    if (!fieldSchema.regex.test(value)) {
+      newFieldErrors[name] = fieldSchema.regexError;
     } else {
-      delete newFieldErrors[event.target.name];
+      delete newFieldErrors[name];
     }
 
     //Call the custom check function if specified

@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Row, Col, Alert, Form, Button } from "react-bootstrap";
-import { ArrowUp } from "react-bootstrap-icons";
 import MazeGrid from "../components/MazeGrid";
 import MazeModal from "../components/MazeModal";
 import SolutionIDForm from "../components/SolutionIDForm";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 import TokenContext from "../utils/TokenContext";
-import ScrollToTop from "react-scroll-to-top";
 
 export default function GenerateMaze() {
   const { t } = useTranslation();
@@ -467,7 +465,6 @@ export default function GenerateMaze() {
         </Col>
       </Row>
       <MazeModal data={maze} visible={modalVisible} setVisible={setModalVisible} locations={locations} />
-      <ScrollToTop smooth component={<ArrowUp />} className="yellow" />
     </>
   );
 }

@@ -20,6 +20,7 @@ jest.mock("react-router-dom", () => ({
 //Mock a component that will be passed to the AuthChecker
 const MockComponent = () => <div>Mock Component</div>;
 
+
 //The test suite
 describe("AuthChecker", () => {
   it("uses Navigate with replace when there is no token", async () => {
@@ -33,6 +34,7 @@ describe("AuthChecker", () => {
 
     expect(screen.getByText("/login/?next=/test-url replace")).toBeInTheDocument();
   });
+
 
   it("renders the passed component when there is a token", () => {
     render(

@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Row, Col, Alert, Button, Card, Tabs, Tab, Form, InputGroup, Dropdown, Pagination } from "react-bootstrap";
-import { ArrowUp, X } from "react-bootstrap-icons";
-import ScrollToTop from "react-scroll-to-top";
+import { X } from "react-bootstrap-icons";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 import TokenContext from "../utils/TokenContext";
@@ -468,7 +467,6 @@ export default function Account() {
             </Tab>
           ))}
         </Tabs>
-        <ScrollToTop smooth component={<ArrowUp />} className="yellow" />
       </>}
     </>
   );
