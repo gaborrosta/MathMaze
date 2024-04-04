@@ -2,11 +2,11 @@ package com.rostagabor.mathmaze.repositories
 
 import com.rostagabor.mathmaze.data.PasswordResetToken
 import com.rostagabor.mathmaze.data.User
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.test.context.ActiveProfiles
 
 /**
@@ -42,6 +42,26 @@ class PasswordResetTokenRepositoryTest {
         assertNotNull(foundToken)
         assertEquals(token, foundToken?.token)
         assertEquals(user, foundToken?.user)
+    }
+
+    @Test
+    fun testTokenUniqueness() {
+        //Save 1 user
+        val user = User(username = "testUser", email = "test@example.com")
+        userRepository.save(user)
+
+        //Create 2 password reset tokens with the same token
+        val token = "testToken"
+        val passwordResetToken1 = PasswordResetToken(token = token, user = user)
+        val passwordResetToken2 = PasswordResetToken(token = token, user = user)
+
+        //Save the first password reset token
+        passwordResetTokenRepository.save(passwordResetToken1)
+
+        //Assert...
+        assertThrows(DataIntegrityViolationException::class.java) {
+            passwordResetTokenRepository.saveAndFlush(passwordResetToken2)
+        }
     }
 
 }

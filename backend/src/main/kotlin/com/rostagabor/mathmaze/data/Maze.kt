@@ -119,7 +119,7 @@ data class Maze(
             this["id"] = mazeId
             this["width"] = width
             this["height"] = height
-            this["start"] = listOf(0, 0)
+            this["start"] = Point.START.toList()
             this["end"] = endPoint.toList()
         }
 
@@ -140,17 +140,11 @@ data class Maze(
      *   A JSON representation of the maze. Used when generated or saved a maze.
      */
     val jsonWhenGeneratedOrSaved: JsonObject
-        get() = jsonWhenRecognised.apply {
-            this["data"] = sendableData
-            this["path"] = sendablePath
-            this["digits"] = numberOfDigits
-            this["pathLength"] = pathLength - 2
-            this["pathTypeEven"] = pathTypeEven
+        get() = jsonForSolving.apply {
             this["location"] = location
             this["description"] = description
             this["isPrivate"] = isPrivate
             this["passcode"] = passcode
-            this["user"] = generatedBy.username
         }
 
     /**
@@ -161,8 +155,6 @@ data class Maze(
             this["numbersRangeStart"] = numbersRangeStart
             this["numbersRangeEnd"] = numbersRangeEnd
             this["operation"] = operation.ordinal
-            this["pathTypeEven"] = pathTypeEven
-            this["pathLength"] = pathLength - 2
             this["createdAt"] = createdAt.toEpochMilli()
             this["solved"] = solutions.size
         }

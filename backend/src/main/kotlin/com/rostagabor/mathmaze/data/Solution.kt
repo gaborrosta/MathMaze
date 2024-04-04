@@ -172,7 +172,7 @@ data class Solution @JvmOverloads constructor(
 
                 MustIncludeTile(numbers[0], numbers[1], expectedResult, operationType, operation)
             }
-        }
+        }.distinct()
     }
 
 }

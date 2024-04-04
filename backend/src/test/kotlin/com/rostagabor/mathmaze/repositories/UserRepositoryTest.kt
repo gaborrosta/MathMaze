@@ -1,11 +1,11 @@
 package com.rostagabor.mathmaze.repositories
 
 import com.rostagabor.mathmaze.data.User
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.test.context.ActiveProfiles
 
 /**
@@ -46,6 +46,32 @@ class UserRepositoryTest {
         assertNotNull(foundUser)
         assertEquals("testUser", foundUser?.username)
         assertEquals("test@example.com", foundUser?.email)
+    }
+
+    @Test
+    fun testUsernameUniqueness() {
+        //Create 2 users with the same username
+        val user1 = User(username = "testUser", email = "test@example.com")
+        val user2 = User(username = "testUser", email = "test2@example.com")
+
+        //Save the first user
+        userRepository.save(user1)
+
+        //Assert...
+        assertThrows(DataIntegrityViolationException::class.java) { userRepository.saveAndFlush(user2) }
+    }
+
+    @Test
+    fun testEmailUniqueness() {
+        //Create 2 users with the same email
+        val user1 = User(username = "testUser", email = "test@example.com")
+        val user2 = User(username = "testUser2", email = "test@example.com")
+
+        //Save the first user
+        userRepository.save(user1)
+
+        //Assert...
+        assertThrows(DataIntegrityViolationException::class.java) { userRepository.saveAndFlush(user2) }
     }
 
 }
