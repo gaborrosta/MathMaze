@@ -24,7 +24,7 @@ class MazeController(
     @PostMapping("/generate")
     fun generate(@RequestBody mazeGenerationRequest: MazeGenerationRequest): ResponseEntity<Any> {
         return try {
-            //Authentication status
+            //Check if the user is still logged in
             val (_, token) = userService.regenerateTokenIfStillValid(mazeGenerationRequest.token)
 
             //Generate the maze
@@ -64,7 +64,7 @@ class MazeController(
     @PostMapping("/save")
     fun save(@RequestBody mazeSaveRequest: MazeSaveRequest): ResponseEntity<Any> {
         return try {
-            //Authentication status
+            //Check if the user is still logged in
             val (email, token) = userService.regenerateTokenIfStillValid(mazeSaveRequest.token)
 
             //Save the maze
@@ -93,7 +93,7 @@ class MazeController(
     @PostMapping("/update")
     fun update(@RequestBody mazeUpdateRequest: MazeUpdateRequest): ResponseEntity<Any> {
         return try {
-            //Authentication status
+            //Check if the user is still logged in
             val (email, token) = userService.regenerateTokenIfStillValid(mazeUpdateRequest.token)
 
             //Update the maze
@@ -127,7 +127,7 @@ class MazeController(
     @GetMapping("/open")
     fun open(@RequestParam mazeId: Long, @RequestParam passcode: String?, @RequestParam token: String?): ResponseEntity<Any> {
         return try {
-            //Authentication status
+            //Check if the user is still logged in
             val (email, newToken) = userService.regenerateTokenIfStillValid(token)
 
             //Open the maze
@@ -161,7 +161,7 @@ class MazeController(
         @RequestParam("token") token: String?,
     ): ResponseEntity<Any> {
         return try {
-            //Authentication status
+            //Check if the user is still logged in
             val (_, newToken) = userService.regenerateTokenIfStillValid(token)
 
             //Recognise the maze
@@ -190,7 +190,7 @@ class MazeController(
     @PostMapping("/check")
     fun check(@RequestBody mazeCheckRequest: MazeCheckRequest): ResponseEntity<Any> {
         return try {
-            //Authentication status
+            //Check if the user is still logged in
             val (email, token) = userService.regenerateTokenIfStillValid(mazeCheckRequest.token)
 
             //Check the maze
@@ -221,7 +221,7 @@ class MazeController(
     @GetMapping("/getAll")
     fun getAll(@RequestParam token: String): ResponseEntity<Any> {
         return try {
-            //Authentication status
+            //Check if the user is still logged in
             val (email, newToken) = userService.regenerateTokenIfStillValid(token)
 
             //Get all the mazes
@@ -248,7 +248,7 @@ class MazeController(
     @GetMapping("/getSolutions")
     fun getSolutions(@RequestParam mazeId: Long, @RequestParam token: String?): ResponseEntity<Any> {
         return try {
-            //Authentication status
+            //Check if the user is still logged in
             val (email, newToken) = userService.regenerateTokenIfStillValid(token)
 
             //Get all the solutions
@@ -276,7 +276,7 @@ class MazeController(
     @PostMapping("/update-location")
     fun updateLocation(@RequestBody locationUpdateRequest: LocationUpdateRequest): ResponseEntity<Any> {
         return try {
-            //Authentication status
+            //Check if the user is still logged in
             val (email, token) = userService.regenerateTokenIfStillValid(locationUpdateRequest.token)
 
             //Update the location

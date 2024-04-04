@@ -23,7 +23,10 @@ class UserController(private val userService: UserService) {
     @PostMapping("/register")
     fun register(@RequestBody user: User): ResponseEntity<Any> {
         return try {
+            //Register the user
             userService.register(user)
+
+            //Generate a token and return it
             ResponseEntity.ok().body(userService.generateToken(user.email))
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(e::class.simpleName)
@@ -37,7 +40,10 @@ class UserController(private val userService: UserService) {
     @PostMapping("/login")
     fun login(@RequestBody loginRequest: LoginRequest): ResponseEntity<Any> {
         return try {
+            //Log in the user
             userService.login(loginRequest.email, loginRequest.password)
+
+            //Generate a token and return it
             ResponseEntity.ok().body(userService.generateToken(loginRequest.email))
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(e::class.simpleName)
@@ -51,10 +57,13 @@ class UserController(private val userService: UserService) {
     @PostMapping("/password-request")
     fun requestPasswordReset(@RequestBody emailRequest: EmailRequest): ResponseEntity<Any> {
         return try {
+            //Request a password reset
             userService.requestPasswordReset(emailRequest.email)
+
+            //Return success
             ResponseEntity.ok().body("1")
         } catch (e: Exception) {
-            //This way hackers can't tell if there is a user with the given email or not
+            //If the user is not found, return success because we don't want to reveal if an email is registered or not
             if (e is UserNotFoundException) {
                 ResponseEntity.ok().body("1")
             } else {
@@ -70,7 +79,10 @@ class UserController(private val userService: UserService) {
     @GetMapping("/password-validate")
     fun validateToken(@RequestParam token: String): ResponseEntity<Any> {
         return try {
+            //Validate the token
             userService.validateToken(token)
+
+            //Return success
             ResponseEntity.ok().body("1")
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(e::class.simpleName)
@@ -84,7 +96,10 @@ class UserController(private val userService: UserService) {
     @PostMapping("/password-reset")
     fun resetPassword(@RequestBody passwordResetRequest: PasswordResetRequest): ResponseEntity<Any> {
         return try {
+            //Reset the password
             userService.resetPassword(passwordResetRequest.token, passwordResetRequest.password)
+
+            //Return success
             ResponseEntity.ok().body("1")
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(e::class.simpleName)
@@ -97,9 +112,13 @@ class UserController(private val userService: UserService) {
     @PostMapping("/account-password-reset")
     fun accountResetPassword(@RequestBody accountPasswordResetRequest: AccountPasswordResetRequest): ResponseEntity<Any> {
         return try {
+            //Check if the user is still logged in
             val (email, newToken) = userService.regenerateTokenIfStillValid(accountPasswordResetRequest.token)
 
+            //Reset the password
             userService.accountResetPassword(email, accountPasswordResetRequest.oldPassword, accountPasswordResetRequest.newPassword)
+
+            //Return success
             ResponseEntity.ok().body(newToken)
         } catch (e: Exception) {
             ResponseEntity.badRequest().body(e::class.simpleName)
@@ -112,15 +131,14 @@ class UserController(private val userService: UserService) {
      */
     @GetMapping("/check")
     fun isUserStillLoggedIn(@RequestParam token: String): ResponseEntity<Any> {
-        return try {
-            val (_, newToken) = userService.regenerateTokenIfStillValid(token)
-            if (newToken.isEmpty()) {
-                ResponseEntity.badRequest().body("1")
-            } else {
-                ResponseEntity.ok().body(newToken)
-            }
-        } catch (e: Exception) {
-            ResponseEntity.badRequest().body(e::class.simpleName)
+        //Check if the user is still logged in
+        val (_, newToken) = userService.regenerateTokenIfStillValid(token)
+
+        //Return the new token or an error
+        return if (newToken.isEmpty()) {
+            ResponseEntity.badRequest().body("1")
+        } else {
+            ResponseEntity.ok().body(newToken)
         }
     }
 
