@@ -8,7 +8,6 @@ import com.rostagabor.mathmaze.requests.EmailRequest
 import com.rostagabor.mathmaze.requests.LoginRequest
 import com.rostagabor.mathmaze.requests.PasswordResetRequest
 import com.rostagabor.mathmaze.services.UserService
-import com.rostagabor.mathmaze.utils.HSqlTest
 import com.rostagabor.mathmaze.utils.UserNotFoundException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -29,8 +28,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 /**
  *   Tests for the UserController class.
  */
-@SpringBootTest
-@HSqlTest
+@SpringBootTest(properties = ["jdbc:hsqldb:mem:23;DB_CLOSE_DELAY=-1", "hibernate.dialect=org.hibernate.dialect.HSQLDialect"])
 @AutoConfigureMockMvc
 @ActiveProfiles("test", "dev")
 class UserControllerTest {
