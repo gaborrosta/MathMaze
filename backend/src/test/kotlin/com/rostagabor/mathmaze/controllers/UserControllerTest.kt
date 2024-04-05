@@ -28,7 +28,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 /**
  *   Tests for the UserController class.
  */
-@SpringBootTest(properties = ["jdbc:hsqldb:mem:23;DB_CLOSE_DELAY=-1", "hibernate.dialect=org.hibernate.dialect.HSQLDialect"])
+@SpringBootTest(properties = [
+    "spring.datasource.url=jdbc:hsqldb:mem:testUser;DB_CLOSE_DELAY=-1",
+    "spring.datasource.driverClassName=org.hsqldb.jdbcDriver",
+    "hibernate.dialect=org.hibernate.dialect.HSQLDialect",
+])
 @AutoConfigureMockMvc
 @ActiveProfiles("test", "dev")
 class UserControllerTest {
