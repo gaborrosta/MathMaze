@@ -7,6 +7,7 @@ import com.rostagabor.mathmaze.data.Point
 import com.rostagabor.mathmaze.requests.*
 import com.rostagabor.mathmaze.services.MazeService
 import com.rostagabor.mathmaze.services.UserService
+import com.rostagabor.mathmaze.utils.HSqlTest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile
  *   Tests for the MazeController class.
  */
 @SpringBootTest
+@HSqlTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test", "dev")
 class MazeControllerTest {
