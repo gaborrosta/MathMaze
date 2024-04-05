@@ -532,7 +532,7 @@ class MazeControllerTest {
 
         //Assert...
         mockMvc
-            .perform(get("/maze/getAll?token=$token"))
+            .perform(get("/maze/get-all?token=$token"))
             .andExpect(status().isOk)
     }
 
@@ -576,7 +576,7 @@ class MazeControllerTest {
         //Assert...
         mockMvc
             .perform(
-                get("/maze/getSolutions")
+                get("/maze/get-solutions")
                     .param("mazeId", mazeId.toString())
                     .param("token", token)
             )
