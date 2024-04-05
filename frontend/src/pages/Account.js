@@ -91,7 +91,7 @@ export default function Account() {
   }, [mazes, handleSortOrderChange, sortOrder]);
 
   useEffect(() => {
-    axios.get(`${BACKEND_URL}/maze/getAll?token=${tokenRef.current}`)
+    axios.get(`${BACKEND_URL}/maze/get-all?token=${tokenRef.current}`)
     .then(response => {
       setTokenRef.current(response.data.token);
 
@@ -259,7 +259,7 @@ export default function Account() {
     }
 
     if (!downloadedSolutions[id]) {
-      axios.get(`${BACKEND_URL}/maze/getSolutions?token=${token}&mazeId=${id}`)
+      axios.get(`${BACKEND_URL}/maze/get-solutions?token=${token}&mazeId=${id}`)
       .then(response => {
         setTimeout(() => {
           setToken(response.data.token);
