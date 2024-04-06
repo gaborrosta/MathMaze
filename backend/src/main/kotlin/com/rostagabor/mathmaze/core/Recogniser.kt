@@ -608,7 +608,7 @@ object Recogniser {
         floatMat.get(0, 0, floatArray)
         floatMat.release()
 
-        return floatArray.map { it * 255 }.toFloatArray()
+        return floatArray
     }
 
 }
