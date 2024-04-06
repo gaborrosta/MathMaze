@@ -274,5 +274,6 @@
     "maze-solve-online-not-number": "Not a number!",
     "error-not-number-in-maze": "Please check the maze, because there is at least one cell which contains not a number.",
     "website-under-construction": "The website is still under construction, so the displayed texts are not final, they may contain errors or typos.",
-    "webpage-under-construction": "This page of the website is still under construction."
+    "webpage-under-construction": "This page of the website is still under construction.",
+    "field-required": "This field is required."
 }

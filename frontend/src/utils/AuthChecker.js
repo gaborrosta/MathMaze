@@ -13,12 +13,38 @@ import TokenContext from "./TokenContext";
  * @returns {React.Element} The provided Component if the user is authenticated, otherwise a Navigate component.
  */
 export default function AuthChecker({ Component, url }) {
+  //Check the parameters
+  checkParameters(Component, url);
+
+
+  //Get the token from the context
   const { token } = useContext(TokenContext);
+
 
   //If there is no token, redirect to the login page
   if (!token) {
     return <Navigate to={"/login/?next=/" + url} replace />;
   } else {
     return <Component />;
+  }
+}
+
+
+/**
+ * Checks the parameters passed to the AuthChecker component.
+ */
+function checkParameters(Component, url) {
+  if (Component === undefined) {
+    throw new Error("Component is required");
+  }
+  if (typeof Component !== "function") {
+    throw new Error("Component must be a function");
+  }
+
+  if (url === undefined) {
+    throw new Error("url is required");
+  }
+  if (typeof url !== "string") {
+    throw new Error("url must be a string");
   }
 }

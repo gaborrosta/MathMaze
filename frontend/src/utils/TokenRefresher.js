@@ -11,6 +11,10 @@ import { BACKEND_URL } from "../utils/constants";
  * @param {number} [props.refreshMinutes] - The number of minutes after which the token should be refreshed. Default: 30 minutes.
  */
 export default function TokenRefresher({ token, setToken, refreshMinutes = 30 }) {
+  //Check the parameters
+  checkParameters(token, setToken, refreshMinutes);
+
+
   //Store the timeout ID in a ref
   const timeoutId = useRef(null);
 
@@ -44,4 +48,28 @@ export default function TokenRefresher({ token, setToken, refreshMinutes = 30 })
 
   //Render nothing
   return null;
+}
+
+
+/**
+ * Checks the parameters passed to the TokenRefresher component.
+ */
+function checkParameters(token, setToken, refreshMinutes) {
+  if (token === undefined) {
+    throw new Error("Token is required.");
+  }
+  if (typeof token !== "string") {
+    throw new Error("Token must be a string.");
+  }
+
+  if (setToken === undefined) {
+    throw new Error("setToken is required.");
+  }
+  if (typeof setToken !== "function") {
+    throw new Error("setToken must be a function.");
+  }
+
+  if (typeof refreshMinutes !== "number") {
+    throw new Error("refreshMinutes must be a number.");
+  }
 }

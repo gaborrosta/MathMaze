@@ -2,6 +2,26 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { FRONTEND_URL } from "../utils/constants";
 
+/**
+ * Generates a PDF document of a maze in the given size.
+ *
+ * @param {Object} data - The maze data. It should have the following properties:
+ * - width: The width of the maze.
+ * - height: The height of the maze.
+ * - digits: The expected maximum number of digits in the answer.
+ * - start: The start point of the maze.
+ * - end: The end point of the maze.
+ * - data: The maze data.
+ * - id: The ID of the maze.
+ * - pathTypeEven: A boolean indicating whether the path type is even.
+ * - pathLength: The length of the path.
+ * - description: The description of the maze.
+ * - user: The user's username who generated the maze.
+ * @param {Function} t - The translation function.
+ * @param {string} size - The size of the PDF document ("A4" or "A3").
+ *
+ * @returns {Promise} A promise that resolves when the PDF document has been saved.
+ */
 export default async function pdfGenerator(data, t, size) {
   //DPI and scale factor
   const dpi = 150;

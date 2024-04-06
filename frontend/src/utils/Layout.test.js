@@ -38,7 +38,7 @@ Object.defineProperty(window, "sessionStorage", {
   writable: true,
 });
 
-//Mock the useLocation hook
+//Mock the useLocation, useNavigate hooks
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useLocation: jest.fn(),
@@ -60,7 +60,7 @@ describe("Layout", () => {
 
     //Mock the useLocation hook
     useLocation.mockReturnValue({
-      pathname: "/",
+      pathname: "/sth",
       search: "",
       hash: "",
       state: null,
@@ -82,7 +82,7 @@ describe("Layout", () => {
 
     //Mock the useLocation hook
     useLocation.mockReturnValue({
-      pathname: "/",
+      pathname: "/sth",
       search: "",
       hash: "",
       state: null,
@@ -165,7 +165,7 @@ describe("Layout", () => {
 
     //Mock the useLocation hook
     useLocation.mockReturnValue({
-      pathname: "/",
+      pathname: "/sth",
       search: "",
       hash: "",
       state: null,
@@ -208,7 +208,7 @@ describe("Layout", () => {
 
     //Mock the useLocation hook
     useLocation.mockReturnValue({
-      pathname: "/",
+      pathname: "/sth",
       search: "",
       hash: "",
       state: null,
@@ -237,5 +237,30 @@ describe("Layout", () => {
     //Check the sessionStorage
     expect(sessionStorage.setItem).toHaveBeenCalledTimes(2);
     expect(sessionStorage.setItem).toHaveBeenCalledWith("token", "");
+  });
+
+
+  it("no menu on index page", () => {
+    //Mock sessionStorage
+    sessionStorage.getItem.mockReturnValue(null);
+
+    //Mock the useLocation hook
+    useLocation.mockReturnValue({
+      pathname: "/",
+      search: "",
+      hash: "",
+      state: null,
+      key: "",
+    });
+
+    //Render the component
+    render(
+      <MemoryRouter>
+        <Layout />
+      </MemoryRouter>
+    );
+
+    //Check if menu is not there
+    expect(screen.queryByText("help-title")).not.toBeInTheDocument();
   });
 });

@@ -15,7 +15,7 @@ import { Form, Button } from "react-bootstrap";
  * @param {Object} props.initialData - An object containing the initial form data. The keys should match the keys in validationSchema. Example: `{ name: "", email: "" }`
  * @param {Object} props.validationSchema - An object containing the validation schema for the form. The keys should match the keys in initialData. Each value should be an object with the following properties:
  *   - required: A boolean indicating whether the field is required.
- *   - regex: A regular expression to validate the field. Example: `new RegExp(/^[\w-.]+@([\w-]+.)+[\w-]{2,4}$/)` or `new RegExp(/.* /)` for any value (remove the space).
+ *   - regex: A regular expression to validate the field. Example: `new RegExp(/^[\w-.]+@([\w-]+.)+[\w-]{2,4}$/)` or `new RegExp(/.* /)` for any value (remove the space). Can use regexes from constants.
  *   - regexError: The key of the error message to display if the field does not match the regex. Example: `"email-error"`
  *   - customCheck: An optional function to perform additional validation on the field. It receives the current form data and should return an object containing a key if there is an error.`
  * @param {Function} props.form - The function to render the form fields. It receives the following parameters:
@@ -26,52 +26,17 @@ import { Form, Button } from "react-bootstrap";
  *   - success: The key of the current success message for the whole form.
  *   - submitButton: The submit button for the form.
  * @param {string} props.buttonText - The key of the text to display on the submit button. Example: `"reset-password-submit"`
+ * @param {Function} props.customValidator - An optional function to perform additional validation on the form. It receives the current form data and should return an object containing a key if there is an error. If the value in the object is an empty string, then the custom error is removed from that field.
  * 
  * @returns {React.Element} The BaseForm component.
  */
-export default function BaseForm ({ onSubmit, initialData, validationSchema, form, buttonText }) {
+export default function BaseForm({ onSubmit, initialData, validationSchema, form, buttonText, customValidator }) {
+  //Check the parameters
+  checkParameters(onSubmit, initialData, validationSchema, form, buttonText, customValidator);
+
+
   //Localisation
   const { t } = useTranslation();
-
-  
-  //Check the initial data and validation schema 
-  const checkValidationSchema = () => {
-    if (!initialData || !validationSchema) {
-      throw new Error("initialData and validationSchema cannot be empty");
-    }
-
-    const initialDataKeys = Object.keys(initialData);
-    const validationSchemaKeys = Object.keys(validationSchema);
-
-    if (initialDataKeys.length !== validationSchemaKeys.length) {
-      throw new Error("initialData and validationSchema must have the same keys");
-    }
-
-    for (let key of validationSchemaKeys) {
-      if (!initialDataKeys.includes(key)) {
-        throw new Error(`Key "${key}" is missing from initialData`);
-      }
-
-      const fieldSchema = validationSchema[key];
-      if (typeof fieldSchema !== "object") {
-        throw new Error(`Every value in validationSchema must be an object. "${key}" is not an object.`);
-      }
-
-      if (!fieldSchema.regex || !(fieldSchema.regex instanceof RegExp)) {
-        throw new Error(`Every value in validationSchema must have a regex. "${key}" does not have a regex.`);
-      }
-
-      if (!fieldSchema.regexError) {
-        throw new Error(`Every value in validationSchema must have a regexError. "${key}" does not have a regexError.`);
-      }
-
-      if (fieldSchema.customCheck && typeof fieldSchema.customCheck !== "function") {
-        throw new Error(`customCheck must be a function. "${key}" has a customCheck that is not a function.`);
-      }
-    }
-  };
-
-  checkValidationSchema();
 
 
   //Is the request in progress?
@@ -103,19 +68,21 @@ export default function BaseForm ({ onSubmit, initialData, validationSchema, for
 
     //Validate the field
     const fieldSchema = validationSchema[name];
-    if (!fieldSchema.regex.test(value)) {
+    if (value === "" && fieldSchema.required) {
+      newFieldErrors[name] = "field-required";
+    } else if (!fieldSchema.regex.test(value)) {
       newFieldErrors[name] = fieldSchema.regexError;
     } else {
       delete newFieldErrors[name];
     }
 
-    //Call the custom check function if specified
-    if (fieldSchema.customCheck) {
-      const customErrors = fieldSchema.customCheck(newFormData);
-    
-      //Merge the custom errors with the existing errors
+    //Call the custom validator 
+    if (customValidator !== undefined) {
+      const customErrors = customValidator(newFormData);
+
+      //Merge the custom errors with the existing errors (it can delete custom errors but not regexErrors or required errors)
       for (let key in customErrors) {
-        if (!newFieldErrors.hasOwnProperty(key)) {
+        if (!newFieldErrors.hasOwnProperty(key) || (newFieldErrors[key] !== "field-required" && newFieldErrors[key] !== validationSchema[key].regexError)) {
           newFieldErrors[key] = customErrors[key];
         }
       }
@@ -174,3 +141,81 @@ export default function BaseForm ({ onSubmit, initialData, validationSchema, for
     </Form>
   );
 };
+
+
+/**
+ * Checks the parameters passed to the BaseForm component.
+ */
+function checkParameters(onSubmit, initialData, validationSchema, form, buttonText, customValidator) {
+  if (onSubmit === undefined) {
+    throw new Error("onSubmit is required.");
+  }
+  if (typeof onSubmit !== "function") {
+    throw new Error("onSubmit must be a function.");
+  }
+  if (onSubmit.length !== 5) {
+    throw new Error("onSubmit must have 5 parameters.");
+  }
+
+  if (initialData === undefined) {
+    throw new Error("initialData is required.");
+  }
+  if (typeof initialData !== "object") {
+    throw new Error("initialData must be an object.");
+  }
+
+  if (validationSchema === undefined) {
+    throw new Error("validationSchema is required.");
+  }
+  if (typeof validationSchema !== "object") {
+    throw new Error("validationSchema must be an object.");
+  }
+
+  const initialDataKeys = Object.keys(initialData);
+  const validationSchemaKeys = Object.keys(validationSchema);
+
+  if (initialDataKeys.filter(x => !validationSchemaKeys.includes(x)).length !== 0) {
+    throw new Error("initialData and validationSchema must have the same keys.");
+  }
+
+  for (let key of validationSchemaKeys) {
+    const fieldSchema = validationSchema[key];
+    if (typeof fieldSchema !== "object") {
+      throw new Error(`Every value in validationSchema must be an object. "${key}" is not an object.`);
+    }
+
+    if (!fieldSchema.regex || !(fieldSchema.regex instanceof RegExp)) {
+      throw new Error(`Every value in validationSchema must have a regex. "${key}" does not have a regex.`);
+    }
+
+    if (fieldSchema.regexError === undefined) {
+      throw new Error(`Every value in validationSchema must have a regexError. "${key}" does not have a regexError.`);
+    }
+  }
+
+  if (form === undefined) {
+    throw new Error("form is required.");
+  }
+  if (typeof form !== "function") {
+    throw new Error("form must be a function.");
+  }
+  if (form.length !== 6) {
+    throw new Error("form must have 6 parameters.");
+  }
+
+  if (buttonText === undefined) {
+    throw new Error("buttonText is required.");
+  }
+  if (typeof buttonText !== "string") {
+    throw new Error("buttonText must be a string.");
+  }
+
+  if (customValidator !== undefined) {
+    if (typeof customValidator !== "function") {
+      throw new Error("customValidator must be a function.");
+    }
+    if (customValidator.length !== 1) {
+      throw new Error("customValidator must have 1 parameter.");
+    }
+  }
+}

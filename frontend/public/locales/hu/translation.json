@@ -273,5 +273,6 @@
     "maze-solve-online-not-number": "Nem szám!",
     "error-not-number-in-maze": "Kérlek, ellenőrizd a labirintust, mert legalább egy mezőben nem szám található.",
     "website-under-construction": "A weboldal még nincs kész, ezért a megjelenített szövegek nem véglegesek, tartalmazhatnak hibákat vagy elírásokat.",
-    "webpage-under-construction": "A weboldal ezen oldala még nincs kész."
+    "webpage-under-construction": "A weboldal ezen oldala még nincs kész.",
+    "field-required": "Ez a mező kötelező."
 }

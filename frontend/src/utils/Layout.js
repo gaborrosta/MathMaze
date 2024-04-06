@@ -50,7 +50,7 @@ const Layout = () => {
 
 
   //Logout function
-  const logout = () => { //TODO
+  const logout = () => {
     logoutRef.current = true;
     setToken("");
     navigate("/");
@@ -58,7 +58,7 @@ const Layout = () => {
 
 
   //Session expiration function
-  const expired = () => { //TODO
+  const expired = () => {
     setToken("");
 
     //If the user is on the account page, redirect to the login page
@@ -114,12 +114,14 @@ const Layout = () => {
   //Render the layout
   return (
     <TokenContext.Provider value={{ token, setToken, logout }}>
-      {/* eslint-disable-next-line jsx-a11y/no-distracting-elements */}
+      {/* eslint-disable-next-line jsx-a11y/no-distracting-elements */}{/* TODO ~ Remove */}
       <marquee behavior="scroll" direction="left"><b>{t("website-under-construction")}</b></marquee>
-      <Menu />
-      <Container>
-        <Outlet />
-      </Container>
+      {location.pathname === "/" ? <Outlet /> : <>
+        <Menu />
+        <Container>
+          <Outlet />
+        </Container>
+      </>}
       <ScrollToTop smooth component={<ArrowUp />} className="yellow" />
       <Modal show={sessionExpired !== SessionExpired.NO} onHide={() => setSessionExpired(SessionExpired.NO)}>
         <Modal.Header closeButton>

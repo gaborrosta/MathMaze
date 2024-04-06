@@ -16,6 +16,31 @@ jest.mock("axios");
 
 //The test suite
 describe("TokenRefresher", () => {
+  it("throws an error if token is missing", () => {
+    expect(() => render(<TokenRefresher />)).toThrow("Token is required.");
+  });
+
+
+  it("throws an error if token is not a string", () => {
+    expect(() => render(<TokenRefresher token={123} />)).toThrow("Token must be a string.");
+  });
+
+
+  it("throws an error if setToken is missing", () => {
+    expect(() => render(<TokenRefresher token="test-token" />)).toThrow("setToken is required.");
+  });
+
+
+  it("throws an error if setToken is not a function", () => {
+    expect(() => render(<TokenRefresher token="test-token" setToken="test-setToken" />)).toThrow("setToken must be a function.");
+  });
+
+
+  it("throws an error if refreshMinutes is not a number", () => {
+    expect(() => render(<TokenRefresher token="test-token" setToken={() => {}} refreshMinutes="test-minutes" />)).toThrow("refreshMinutes must be a number.");
+  });
+
+
   it("refreshes the token after a certain amount of time", () => {
     //"TokenContext"
     const setToken = jest.fn();
