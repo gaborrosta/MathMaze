@@ -177,7 +177,9 @@ describe("ContactForm", () => {
       );
     });
 
-    expect(screen.getByText("error-unknown")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("error-unknown")).toBeInTheDocument();
+    });
   });
 
 
@@ -213,7 +215,9 @@ describe("ContactForm", () => {
       );
     });
 
-    expect(screen.getByText("error-contact-name-empty")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("error-contact-name-empty")).toBeInTheDocument();
+    });
   });
 
 
@@ -249,7 +253,9 @@ describe("ContactForm", () => {
       );
     });
 
-    expect(screen.getByText("error-email-invalid-format")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("error-email-invalid-format")).toBeInTheDocument();
+    });
   });
 
 
@@ -285,7 +291,9 @@ describe("ContactForm", () => {
       );
     });
 
-    expect(screen.getByText("error-contact-subject-empty")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("error-contact-subject-empty")).toBeInTheDocument();
+    });
   });
 
 
@@ -321,7 +329,9 @@ describe("ContactForm", () => {
       );
     });
 
-    expect(screen.getByText("error-contact-message-empty")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("error-contact-message-empty")).toBeInTheDocument();
+    });
   });
 
 
@@ -357,6 +367,8 @@ describe("ContactForm", () => {
       );
     });
 
-    expect(screen.getByText("error-unknown-form")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("error-unknown-form")).toBeInTheDocument();
+    });
   });
 });
