@@ -12,4 +12,10 @@ interface MailService {
      */
     fun sendPasswordResetMail(user: User, token: String)
 
+
+    /**
+     *   Sends a mail to the admin.
+     */
+    fun sendAdminMail(name: String, email: String, subject: String, message: String)
+
 }

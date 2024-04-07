@@ -150,3 +150,19 @@ class LocationNotFoundException : Exception()
  *   Exception for when a passcode is in an invalid format.
  */
 class PasscodeInvalidFormatException : Exception()
+
+
+/**
+ *   Exception for when the name in the contact form is empty.
+ */
+class ContactNameEmptyException : Exception()
+
+/**
+ *   Exception for when the subject in the contact form is empty.
+ */
+class ContactSubjectEmptyException : Exception()
+
+/**
+ *   Exception for when the message in the contact form is empty.
+ */
+class ContactMessageEmptyException : Exception()

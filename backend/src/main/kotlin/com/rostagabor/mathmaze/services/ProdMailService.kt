@@ -22,6 +22,13 @@ class ProdMailService(private val emailSender: JavaMailSender) : MailService {
 
 
     /**
+     *   The email of the admin.
+     */
+    @Value("\${app.admin-contact-email}")
+    private lateinit var adminEmail: String
+
+
+    /**
      *   Sends a password reset mail to the user.
      */
     override fun sendPasswordResetMail(user: User, token: String) {
@@ -58,8 +65,8 @@ class ProdMailService(private val emailSender: JavaMailSender) : MailService {
         val plainText = """
             Hey ${user.username},\n
             To reset your password, visit the following link:\n
-            $url
-            ---
+            $url\n
+            ---\n
             Szia ${user.username},\n
             Egy új jelszó beállításához kattints a következő linkre:\n
             $url
@@ -71,6 +78,49 @@ class ProdMailService(private val emailSender: JavaMailSender) : MailService {
 
         //Send the email
         emailSender.send(message)
+    }
+
+
+    /**
+     *   Sends a mail to the admin.
+     */
+    override fun sendAdminMail(name: String, email: String, subject: String, message: String) {
+        val adminMessage = emailSender.createMimeMessage()
+        val helper = MimeMessageHelper(adminMessage, true)
+        helper.setTo(adminEmail)
+        helper.setSubject("Contact request - Kapcsolatfelvételi kérelem | MathMaze")
+
+        //HTML content
+        val htmlText = """
+        <html>
+            <head>
+                <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab&display=swap" rel="stylesheet">
+            </head>
+            <body style="font-family: 'Zilla Slab', serif; font-size: 1rem">
+                <h1>Contact request - Kapcsolatfelvételi kérelem</h1>
+                <p>Name - Név: $name</p>
+                <p>Email - E-mail: $email</p>
+                <p>Subject - Tárgy: $subject</p>
+                <p>Message - Üzenet:<br />$message</p>
+            </body>
+        </html>
+        """.trimIndent()
+
+        //Plain text content
+        val plainText = """
+            Contact Request - Kapcsolatfelvételi kérelem\n
+            Name - Név: $name\n
+            Email - E-mail: $email\n
+            Subject - Tárgy: $subject\n
+            Message - Üzenet:\n$message
+        """.trimIndent()
+
+        //Set the content
+        helper.setText(plainText, false)
+        helper.setText(htmlText, true)
+
+        //Send the email
+        emailSender.send(adminMessage)
     }
 
 }
