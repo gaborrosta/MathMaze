@@ -245,7 +245,7 @@ export default function SolveMaze() {
           </Alert>
           <Row className="mb-3">
             <Col className="mx-auto text-center" xs={12} md={6}>
-              <PDFButtons actualData={maze} t={t} />
+              <PDFButtons actualData={maze} />
 
               {!showOnline && <>
                 <p>{t("or")}</p>

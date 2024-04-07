@@ -9,6 +9,9 @@ import { MemoryRouter, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Layout from "./Layout";
 
+//Mock console.error
+jest.spyOn(console, "error").mockImplementation(() => jest.fn());
+
 //Mock the useTranslation hook
 jest.mock("react-i18next", () => ({
   useTranslation: () => {

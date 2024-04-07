@@ -9,6 +9,9 @@ import { MemoryRouter  } from "react-router-dom";
 import TokenContext from "./TokenContext";
 import AuthChecker from "./AuthChecker";
 
+//Mock console.error
+jest.spyOn(console, "error").mockImplementation(() => jest.fn());
+
 //Mock the Navigate component from react-router-dom
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),

@@ -8,6 +8,9 @@ import { toBeInTheDocument } from "@testing-library/jest-dom";
 import { Form } from "react-bootstrap";
 import BaseForm from "./BaseForm";
 
+//Mock console.error
+jest.spyOn(console, "error").mockImplementation(() => jest.fn());
+
 //Mock the useTranslation hook
 jest.mock("react-i18next", () => ({
   useTranslation: () => {

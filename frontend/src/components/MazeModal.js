@@ -161,7 +161,7 @@ function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged, 
         <Modal.Title>{t("maze-title")} #{actualData.id}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <PDFButtons actualData={actualData} t={t} />
+        <PDFButtons actualData={actualData} />
         <hr />
         {token ?
           <>

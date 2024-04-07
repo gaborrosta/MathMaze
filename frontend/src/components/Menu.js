@@ -1,14 +1,24 @@
 import React, { useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Container, Nav, Navbar, Form} from "react-bootstrap";
+import { Container, Nav, Navbar, Form } from "react-bootstrap";
 import TokenContext from "../utils/TokenContext";
 
-export default function Menu() {
+/**
+ * Menu displays the navigation menu.
+ *
+ * @returns {React.Element} The Menu component.
+ */
+const Menu = () => {
+  //Localisation
   const { i18n, t } = useTranslation();
 
+
+  //Token and logout
   const { token, logout } = useContext(TokenContext);
 
+
+  //Render the component
   return (
     <>
       <Navbar expand="lg" className="yellow">
@@ -48,4 +58,6 @@ export default function Menu() {
       </Navbar>
     </>
   );
-}
+};
+
+export default Menu;

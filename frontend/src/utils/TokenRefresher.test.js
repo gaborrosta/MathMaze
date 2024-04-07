@@ -7,6 +7,9 @@ import { render } from "@testing-library/react";
 import axios from "axios";
 import TokenRefresher from "./TokenRefresher";
 
+//Mock console.error
+jest.spyOn(console, "error").mockImplementation(() => jest.fn());
+
 //Mock the timers
 jest.useFakeTimers();
 
