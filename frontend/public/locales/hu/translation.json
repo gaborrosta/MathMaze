@@ -274,5 +274,18 @@
     "error-not-number-in-maze": "Kérlek, ellenőrizd a labirintust, mert legalább egy mezőben nem szám található.",
     "website-under-construction": "A weboldal még nincs kész, ezért a megjelenített szövegek nem véglegesek, tartalmazhatnak hibákat vagy elírásokat.",
     "webpage-under-construction": "A weboldal ezen oldala még nincs kész.",
-    "field-required": "Ez a mező kötelező."
+    "field-required": "Ez a mező kötelező.",
+    "contact-title": "Kapcsolat",
+    "contact-description": "Ha bármilyen kérdésed vagy észrevételed van, kérünk, írj nekünk.",
+    "success-contact": "Az üzenetedet elküldtük. Hamarosan válaszolunk.",
+    "contact-name": "Név",
+    "contact-name-placeholder": "Írd be a neved",
+    "contact-subject": "Tárgy",
+    "contact-subject-placeholder": "Írd be az üzenet tárgyát",
+    "contact-message": "Üzenet",
+    "contact-message-placeholder": "Írd be az üzeneted",
+    "contact-submit": "Küldés",
+    "error-contact-name-empty": "Kérünk, add meg a neved.",
+    "error-contact-subject-empty": "Kérünk, add meg az üzenet tárgyát.",
+    "error-contact-message-empty": "Kérünk, írj egy üzenetet."
 }

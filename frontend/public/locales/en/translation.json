@@ -275,5 +275,18 @@
     "error-not-number-in-maze": "Please check the maze, because there is at least one cell which contains not a number.",
     "website-under-construction": "The website is still under construction, so the displayed texts are not final, they may contain errors or typos.",
     "webpage-under-construction": "This page of the website is still under construction.",
-    "field-required": "This field is required."
+    "field-required": "This field is required.",
+    "contact-title": "Contact",
+    "contact-description": "If you have any questions or comments, please write to us.",
+    "success-contact": "Your message has been sent. We will respond soon.",
+    "contact-name": "Name",
+    "contact-name-placeholder": "Enter your name",
+    "contact-subject": "Subject",
+    "contact-subject-placeholder": "Enter the subject of the message",
+    "contact-message": "Message",
+    "contact-message-placeholder": "Enter your message",
+    "contact-submit": "Send",
+    "error-contact-name-empty": "Please enter your name.",
+    "error-contact-subject-empty": "Please enter the subject of the message.",
+    "error-contact-message-empty": "Please enter your message."
 }
