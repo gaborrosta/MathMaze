@@ -17,6 +17,32 @@ body {
 }
 
 
+//Styles for index page
+.layout-container {
+	display: grid;
+	grid-template-rows: auto 1fr;
+	min-height: min(100vh, 720px);
+}
+
+.fill-height {
+	height: 100%;
+}
+
+.fill-height-with-max {
+	@extend .fill-height;
+	max-height: 720px;
+}
+
+.yellow-full {
+	background-color: #fedf19 !important;
+}
+
+.red {
+	background-color: #7d141d;
+	color: white;
+}
+
+
 //Style for online solver
 .path {
 	background-color: #7d141d50;

@@ -141,7 +141,9 @@ describe("ContactForm", () => {
       );
     });
 
-    expect(screen.getByText("success-contact")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("success-contact")).toBeInTheDocument();
+    });
   });
 
 

@@ -67,6 +67,8 @@ export default function ContactForm() {
       setFormData({ name: "", email: "", subject: "", message: "" });
     })
     .catch(error => {
+      setSuccess("");
+
       if (!error.response) {
         setError("error-unknown");
         return;
