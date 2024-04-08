@@ -23,7 +23,7 @@ class DevMailService : MailService {
      *   Sends a password reset mail to the user.
      */
     override fun sendPasswordResetMail(user: User, token: String) {
-        println("Sending password reset mail to ${user.email} with token $token and reset link: $baseUrl/set-new-password?token=$token")
+        println("Sending password reset mail to ${user.email} with reset link: $baseUrl/set-new-password?token=$token")
     }
 
 
