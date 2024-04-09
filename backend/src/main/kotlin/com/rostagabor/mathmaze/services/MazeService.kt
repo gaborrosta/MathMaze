@@ -380,10 +380,10 @@ class MazeService(
         //Check if the new location is unique
         val completeNewLocation = "$parentLocation$newLocation/"
         val completeOriginalLocation = "$parentLocation$originalLocation/"
-        if (mazes.any { it.location == completeNewLocation }) throw LocationNotUniqueException()
+        if (mazes.any { it.location.startsWith(completeNewLocation) }) throw LocationNotUniqueException()
 
         //Check if the original location exists
-        if (mazes.none { it.location == completeOriginalLocation }) throw LocationNotFoundException()
+        if (mazes.none { it.location.startsWith(completeOriginalLocation) }) throw LocationNotFoundException()
 
         //Update the location
         mazes.forEach { maze ->
