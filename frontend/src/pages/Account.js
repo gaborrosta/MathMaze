@@ -7,7 +7,7 @@ import axios from "axios";
 import TokenContext from "../utils/TokenContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import MazeModal from "../components/MazeModal";
-import LocationList from "../components/LocationList";
+import LocationsList from "../components/LocationsList";
 import EditLocation from "../components/EditLocation";
 import AccountSolutionsTab from "../components/AccountSolutionsTab";
 
@@ -327,7 +327,7 @@ export default function Account() {
                 <Col xs={12} md={4}>
                   <div className="border p-3 m-2">
                     <p>{t("account-locations")}</p>
-                    <LocationList locations={locations} onLocationChange={setSelectedLocation} selectedLocation={selectedLocation} onEdit={onEditLocation} />
+                    <LocationsList locations={locations} onLocationChange={setSelectedLocation} selectedLocation={selectedLocation} onEdit={onEditLocation} />
                     <Alert variant="info" className="mt-3">{t("account-locations-info")}</Alert>
                   </div>
                 </Col>
@@ -404,7 +404,7 @@ export default function Account() {
               </Row>
             }
             <MazeModal data={maze} visible={modalVisible} setVisible={closeModal} locations={locations} mazeChanged={mazeChanged} locationsChanged={locationsChanged} />
-            <EditLocation location={editLocation} visible={editLocationModalVisible} setVisible={setEditLocationModalVisible} mazesChanged={mazesChanged} locationsChanged={locationsChanged} />
+            <EditLocation location={editLocation} visible={editLocationModalVisible} setVisible={setEditLocationModalVisible} changed={(mazes, locations) => {mazesChanged(mazes); locationsChanged(locations) }} />
           </Tab>
           <Tab eventKey="settings" title={t("account-settings")}>
             <Col>

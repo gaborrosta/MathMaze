@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Modal, Form, Button, Alert, Row, Col } from "react-bootstrap";
-import LocationList from "./LocationList";
+import LocationsList from "./LocationsList";
 import { BACKEND_URL, FRONTEND_URL } from "../utils/constants";
 import axios from "axios";
 import TokenContext from "../utils/TokenContext";
@@ -144,8 +144,8 @@ function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged, 
   const [addButtonDisabled, setAddButtonDisabled] = useState(false);
 
   const handleAddLocation = () => {
-    const newLocationList = [...actualLocations, (parentLocation + newLocation + "/")];
-    setActualLocations(newLocationList);
+    const newLocationsList = [...actualLocations, (parentLocation + newLocation + "/")];
+    setActualLocations(newLocationsList);
     setParentLocation("/");
     setNewLocation("");
   };
@@ -200,7 +200,7 @@ function MazeModalContent({ mazeData, locations, mazeChanged, locationsChanged, 
               </Form.Group>
               <Form.Group className="mb-3" controlId="location">
                 <Form.Label>{t("location")}</Form.Label>
-                <LocationList locations={actualLocations} onLocationChange={handleLocationChange} selectedLocation={formData.selectedLocation} />
+                <LocationsList locations={actualLocations} onLocationChange={handleLocationChange} selectedLocation={formData.selectedLocation} />
               </Form.Group>
               <Row className="mb-3 pb-1 border">
                 <p className="text-muted mb-0">{t("location-add")}</p>
