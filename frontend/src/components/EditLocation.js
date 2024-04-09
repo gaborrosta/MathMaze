@@ -19,7 +19,7 @@ import TokenContext from "../utils/TokenContext";
  */
 export default function EditLocation({ visible, setVisible, location, changed }) {
   //Check the parameters
-  checkParameters(visible, setVisible, location, changed);
+  checkParameters1(visible, setVisible);
 
 
   //Render the component
@@ -41,6 +41,10 @@ export default function EditLocation({ visible, setVisible, location, changed })
  * @returns {React.Element} The EditLocationContent component.
  */
 function EditLocationContent({ location, changed }) {
+  //Check the parameters
+  checkParameters2(location, changed);
+
+
   //Localisation
   const { t } = useTranslation();
 
@@ -164,7 +168,7 @@ function EditLocationContent({ location, changed }) {
 /**
  * Checks the parameters passed to the EditLocation component.
  */
-function checkParameters(visible, setVisible, location, changed) {
+function checkParameters1(visible, setVisible, location, changed) {
   if (visible === undefined) {
     throw new Error("visible is required.");
   }
@@ -181,7 +185,12 @@ function checkParameters(visible, setVisible, location, changed) {
   if (setVisible.length !== 1) {
     throw new Error("setVisible must have 1 parameter.");
   }
+}
 
+/**
+ * Checks the parameters passed to the EditLocationContent component.
+ */
+function checkParameters2(location, changed) {
   if (location === undefined) {
     throw new Error("location is required.");
   }
