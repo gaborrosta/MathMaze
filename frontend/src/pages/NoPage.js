@@ -3,11 +3,21 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Alert } from "react-bootstrap";
 
+/**
+ * NoPage displays the 404 page.
+ * 
+ * @returns {React.Element} The NoPage component.
+ */
 const NoPage = () => {
+  //Localisation
   const { t } = useTranslation();
 
+
+  //Set the page title
   useEffect(() => { document.title = "404 | " + t("app-name"); });
 
+
+  //Render the page
   return (
     <>
       <center>
