@@ -1,123 +1,110 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams  } from "react-router-dom"
 import Loading from "react-fullscreen-loading";
-import { useTranslation } from "react-i18next";
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
-import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
+import { BACKEND_URL, PASSWORD_REGEX, EMPTY_REGEX } from "../utils/constants";
+import BaseForm from "../utils/BaseForm";
 
-export default function SetPassword() {
+/**
+ * SetNewPassword renders the set new password page.
+ * 
+ * @returns {React.Element} The SetNewPassword component.
+ */
+export default function SetNewPassword() {
+  //Localisation
   const { t } = useTranslation();
 
+
+  //Set the page title
   useEffect(() => { document.title = t("set-new-password-title") + " | " + t("app-name"); });
 
-  const [isRequestInProgress, setIsRequestInProgress] = useState(false);
 
+  //Params for the token
   const [params] = useSearchParams();
 
-  const [formData, setFormData] = useState({
-    password: "",
-    confirmPassword: "",
-  });
-
+  //Error and loading states
   const [tokenError, setTokenError] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
-  const [passwordError, setPasswordError] = useState("");
-  const [confirmPasswordError, setConfirmPasswordError] = useState("");
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-
+  //Function to set loading to false after 1 second
   const loadingDone = () => {
     setTimeout(() => {
       setLoading(false);
     }, 1000);
   }
 
+
+  //Check the token
   useEffect(() => {
     const token = params.get("token");
+
+    //If no token, set error and stop loading
     if (!token) {
       setTokenError("set-new-password-error-no-token");
       loadingDone();
     } else {
       setTokenError("");
 
+      //Check the token
       axios.get(`${BACKEND_URL}/users/password-validate?token=${token}`)
       .then(_ => {
         loadingDone();
       })
       .catch(error => {
-        if (!error.response) {
-          setError("error-unknown");
-          loadingDone();
-          return;
+        if (!error.response || (error.response && error.response.data !== "TokenInvalidOrExpiredException")) {
+          setTokenError("error-unknown");
+        } else {
+          setTokenError("set-new-password-error-token-invalid-or-expired");
         }
 
-        if (error.response.data === "TokenInvalidOrExpiredException") {
-          setTokenError("set-new-password-error-token-invalid-or-expired");
-          loadingDone();
-        } else {
-          setTokenError("error-unknown");
-          loadingDone();
-        }
+        loadingDone();
       });
     }
   }, [params]);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  
-    if (e.target.name === "password") {
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W)[A-Za-z\d\W]{8,20}$/;
-      if (e.target.value) {
-        if (!passwordRegex.test(e.target.value)) {
-          setPasswordError("signup-password-error");
-        } else if (e.target.value === formData.confirmPassword) {
-          setConfirmPasswordError("");
-          setPasswordError("");
-        } else {
-          setConfirmPasswordError("signup-confirm-password-error");
-          setPasswordError("");
-        }
-      } else {
-        setPasswordError("");
 
-        if (!formData.confirmPassword) {
-          setConfirmPasswordError("");
-        }
-      }
-    }
-    else if (e.target.name === "confirmPassword") {
-      if (e.target.value !== formData.password) {
-        setConfirmPasswordError("signup-confirm-password-error");
-      } else {
-        setConfirmPasswordError("");
-      }
+  //Initial data, validation schema and custom validator
+  const initialData = {
+    password: "",
+    confirmPassword: "",
+  };
+  const validationSchema = {
+    password: {
+      required: true,
+      regex: PASSWORD_REGEX,
+      regexError: "signup-password-error",
+    },
+    confirmPassword: {
+      required: true,
+      regex: EMPTY_REGEX,
+      regexError: "-",
     }
   };
-
-  useEffect(() => {
-    if (passwordError || confirmPasswordError || !formData.password || !formData.confirmPassword) {
-      setIsSubmitDisabled(true);
-    } else {
-      setIsSubmitDisabled(false);
+  const customValidator = (formData) => {
+    if (formData.password !== "" && formData.confirmPassword !== "") {
+      if (formData.password !== formData.confirmPassword) {
+        return { confirmPassword: "signup-confirm-password-error" };
+      } else {
+        return { confirmPassword: "" };
+      }
     }
-  }, [passwordError, confirmPasswordError, formData]);
+    return { confirmPassword: "" };
+  }
 
-  const handleSetNewPassword = (e) => {
-    e.preventDefault();
 
+  //Show password states
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+
+  //Handle the set new password request
+  const handleSetNewPassword = (formData, setError, setSuccess, setFormData, done) => {
     const data = {
       token: params.get("token"),
       password: formData.password,
     };
-
-    setIsRequestInProgress(true);
 
     //Send data
     axios.post(`${BACKEND_URL}/users/password-reset`, data, {
@@ -128,8 +115,10 @@ export default function SetPassword() {
     .then(_ => {
       setError("");
       setSuccess("success-set-new-password");
+      setFormData({ password: "", confirmPassword: "" });
     })
     .catch(error => {
+      setSuccess("");
       setFormData({ password: "", confirmPassword: ""});
 
       if (!error.response) {
@@ -147,10 +136,43 @@ export default function SetPassword() {
       }
     })
     .finally(() => {
-      setIsRequestInProgress(false);
+      done();
     });
   }
 
+
+  //Create the form
+  const form = (formData, handleChange, fieldErrors, error, success, submitButton) => {
+    return (
+      <>
+        {error && <Alert variant="danger">{t(error)}</Alert>}
+        {success && <Alert variant="success">{t(success)}</Alert>}
+        <Form.Group className="mb-3" controlId="password">
+          <Form.Label>{t("password")} <span className="text-danger">*</span></Form.Label>
+          <InputGroup>
+            <Form.Control required type={showPassword ? "text" : "password"} placeholder={t("signup-password-placeholder")} name="password" value={formData.password} onChange={handleChange} aria-describedby="passwordHelp fieldErrors.password" />
+            <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>{showPassword ? t("password-hide") : t("password-show")}</Button>
+          </InputGroup>
+          <Form.Text id="passwordHelp" className="text-muted">
+            {t("signup-password-help")}
+          </Form.Text>
+          {fieldErrors.password && <><br /><Form.Text className="text-danger">{t(fieldErrors.password)}</Form.Text></>}
+        </Form.Group>
+        <Form.Group className="mb-3" controlId="confirmPassword">
+          <Form.Label>{t("signup-confirm-password")} <span className="text-danger">*</span></Form.Label>
+          <InputGroup>
+            <Form.Control required type={showConfirmPassword ? "text" : "password"} placeholder={t("signup-confirm-password-placeholder")} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} aria-describedby="confirmPasswordHelp fieldErrors.confirmPassword" />
+            <Button variant="outline-secondary" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>{showConfirmPassword ? t("password-hide") : t("password-show")}</Button>
+          </InputGroup>
+          {fieldErrors.confirmPassword && <Form.Text className="text-danger">{t(fieldErrors.confirmPassword)}</Form.Text>}
+        </Form.Group>
+        {submitButton}
+      </>
+    );
+  };
+
+
+  //Render the page
   return (
     <>
       {loading ? <Loading loading background="#fedf19" loaderColor="#7d141d" /> : <>
@@ -160,34 +182,16 @@ export default function SetPassword() {
         <p>
           {t("set-new-password-text")}
         </p>
-        {tokenError ? <Alert variant="danger">{t(tokenError)}</Alert> : <>
-          {error && <Alert variant="danger">{t(error)}</Alert>}
-          {success && <Alert variant="success">{t(success)}</Alert>}
-          <Form onSubmit={handleSetNewPassword}>
-            <Form.Group className="mb-3" controlId="password">
-              <Form.Label>{t("password")}</Form.Label>
-              <InputGroup>
-                <Form.Control required type={showPassword ? "text" : "password"} placeholder={t("signup-password-placeholder")} name="password" value={formData.password} onChange={handleChange} aria-describedby="passwordHelp passwordError" />
-                <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>{showPassword ? t("password-hide") : t("password-show")}</Button>
-              </InputGroup>
-              <Form.Text id="passwordHelp" className="text-muted">
-                {t("signup-password-help")}
-              </Form.Text>
-              {passwordError && <><br /><Form.Text id="passwordError" className="text-danger" aria-live="polite">{t(passwordError)}</Form.Text></>}
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="confirmPassword">
-              <Form.Label>{t("signup-confirm-password")}</Form.Label>
-              <InputGroup>
-                <Form.Control required type={showConfirmPassword ? "text" : "password"} placeholder={t("signup-confirm-password-placeholder")} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} aria-describedby="confirmPasswordHelp confirmPasswordError" />
-                <Button variant="outline-secondary" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>{showConfirmPassword ? t("password-hide") : t("password-show")}</Button>
-              </InputGroup>
-              {confirmPasswordError && <Form.Text id="confirmPasswordError" className="text-danger" aria-live="polite">{t(confirmPasswordError)}</Form.Text>}
-            </Form.Group>
-            <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
-              {t("set-new-password-title")}
-            </Button>
-          </Form>
-        </>}
+        {tokenError ? <Alert variant="danger">{t(tokenError)}</Alert> : 
+          <BaseForm
+            onSubmit={handleSetNewPassword}
+            initialData={initialData}
+            validationSchema={validationSchema}
+            form={form}
+            buttonText="set-new-password-title"
+            customValidator={customValidator}
+          />
+        }
       </>}
     </>
   );

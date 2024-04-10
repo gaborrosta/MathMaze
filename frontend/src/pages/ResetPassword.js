@@ -1,56 +1,40 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Form, Button, Alert } from "react-bootstrap";
-import { BACKEND_URL } from "../utils/constants";
+import { Form, Alert } from "react-bootstrap";
 import axios from "axios";
+import { BACKEND_URL, EMAIL_REGEX } from "../utils/constants";
+import BaseForm from "../utils/BaseForm";
 
+/**
+ * ResetPassword renders the reset password page.
+ *
+ * @returns {React.Element} The ResetPassword component.
+ */
 export default function ResetPassword() {
+  //Localisation
   const { t } = useTranslation();
 
+
+  //Set the page title
   useEffect(() => { document.title = t("reset-password-title") + " | " + t("app-name"); });
 
-  const [isRequestInProgress, setIsRequestInProgress] = useState(false);
 
-  const [formData, setFormData] = useState({
-    email: "",
-  });
-
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  const [emailError, setEmailError] = useState("");
-
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  
-    if (e.target.name === "email") {
-      const emailRegex = /^[\w-.]+@([\w-]+.)+[\w-]{2,4}$/;
-      if (!emailRegex.test(e.target.value)) {
-        setEmailError("email-error");
-      } else {
-        setEmailError("");
-      }
+  //Initial data and validation schema
+  const initialData = { email: "" };
+  const validationSchema = {
+    email: {
+      required: true,
+      regex: EMAIL_REGEX,
+      regexError: "email-error",
     }
   };
 
-  useEffect(() => {
-    if (emailError || !formData.email) {
-      setIsSubmitDisabled(true);
-    } else {
-      setIsSubmitDisabled(false);
-    }
-  }, [emailError, formData]);
 
-  const handleResetPassword = (e) => {
-    e.preventDefault();
-
+  //Handle the reset password request
+  const handleResetPassword = (formData, setError, setSuccess, setFormData, done) => {
     const data = {
       email: formData.email,
     };
-
-    setIsRequestInProgress(true);
 
     //Send data
     axios.post(`${BACKEND_URL}/users/password-request`, data, {
@@ -64,13 +48,33 @@ export default function ResetPassword() {
       setFormData({ email: "" });
     })
     .catch(_ => {
+      setSuccess("");
       setError("error-unknown");
     })
     .finally(() => {
-      setIsRequestInProgress(false);
+      done();
     });
   };
 
+
+  //Create the form
+  const form = (formData, handleChange, fieldErrors, error, success, submitButton) => {
+    return (
+      <>
+        {error && <Alert variant="danger">{t(error)}</Alert>}
+        {success && <Alert variant="success">{t(success)}</Alert>}
+        <Form.Group className="mb-3" controlId="email">
+          <Form.Label>{t("email")} <span className="text-danger">*</span></Form.Label>
+          <Form.Control required type="email" placeholder={t("email-placeholder")} name="email" value={formData.email} onChange={handleChange} aria-describedby="emailHelp fieldErrors.email" />
+          {fieldErrors.email && <Form.Text className="text-danger">{t(fieldErrors.email)}</Form.Text>}
+        </Form.Group>
+        {submitButton}
+      </>
+    );
+  }
+
+
+  //Render the page
   return (
     <>
       <center>
@@ -79,18 +83,13 @@ export default function ResetPassword() {
       <p>
         {t("reset-password-text")}
       </p>
-      {error && <Alert variant="danger">{t(error)}</Alert>}
-      {success && <Alert variant="success">{t(success)}</Alert>}
-      <Form onSubmit={handleResetPassword}>
-        <Form.Group className="mb-3" controlId="email">
-          <Form.Label>{t("email")}</Form.Label>
-          <Form.Control required type="email" placeholder={t("email-placeholder")} name="email" value={formData.email} onChange={handleChange} aria-describedby="emailHelp emailError" />
-          {emailError && <Form.Text className="text-danger">{t(emailError)}</Form.Text>}
-        </Form.Group>
-        <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
-          {t("reset-password-submit")}
-        </Button>
-      </Form>
+      <BaseForm
+        onSubmit={handleResetPassword}
+        initialData={initialData}
+        validationSchema={validationSchema}
+        form={form}
+        buttonText="reset-password-submit"
+      />
     </>
   );
 }
