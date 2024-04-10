@@ -51,7 +51,9 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-jackson:0.12.5")
 
 	//Tests
-	testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.4")
+	testImplementation("org.springframework.boot:spring-boot-starter-test:3.2.4") { exclude(module = "mockito-core") }
+	testImplementation("io.mockk:mockk:1.13.10")
+	testImplementation("com.ninja-squad:springmockk:4.0.2")
 }
 
 tasks.withType<KotlinCompile> {

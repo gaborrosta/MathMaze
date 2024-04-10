@@ -8,13 +8,13 @@ import com.rostagabor.mathmaze.data.User
 interface MailService {
 
     /**
-     *   Sends a password reset mail to the user.
+     *   Sends a password reset email to the user.
      */
     fun sendPasswordResetMail(user: User, token: String)
 
 
     /**
-     *   Sends a mail to the admin.
+     *   Sends an email to the admin.
      */
     fun sendAdminMail(name: String, email: String, subject: String, message: String)
 

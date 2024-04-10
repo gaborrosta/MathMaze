@@ -20,15 +20,15 @@ class DevMailService : MailService {
 
 
     /**
-     *   Sends a password reset mail to the user.
+     *   Sends a password reset email to the user.
      */
     override fun sendPasswordResetMail(user: User, token: String) {
-        println("Sending password reset mail to ${user.email} with reset link: $baseUrl/set-new-password?token=$token")
+        println("Sending password reset email to ${user.email} with reset link: $baseUrl/set-new-password?token=$token")
     }
 
 
     /**
-     *   Sends a mail to the admin.
+     *   Sends an email to the admin.
      */
     override fun sendAdminMail(name: String, email: String, subject: String, message: String) {
         println("Sending email to admin with name: $name, email: $email, subject: $subject, message:\n$message")

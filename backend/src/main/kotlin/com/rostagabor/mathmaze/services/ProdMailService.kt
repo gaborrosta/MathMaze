@@ -29,7 +29,7 @@ class ProdMailService(private val emailSender: JavaMailSender) : MailService {
 
 
     /**
-     *   Sends a password reset mail to the user.
+     *   Sends a password reset email to the user.
      */
     override fun sendPasswordResetMail(user: User, token: String) {
         val message = emailSender.createMimeMessage()
@@ -82,7 +82,7 @@ class ProdMailService(private val emailSender: JavaMailSender) : MailService {
 
 
     /**
-     *   Sends a mail to the admin.
+     *   Sends an email to the admin.
      */
     override fun sendAdminMail(name: String, email: String, subject: String, message: String) {
         val adminMessage = emailSender.createMimeMessage()
