@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { Form, Row, Col, Alert } from "react-bootstrap";
+import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "react-bootstrap-icons";
+import { useLongPress } from "react-use";
 import NicknameForm from "./NicknameForm";
 
 const GRID_WINDOW_SIZE = 5;
@@ -25,6 +27,11 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
   const [tempValue, setTempValue] = useState("");
   const [grid, setGrid] = useState(initialMaze || Array(data.height).fill().map(() => Array(data.width).fill("")));
   const [path, setPath] = useState(initialPath || [start, end]);
+
+  const [canMoveUp, setCanMoveUp] = useState(false);
+  const [canMoveDown, setCanMoveDown] = useState(true);
+  const [canMoveLeft, setCanMoveLeft] = useState(false);
+  const [canMoveRight, setCanMoveRight] = useState(true);
 
   useEffect(() => {
     mazeRef.current.scrollIntoView({ behavior: "smooth" });
@@ -57,7 +64,9 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
     if (!isKeyActive) return;
 
     if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "Enter", "x", "X"].includes(event.key)) {
-      event.preventDefault();
+      if (event.preventDefault !== undefined) {
+        event.preventDefault();
+      }
     }
 
     if (isInputActive) {
@@ -117,7 +126,16 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
     setSelectedCell({x, y});
     setGridShift({x: shiftX, y: shiftY});
     document.getElementById(`cell-${x}-${y}`).focus();
+    updateCanMove(x, y);
   };
+
+  const updateCanMove = (x, y) => {
+    let {x: shiftX, y: shiftY} = gridShift;
+    setCanMoveUp(y > 0 || shiftY > 0);
+    setCanMoveDown(y < GRID_WINDOW_SIZE - 1 || shiftY < data.height - GRID_WINDOW_SIZE);
+    setCanMoveLeft(x > 0 || shiftX > 0);
+    setCanMoveRight(x < GRID_WINDOW_SIZE - 1 || shiftX < data.width - GRID_WINDOW_SIZE);
+  }
 
   const handleInputChange = (event) => {
     setTempValue(event.target.value);
@@ -132,7 +150,7 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
   useEffect(() => {
     const updateCellSize = () => {
       const minDimension = Math.max(Math.min(window.innerWidth, window.innerHeight, 800), 75 * GRID_WINDOW_SIZE);
-      setMazeSize((minDimension / GRID_WINDOW_SIZE + 1) * GRID_WINDOW_SIZE);
+      setMazeSize((minDimension / GRID_WINDOW_SIZE + 1) * GRID_WINDOW_SIZE - 107);
     };
 
     updateCellSize();
@@ -141,8 +159,42 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
     return () => window.removeEventListener("resize", updateCellSize);
   }, []);
 
+  const handleButtonPress = (direction) => {
+    handleKeyDown({ key: direction });
+  };
+
+  const onClick = (x, y) => {
+    if (!isInputActive) {
+      setSelectedCell({x: x, y: y});
+      setIsKeyActive(true);
+      updateCanMove(x, y);
+    }
+  }
+
+  const onDoubleClick = (x, y) => {
+    if (!isInputActive) {
+      handleCellSelection(x, y);
+      setIsKeyActive(true);
+      updateCanMove(x, y);
+    }
+  }
+
+  const onLongPress = (event) => {
+    if (!isInputActive) {
+      const x = Number(event.target.dataset.x);
+      const y = Number(event.target.dataset.y);
+
+      let {x: shiftX, y: shiftY} = gridShift;
+      setSelectedCell({x: x, y: y});
+      setIsInputActive(true);
+      setTempValue(grid[shiftY + y][shiftX + x]);
+    }
+  };
+
+  const longPressEvent = useLongPress(onLongPress, { isPreventDefault: true, delay: 300 });
+
   return (
-    <Row className="mb-3">
+    <Row ref={mazeRef} className="mb-3">
       <Col>
         <div>
           <h2>{t("maze-solve-online-instructions")}</h2>
@@ -154,48 +206,97 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
         </div>
       </Col>
       <Col xs={{ order: "last" }} lg={{ order: 0 }}>
-        <div ref={mazeRef} className="maze mb-3" style={{ width: `${mazeSize}px`, height: `${mazeSize}px`, gridTemplateColumns: `repeat(${GRID_WINDOW_SIZE}, 1fr)`}}>
-          {Array.from({length: GRID_WINDOW_SIZE}).map((_, i) => (
-            Array.from({length: GRID_WINDOW_SIZE}).map((__, j) => {
-              const actualX = gridShift.x + j;
-              const actualY = gridShift.y + i;
-              const isStart = data.start[0] === actualX && data.start[1] === actualY;
-              const isEnd = data.end[0] === actualX && data.end[1] === actualY;
-              const isPath = path.some(cell => cell.x === actualX && cell.y === actualY);
-              const isSelected = selectedCell.x === j && selectedCell.y === i;
+        <table>
+          <tbody>
+            <tr>
+              <td></td>
+              <td className="d-flex justify-content-center align-items-center">
+                <ChevronUp
+                  size={48}
+                  onClick={() => handleButtonPress("ArrowUp")}
+                  className={!canMoveUp ? "text-white" : ""}
+                  disabled={!canMoveUp}
+                />
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>
+                <ChevronLeft
+                  size={48}
+                  onClick={() => handleButtonPress("ArrowLeft")}
+                  className={!canMoveLeft ? "text-white" : ""}
+                  disabled={!canMoveLeft}
+                />
+              </td>
+              <td>
+                <div className="maze" style={{ width: `${mazeSize}px`, height: `${mazeSize}px`, gridTemplateColumns: `repeat(${GRID_WINDOW_SIZE}, 1fr)` }}>
+                  {Array.from({length: GRID_WINDOW_SIZE}).map((_, i) => (
+                    Array.from({length: GRID_WINDOW_SIZE}).map((__, j) => {
+                      const actualX = gridShift.x + j;
+                      const actualY = gridShift.y + i;
+                      const isStart = data.start[0] === actualX && data.start[1] === actualY;
+                      const isEnd = data.end[0] === actualX && data.end[1] === actualY;
+                      const isPath = path.some(cell => cell.x === actualX && cell.y === actualY);
+                      const isSelected = selectedCell.x === j && selectedCell.y === i;
 
-              return (
-                <div 
-                  id={`cell-${j}-${i}`} 
-                  key={`${j}-${i}`} 
-                  className={`maze-cell-solving ${isSelected ? "yellow" : ""} ${isPath ? "path" : ""}`} 
-                  tabIndex="0"
-                  onKeyDown={handleKeyDown}
-                  onClick={() => { if (!isInputActive) { setSelectedCell({x: j, y: i}); setIsKeyActive(true); } }}
-                  onDoubleClick={() => { handleCellSelection(actualX, actualY); setIsKeyActive(true); }}
-                  style={{ userSelect: "none" }}
-                >
-                  <div className="maze-cell-content" style={{ height: "100%" }}>
-                    <div style={{ display: "block" }} className="text-center">
-                      {isStart ? t("maze-start") : isEnd ? t("maze-end") : data.data[actualY][actualX]}
-                      <br />
-                      {(isSelected && isInputActive && !isStart && !isEnd) ? <>
-                        <Form.Control
-                          ref={inputRef}
-                          type="text"
-                          value={tempValue}
-                          onChange={handleInputChange}
-                          style={{ width: "50%", margin: "auto" }}
-                        />
-                        {error && <Form.Text className="text-danger">{t("maze-solve-online-not-number")}</Form.Text>}
-                      </> : grid[actualY][actualX]}
-                    </div>
-                  </div>
+                      return (
+                        <div
+                          id={`cell-${j}-${i}`}
+                          key={`${j}-${i}`}
+                          className={`maze-cell-solving ${isSelected ? "yellow" : ""} ${isPath ? "path" : ""}`}
+                          tabIndex="0"
+                          onKeyDown={handleKeyDown}
+                          onClick={() => onClick(j, i)}
+                          onDoubleClick={() => onDoubleClick(j, i)}
+                          {...longPressEvent}
+                          style={{ userSelect: "none" }}
+                        >
+                          <div className="maze-cell-content" style={{ height: "100%" }} data-x={j} data-y={i}>
+                            <div style={{ display: "block" }} className="text-center" data-x={j} data-y={i}>
+                              {isStart ? t("maze-start") : isEnd ? t("maze-end") : data.data[actualY][actualX]}
+                              <br />
+                              {(isSelected && isInputActive && !isStart && !isEnd) ? <>
+                                <Form.Control
+                                  ref={inputRef}
+                                  type="text"
+                                  value={tempValue}
+                                  onChange={handleInputChange}
+                                  style={{ width: "50%", margin: "auto" }}
+                                />
+                                {error && <Form.Text className="text-danger">{t("maze-solve-online-not-number")}</Form.Text>}
+                              </> : grid[actualY][actualX]}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  ))}
                 </div>
-              );
-            })
-          ))}
-        </div>
+              </td>
+              <td>
+                <ChevronRight
+                  size={48}
+                  onClick={() => handleButtonPress("ArrowRight")}
+                  className={!canMoveRight ? "text-white" : ""}
+                  disabled={!canMoveRight}
+                />
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td className="d-flex justify-content-center align-items-center">
+                <ChevronDown
+                  size={48}
+                  onClick={() => handleButtonPress("ArrowDown")}
+                  className={!canMoveDown ? "text-white" : ""}
+                  disabled={!canMoveDown}
+                />
+              </td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
       </Col>
       <Col>
         <div>
