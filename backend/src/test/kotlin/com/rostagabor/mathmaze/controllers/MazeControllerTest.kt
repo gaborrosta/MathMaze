@@ -2,18 +2,23 @@ package com.rostagabor.mathmaze.controllers
 
 import com.beust.klaxon.JsonObject
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.ninjasquad.springmockk.MockkBean
 import com.rostagabor.mathmaze.data.OperationType
 import com.rostagabor.mathmaze.data.Point
 import com.rostagabor.mathmaze.requests.*
 import com.rostagabor.mathmaze.services.MazeService
 import com.rostagabor.mathmaze.services.UserService
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.unmockkAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
@@ -39,11 +44,26 @@ class MazeControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    @MockBean
+    @Autowired
+    @MockkBean(relaxed = true)
     private lateinit var userService: UserService
 
-    @MockBean
+    @Autowired
+    @MockkBean
     private lateinit var mazeService: MazeService
+
+    private lateinit var mazeController: MazeController
+
+    @BeforeEach
+    fun setUp() {
+        mazeController = MazeController(userService, mazeService)
+    }
+
+    @AfterEach
+    fun tearDown() {
+        unmockkAll()
+    }
+
 
     @Test
     fun generate() {
@@ -60,23 +80,10 @@ class MazeControllerTest {
             token = "token",
         )
         val json = JsonObject(mapOf("hi" to "there"))
-        Mockito.`when`(userService.regenerateTokenIfStillValid(mazeGenerationRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(
-            mazeService.generateMaze(
-                width = mazeGenerationRequest.width,
-                height = mazeGenerationRequest.height,
-                numbersRangeStart = mazeGenerationRequest.numbersRangeStart,
-                numbersRangeEnd = mazeGenerationRequest.numbersRangeEnd,
-                operation = mazeGenerationRequest.operation,
-                pathTypeEven = mazeGenerationRequest.pathTypeEven,
-                minLength = mazeGenerationRequest.minLength,
-                maxLength = mazeGenerationRequest.maxLength,
-                discardedMazes = mazeGenerationRequest.discardedMazes,
-                solutions = emptyList()
-            )
-        ).thenReturn(json)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.generateMaze(any(), any(), any(), any(), any(), any(), any(), any(), any(), any()) } returns json
 
-        val response = MazeController(userService, mazeService).generate(mazeGenerationRequest)
+        val response = mazeController.generate(mazeGenerationRequest)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -97,23 +104,10 @@ class MazeControllerTest {
             solution3 = SolutionIDForm(null, null, null),
             token = "token",
         )
-        Mockito.`when`(userService.regenerateTokenIfStillValid(mazeGenerationRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(
-            mazeService.generateMaze(
-                width = mazeGenerationRequest.width,
-                height = mazeGenerationRequest.height,
-                numbersRangeStart = mazeGenerationRequest.numbersRangeStart,
-                numbersRangeEnd = mazeGenerationRequest.numbersRangeEnd,
-                operation = mazeGenerationRequest.operation,
-                pathTypeEven = mazeGenerationRequest.pathTypeEven,
-                minLength = mazeGenerationRequest.minLength,
-                maxLength = mazeGenerationRequest.maxLength,
-                discardedMazes = mazeGenerationRequest.discardedMazes,
-                solutions = emptyList()
-            )
-        ).thenThrow(Exception::class.java)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.generateMaze(any(), any(), any(), any(), any(), any(), any(), any(), any(), any()) } throws Exception()
 
-        val response = MazeController(userService, mazeService).generate(mazeGenerationRequest)
+        val response = mazeController.generate(mazeGenerationRequest)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -135,21 +129,8 @@ class MazeControllerTest {
             token = "token",
         )
         val json = JsonObject(mapOf("hi" to "there"))
-        Mockito.`when`(userService.regenerateTokenIfStillValid(mazeGenerationRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(
-            mazeService.generateMaze(
-                width = mazeGenerationRequest.width,
-                height = mazeGenerationRequest.height,
-                numbersRangeStart = mazeGenerationRequest.numbersRangeStart,
-                numbersRangeEnd = mazeGenerationRequest.numbersRangeEnd,
-                operation = mazeGenerationRequest.operation,
-                pathTypeEven = mazeGenerationRequest.pathTypeEven,
-                minLength = mazeGenerationRequest.minLength,
-                maxLength = mazeGenerationRequest.maxLength,
-                discardedMazes = mazeGenerationRequest.discardedMazes,
-                solutions = emptyList()
-            )
-        ).thenReturn(json)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.generateMaze(any(), any(), any(), any(), any(), any(), any(), any(), any(), any()) } returns json
 
         val objectMapper = ObjectMapper()
         val content = objectMapper.writeValueAsString(mazeGenerationRequest)
@@ -169,10 +150,10 @@ class MazeControllerTest {
         val mazeSaveRequest = MazeSaveRequest(mazeId = 1, token = "token")
         val json = JsonObject(mapOf("hi" to "there"))
         val locations = listOf("/")
-        Mockito.`when`(userService.regenerateTokenIfStillValid(mazeSaveRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.saveMaze("test@example.com", mazeSaveRequest.mazeId)).thenReturn(Pair(json, locations))
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.saveMaze(any(), any()) } returns Pair(json, locations)
 
-        val response = MazeController(userService, mazeService).save(mazeSaveRequest)
+        val response = mazeController.save(mazeSaveRequest)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -182,10 +163,10 @@ class MazeControllerTest {
     @Test
     fun saveWithException() {
         val mazeSaveRequest = MazeSaveRequest(mazeId = 1, token = "token")
-        Mockito.`when`(userService.regenerateTokenIfStillValid(mazeSaveRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.saveMaze("test@example.com", mazeSaveRequest.mazeId)).thenThrow(Exception::class.java)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.saveMaze(any(), any()) } throws Exception()
 
-        val response = MazeController(userService, mazeService).save(mazeSaveRequest)
+        val response = mazeController.save(mazeSaveRequest)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -197,8 +178,8 @@ class MazeControllerTest {
         val mazeSaveRequest = MazeSaveRequest(mazeId = 1, token = "token")
         val json = JsonObject(mapOf("hi" to "there"))
         val locations = listOf("/")
-        Mockito.`when`(userService.regenerateTokenIfStillValid(mazeSaveRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.saveMaze("test@example.com", mazeSaveRequest.mazeId)).thenReturn(Pair(json, locations))
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.saveMaze(any(), any()) } returns Pair(json, locations)
 
         val objectMapper = ObjectMapper()
         val content = objectMapper.writeValueAsString(mazeSaveRequest)
@@ -225,19 +206,10 @@ class MazeControllerTest {
         )
         val json = JsonObject(mapOf("hi" to "there"))
         val locations = listOf("/")
-        Mockito.`when`(userService.regenerateTokenIfStillValid(mazeUpdateRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(
-            mazeService.updateMaze(
-                "test@example.com",
-                mazeUpdateRequest.mazeId,
-                mazeUpdateRequest.description!!,
-                mazeUpdateRequest.location,
-                mazeUpdateRequest.isPrivate,
-                mazeUpdateRequest.passcode,
-            )
-        ).thenReturn(Pair(json, locations))
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.updateMaze(any(), any(), any(), any(), any(), any()) } returns Pair(json, locations)
 
-        val response = MazeController(userService, mazeService).update(mazeUpdateRequest)
+        val response = mazeController.update(mazeUpdateRequest)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -254,19 +226,10 @@ class MazeControllerTest {
             passcode = "",
             token = "token",
         )
-        Mockito.`when`(userService.regenerateTokenIfStillValid(mazeUpdateRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(
-            mazeService.updateMaze(
-                "test@example.com",
-                mazeUpdateRequest.mazeId,
-                mazeUpdateRequest.description!!,
-                mazeUpdateRequest.location,
-                mazeUpdateRequest.isPrivate,
-                mazeUpdateRequest.passcode,
-            )
-        ).thenThrow(Exception::class.java)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.updateMaze(any(), any(), any(), any(), any(), any()) } throws Exception()
 
-        val response = MazeController(userService, mazeService).update(mazeUpdateRequest)
+        val response = mazeController.update(mazeUpdateRequest)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -285,17 +248,8 @@ class MazeControllerTest {
         )
         val json = JsonObject(mapOf("hi" to "there"))
         val locations = listOf("/")
-        Mockito.`when`(userService.regenerateTokenIfStillValid(mazeUpdateRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(
-            mazeService.updateMaze(
-                "test@example.com",
-                mazeUpdateRequest.mazeId,
-                mazeUpdateRequest.description!!,
-                mazeUpdateRequest.location,
-                mazeUpdateRequest.isPrivate,
-                mazeUpdateRequest.passcode,
-            )
-        ).thenReturn(Pair(json, locations))
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.updateMaze(any(), any(), any(), any(), any(), any()) } returns Pair(json, locations)
 
         val objectMapper = ObjectMapper()
         val content = objectMapper.writeValueAsString(mazeUpdateRequest)
@@ -316,10 +270,10 @@ class MazeControllerTest {
         val passcode = "123456789"
         val token = "token"
         val json = JsonObject(mapOf("hi" to "there"))
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.openMaze(mazeId, passcode, "test@example.com")).thenReturn(json)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.openMaze(any(), any(), any()) } returns json
 
-        val response = MazeController(userService, mazeService).open(mazeId, passcode, token)
+        val response = mazeController.open(mazeId, passcode, token)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -331,10 +285,10 @@ class MazeControllerTest {
         val mazeId = 1L
         val passcode = "123456789"
         val token = "token"
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.openMaze(mazeId, passcode, "test@example.com")).thenThrow(Exception::class.java)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.openMaze(any(), any(), any()) } throws Exception()
 
-        val response = MazeController(userService, mazeService).open(mazeId, passcode, token)
+        val response = mazeController.open(mazeId, passcode, token)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -347,8 +301,8 @@ class MazeControllerTest {
         val passcode = "123456789"
         val token = "token"
         val json = JsonObject(mapOf("hi" to "there"))
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.openMaze(mazeId, passcode, "test@example.com")).thenReturn(json)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.openMaze(any(), any(), any()) } returns json
 
         //Assert...
         mockMvc
@@ -364,14 +318,14 @@ class MazeControllerTest {
     @Test
     fun recognise() {
         val mazeId = 1L
-        val image = Mockito.mock(MultipartFile::class.java)
+        val image = mockk<MultipartFile>()
         val rotation = 0
         val token = "token"
         val json = JsonObject(mapOf("hi" to "there"))
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.recogniseMaze(mazeId, image, rotation)).thenReturn(json)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.recogniseMaze(any(), any(), any()) } returns json
 
-        val response = MazeController(userService, mazeService).recognise(mazeId, image, rotation, token)
+        val response = mazeController.recognise(mazeId, image, rotation, token)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -381,13 +335,13 @@ class MazeControllerTest {
     @Test
     fun recogniseWithException() {
         val mazeId = 1L
-        val image = Mockito.mock(MultipartFile::class.java)
+        val image = mockk<MultipartFile>()
         val rotation = 0
         val token = "token"
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.recogniseMaze(mazeId, image, rotation)).thenThrow(Exception::class.java)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.recogniseMaze(any(), any(), any()) } throws Exception()
 
-        val response = MazeController(userService, mazeService).recognise(mazeId, image, rotation, token)
+        val response = mazeController.recognise(mazeId, image, rotation, token)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -397,12 +351,12 @@ class MazeControllerTest {
     @Test
     fun urlRecognise() {
         val mazeId = 1L
-        val image = Mockito.mock(MultipartFile::class.java)
+        val image = spyk<MultipartFile>()
         val rotation = 0
         val token = "token"
         val json = JsonObject(mapOf("hi" to "there"))
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.recogniseMaze(mazeId, image, rotation)).thenReturn(json)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.recogniseMaze(any(), any(), any()) } returns json
 
         //Assert...
         mockMvc
@@ -427,18 +381,10 @@ class MazeControllerTest {
             token = "token",
         )
         val json = JsonObject(mapOf("hi" to "there"))
-        Mockito.`when`(userService.regenerateTokenIfStillValid(mazeCheckRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(
-            mazeService.checkMaze(
-                mazeCheckRequest.mazeId,
-                mazeCheckRequest.data,
-                mazeCheckRequest.path,
-                mazeCheckRequest.nickname,
-                "test@example.com",
-            )
-        ).thenReturn(json)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.checkMaze(any(), any(), any(), any(), any()) } returns json
 
-        val response = MazeController(userService, mazeService).check(mazeCheckRequest)
+        val response = mazeController.check(mazeCheckRequest)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -454,18 +400,10 @@ class MazeControllerTest {
             nickname = "nickname",
             token = "token",
         )
-        Mockito.`when`(userService.regenerateTokenIfStillValid(mazeCheckRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(
-            mazeService.checkMaze(
-                mazeCheckRequest.mazeId,
-                mazeCheckRequest.data,
-                mazeCheckRequest.path,
-                mazeCheckRequest.nickname,
-                "test@example.com",
-            )
-        ).thenThrow(Exception::class.java)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.checkMaze(any(), any(), any(), any(), any()) } throws Exception()
 
-        val response = MazeController(userService, mazeService).check(mazeCheckRequest)
+        val response = mazeController.check(mazeCheckRequest)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -481,7 +419,9 @@ class MazeControllerTest {
             nickname = "nickname",
             token = "token",
         )
-        Mockito.`when`(userService.regenerateTokenIfStillValid(mazeCheckRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
+        val json = JsonObject(mapOf("hi" to "there"))
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.checkMaze(any(), any(), any(), any(), any()) } returns json
 
         val objectMapper = ObjectMapper()
         val content = objectMapper.writeValueAsString(mazeCheckRequest)
@@ -501,10 +441,10 @@ class MazeControllerTest {
         val token = "token"
         val mazes = listOf(JsonObject(mapOf("hi" to "there")))
         val locations = listOf("/")
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.getAllMazes("test@example.com")).thenReturn(Pair(mazes, locations))
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.getAllMazes(any()) } returns Pair(mazes, locations)
 
-        val response = MazeController(userService, mazeService).getAll(token)
+        val response = mazeController.getAll(token)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -514,10 +454,10 @@ class MazeControllerTest {
     @Test
     fun getAllWithException() {
         val token = "token"
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.getAllMazes("test@example.com")).thenThrow(Exception::class.java)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.getAllMazes(any()) } throws Exception()
 
-        val response = MazeController(userService, mazeService).getAll(token)
+        val response = mazeController.getAll(token)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -529,8 +469,8 @@ class MazeControllerTest {
         val token = "token"
         val mazes = listOf(JsonObject(mapOf("hi" to "there")))
         val locations = listOf("/")
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.getAllMazes("test@example.com")).thenReturn(Pair(mazes, locations))
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.getAllMazes(any()) } returns Pair(mazes, locations)
 
         //Assert...
         mockMvc
@@ -543,10 +483,10 @@ class MazeControllerTest {
         val mazeId = 1L
         val token = "token"
         val solutions = listOf(JsonObject(mapOf("hi" to "there")))
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.getSolutions(mazeId, "test@example.com")).thenReturn(solutions)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.getSolutions(any(), any()) } returns solutions
 
-        val response = MazeController(userService, mazeService).getSolutions(mazeId, token)
+        val response = mazeController.getSolutions(mazeId, token)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -557,10 +497,10 @@ class MazeControllerTest {
     fun getSolutionsWithException() {
         val mazeId = 1L
         val token = "token"
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.getSolutions(mazeId, "test@example.com")).thenThrow(Exception::class.java)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.getSolutions(any(), any()) } throws Exception()
 
-        val response = MazeController(userService, mazeService).getSolutions(mazeId, token)
+        val response = mazeController.getSolutions(mazeId, token)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -572,8 +512,8 @@ class MazeControllerTest {
         val mazeId = 1L
         val token = "token"
         val solutions = listOf(JsonObject(mapOf("hi" to "there")))
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(mazeService.getSolutions(mazeId, "test@example.com")).thenReturn(solutions)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.getSolutions(any(), any()) } returns solutions
 
         //Assert...
         mockMvc
@@ -595,17 +535,10 @@ class MazeControllerTest {
         )
         val mazes = listOf(JsonObject(mapOf("hi" to "there")))
         val locations = listOf("/")
-        Mockito.`when`(userService.regenerateTokenIfStillValid(locationUpdateRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(
-            mazeService.updateLocation(
-                locationUpdateRequest.parentLocation,
-                locationUpdateRequest.originalLocation,
-                locationUpdateRequest.newLocation,
-                "test@example.com",
-            )
-        ).thenReturn(Pair(mazes, locations))
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.updateLocation(any(), any(), any(), any()) } returns Pair(mazes, locations)
 
-        val response = MazeController(userService, mazeService).updateLocation(locationUpdateRequest)
+        val response = mazeController.updateLocation(locationUpdateRequest)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -620,17 +553,10 @@ class MazeControllerTest {
             newLocation = "/qwe",
             token = "token",
         )
-        Mockito.`when`(userService.regenerateTokenIfStillValid(locationUpdateRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(
-            mazeService.updateLocation(
-                locationUpdateRequest.parentLocation,
-                locationUpdateRequest.originalLocation,
-                locationUpdateRequest.newLocation,
-                "test@example.com",
-            )
-        ).thenThrow(Exception::class.java)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.updateLocation(any(), any(), any(), any()) } throws Exception()
 
-        val response = MazeController(userService, mazeService).updateLocation(locationUpdateRequest)
+        val response = mazeController.updateLocation(locationUpdateRequest)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -641,21 +567,14 @@ class MazeControllerTest {
     fun urlUpdateLocation() {
         val locationUpdateRequest = LocationUpdateRequest(
             parentLocation = "/",
-            originalLocation = "/asd",
-            newLocation = "/qwe",
+            originalLocation = "asd",
+            newLocation = "qwe",
             token = "token",
         )
         val mazes = listOf(JsonObject(mapOf("hi" to "there")))
         val locations = listOf("/")
-        Mockito.`when`(userService.regenerateTokenIfStillValid(locationUpdateRequest.token)).thenReturn(Pair("test@example.com", "newToken"))
-        Mockito.`when`(
-            mazeService.updateLocation(
-                locationUpdateRequest.parentLocation,
-                locationUpdateRequest.originalLocation,
-                locationUpdateRequest.newLocation,
-                "test@example.com",
-            )
-        ).thenReturn(Pair(mazes, locations))
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "newToken")
+        every { mazeService.updateLocation(any(), any(), any(), any()) } returns Pair(mazes, locations)
 
         val objectMapper = ObjectMapper()
         val content = objectMapper.writeValueAsString(locationUpdateRequest)

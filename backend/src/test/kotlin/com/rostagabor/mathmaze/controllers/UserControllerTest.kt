@@ -1,6 +1,7 @@
 package com.rostagabor.mathmaze.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.ninjasquad.springmockk.MockkBean
 import com.rostagabor.mathmaze.data.PasswordResetToken
 import com.rostagabor.mathmaze.data.User
 import com.rostagabor.mathmaze.requests.AccountPasswordResetRequest
@@ -9,13 +10,17 @@ import com.rostagabor.mathmaze.requests.LoginRequest
 import com.rostagabor.mathmaze.requests.PasswordResetRequest
 import com.rostagabor.mathmaze.services.UserService
 import com.rostagabor.mathmaze.utils.UserNotFoundException
+import io.mockk.every
+import io.mockk.just
+import io.mockk.runs
+import io.mockk.unmockkAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
@@ -42,16 +47,30 @@ class UserControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    @MockBean
+    @Autowired
+    @MockkBean(relaxed = true)
     private lateinit var userService: UserService
+
+    private lateinit var userController: UserController
+
+    @BeforeEach
+    fun setUp() {
+        userController = UserController(userService)
+    }
+
+    @AfterEach
+    fun tearDown() {
+        unmockkAll()
+    }
+
 
     @Test
     fun register() {
         val user = User(username = "testUser", email = "test@example.com")
-        Mockito.`when`(userService.register(user)).thenReturn(user)
-        Mockito.`when`(userService.generateToken(user.email)).thenReturn("testToken")
+        every { userService.register(any()) } returns user
+        every { userService.generateToken(any()) } returns "testToken"
 
-        val response = UserController(userService).register(user)
+        val response = userController.register(user)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -61,10 +80,10 @@ class UserControllerTest {
     @Test
     fun registerWithException() {
         val user = User(username = "testUser", email = "test@example.com")
-        Mockito.`when`(userService.register(user)).thenThrow(Exception::class.java)
-        Mockito.`when`(userService.generateToken(user.email)).thenReturn("testToken")
+        every { userService.register(any()) } throws Exception()
+        every { userService.generateToken(any()) } returns "testToken"
 
-        val response = UserController(userService).register(user)
+        val response = userController.register(user)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -74,8 +93,8 @@ class UserControllerTest {
     @Test
     fun urlRegister() {
         val user = User(username = "testUser", email = "test@example.com")
-        Mockito.`when`(userService.register(user)).thenReturn(user)
-        Mockito.`when`(userService.generateToken(user.email)).thenReturn("testToken")
+        every { userService.register(any()) } returns user
+        every { userService.generateToken(any()) } returns "testToken"
 
         val objectMapper = ObjectMapper()
         val content = objectMapper.writeValueAsString(user)
@@ -94,11 +113,10 @@ class UserControllerTest {
     @Test
     fun login() {
         val loginRequest = LoginRequest(email = "test@example.com", password = "testPassword")
-        Mockito.`when`(userService.login(loginRequest.email, loginRequest.password))
-            .thenReturn(User(username = "testUser", email = loginRequest.email))
-        Mockito.`when`(userService.generateToken(loginRequest.email)).thenReturn("testToken")
+        every { userService.login(any(), any()) } returns User(username = "testUser", email = loginRequest.email)
+        every { userService.generateToken(any()) } returns "testToken"
 
-        val response = UserController(userService).login(loginRequest)
+        val response = userController.login(loginRequest)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -108,10 +126,10 @@ class UserControllerTest {
     @Test
     fun loginWithException() {
         val loginRequest = LoginRequest(email = "test@example.com", password = "testPassword")
-        Mockito.`when`(userService.login(loginRequest.email, loginRequest.password)).thenThrow(Exception::class.java)
-        Mockito.`when`(userService.generateToken(loginRequest.email)).thenReturn("testToken")
+        every { userService.login(any(), any()) } throws Exception()
+        every { userService.generateToken(any()) } returns "testToken"
 
-        val response = UserController(userService).login(loginRequest)
+        val response = userController.login(loginRequest)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -121,9 +139,8 @@ class UserControllerTest {
     @Test
     fun urlLogin() {
         val loginRequest = LoginRequest(email = "test@example.com", password = "testPassword")
-        Mockito.`when`(userService.login(loginRequest.email, loginRequest.password))
-            .thenReturn(User(username = "testUser", email = loginRequest.email))
-        Mockito.`when`(userService.generateToken(loginRequest.email)).thenReturn("testToken")
+        every { userService.login(any(), any()) } returns User(username = "testUser", email = loginRequest.email)
+        every { userService.generateToken(any()) } returns "testToken"
 
         val objectMapper = ObjectMapper()
         val content = objectMapper.writeValueAsString(loginRequest)
@@ -142,9 +159,9 @@ class UserControllerTest {
     @Test
     fun requestPasswordReset() {
         val emailRequest = EmailRequest(email = "test@example.com")
-        Mockito.doNothing().`when`(userService).requestPasswordReset(emailRequest.email)
+        every { userService.requestPasswordReset(any()) } just runs
 
-        val response = UserController(userService).requestPasswordReset(emailRequest)
+        val response = userController.requestPasswordReset(emailRequest)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -154,9 +171,9 @@ class UserControllerTest {
     @Test
     fun requestPasswordResetWithException1() {
         val emailRequest = EmailRequest(email = "test@example.com")
-        Mockito.`when`(userService.requestPasswordReset(emailRequest.email)).thenThrow(Exception::class.java)
+        every { userService.requestPasswordReset(any()) } throws Exception()
 
-        val response = UserController(userService).requestPasswordReset(emailRequest)
+        val response = userController.requestPasswordReset(emailRequest)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -166,9 +183,9 @@ class UserControllerTest {
     @Test
     fun requestPasswordResetWithException2() {
         val emailRequest = EmailRequest(email = "test@example.com")
-        Mockito.`when`(userService.requestPasswordReset(emailRequest.email)).thenThrow(UserNotFoundException::class.java)
+        every { userService.requestPasswordReset(any()) } throws UserNotFoundException()
 
-        val response = UserController(userService).requestPasswordReset(emailRequest)
+        val response = userController.requestPasswordReset(emailRequest)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -178,7 +195,7 @@ class UserControllerTest {
     @Test
     fun urlRequestPasswordReset() {
         val emailRequest = EmailRequest(email = "test@example.com")
-        Mockito.doNothing().`when`(userService).requestPasswordReset(emailRequest.email)
+        every { userService.requestPasswordReset(any()) } just runs
 
         val objectMapper = ObjectMapper()
         val content = objectMapper.writeValueAsString(emailRequest)
@@ -197,9 +214,9 @@ class UserControllerTest {
     @Test
     fun validateToken() {
         val token = "test-token"
-        Mockito.`when`(userService.validateToken(token)).thenReturn(PasswordResetToken())
+        every { userService.validateToken(any()) } returns PasswordResetToken()
 
-        val response = UserController(userService).validateToken(token)
+        val response = userController.validateToken(token)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -209,9 +226,9 @@ class UserControllerTest {
     @Test
     fun validateTokenWithException() {
         val token = "test-token"
-        Mockito.`when`(userService.validateToken(token)).thenThrow(Exception::class.java)
+        every { userService.validateToken(any()) } throws Exception()
 
-        val response = UserController(userService).validateToken(token)
+        val response = userController.validateToken(token)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -221,7 +238,7 @@ class UserControllerTest {
     @Test
     fun urlValidateToken() {
         val token = "test-token"
-        Mockito.`when`(userService.validateToken(token)).thenReturn(PasswordResetToken())
+        every { userService.validateToken(any()) } returns PasswordResetToken()
 
         //Assert...
         mockMvc
@@ -233,9 +250,9 @@ class UserControllerTest {
     @Test
     fun resetPassword() {
         val passwordResetRequest = PasswordResetRequest(token = "test-token", password = "testPassword")
-        Mockito.doNothing().`when`(userService).resetPassword(passwordResetRequest.token, passwordResetRequest.password)
+        every { userService.resetPassword(any(), any()) } just runs
 
-        val response = UserController(userService).resetPassword(passwordResetRequest)
+        val response = userController.resetPassword(passwordResetRequest)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -245,9 +262,9 @@ class UserControllerTest {
     @Test
     fun resetPasswordWithException() {
         val passwordResetRequest = PasswordResetRequest(token = "test-token", password = "testPassword")
-        Mockito.`when`(userService.resetPassword(passwordResetRequest.token, passwordResetRequest.password)).thenThrow(Exception::class.java)
+        every { userService.resetPassword(any(), any()) } throws Exception()
 
-        val response = UserController(userService).resetPassword(passwordResetRequest)
+        val response = userController.resetPassword(passwordResetRequest)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -257,7 +274,7 @@ class UserControllerTest {
     @Test
     fun urlResetPassword() {
         val passwordResetRequest = PasswordResetRequest(token = "test-token", password = "testPassword")
-        Mockito.doNothing().`when`(userService).resetPassword(passwordResetRequest.token, passwordResetRequest.password)
+        every { userService.resetPassword(any(), any()) } just runs
 
         val objectMapper = ObjectMapper()
         val content = objectMapper.writeValueAsString(passwordResetRequest)
@@ -277,11 +294,10 @@ class UserControllerTest {
     fun accountResetPassword() {
         val accountPasswordResetRequest =
             AccountPasswordResetRequest(token = "test-token", oldPassword = "testOldPassword", newPassword = "testNewPassword")
-        Mockito.`when`(userService.regenerateTokenIfStillValid(accountPasswordResetRequest.token))
-            .thenReturn(Pair("test@example.com", "testNewToken"))
-        Mockito.doNothing().`when`(userService).accountResetPassword(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "testNewToken")
+        every { userService.accountResetPassword(any(), any(), any()) } just runs
 
-        val response = UserController(userService).accountResetPassword(accountPasswordResetRequest)
+        val response = userController.accountResetPassword(accountPasswordResetRequest)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -292,12 +308,10 @@ class UserControllerTest {
     fun accountResetPasswordWithException() {
         val accountPasswordResetRequest =
             AccountPasswordResetRequest(token = "test-token", oldPassword = "testOldPassword", newPassword = "testNewPassword")
-        Mockito.`when`(userService.regenerateTokenIfStillValid(accountPasswordResetRequest.token))
-            .thenReturn(Pair("test@example.com", "testNewToken"))
-        Mockito.`when`(userService.accountResetPassword(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
-            .thenThrow(Exception::class.java)
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "testNewToken")
+        every { userService.accountResetPassword(any(), any(), any()) } throws Exception()
 
-        val response = UserController(userService).accountResetPassword(accountPasswordResetRequest)
+        val response = userController.accountResetPassword(accountPasswordResetRequest)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -308,8 +322,8 @@ class UserControllerTest {
     fun urlAccountResetPassword() {
         val accountPasswordResetRequest =
             AccountPasswordResetRequest(token = "test-token", oldPassword = "testOldPassword", newPassword = "testNewPassword")
-        Mockito.`when`(userService.regenerateTokenIfStillValid(accountPasswordResetRequest.token))
-            .thenReturn(Pair("test@example.com", "testNewToken"))
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "testNewToken")
+        every { userService.accountResetPassword(any(), any(), any()) } just runs
 
         val objectMapper = ObjectMapper()
         val content = objectMapper.writeValueAsString(accountPasswordResetRequest)
@@ -328,9 +342,9 @@ class UserControllerTest {
     @Test
     fun isUserStillLoggedIn() {
         val token = "test-token"
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("test@example.com", "testNewToken"))
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "testNewToken")
 
-        val response = UserController(userService).isUserStillLoggedIn(token)
+        val response = userController.isUserStillLoggedIn(token)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -340,9 +354,9 @@ class UserControllerTest {
     @Test
     fun isUserStillLoggedInWithException() {
         val token = "test-token"
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("", ""))
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("", "")
 
-        val response = UserController(userService).isUserStillLoggedIn(token)
+        val response = userController.isUserStillLoggedIn(token)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -352,7 +366,7 @@ class UserControllerTest {
     @Test
     fun urlIsUserStillLoggedIn() {
         val token = "test-token"
-        Mockito.`when`(userService.regenerateTokenIfStillValid(token)).thenReturn(Pair("test@example.com", "testNewToken"))
+        every { userService.regenerateTokenIfStillValid(any()) } returns Pair("test@example.com", "testNewToken")
 
         //Assert...
         mockMvc

@@ -1,15 +1,20 @@
 package com.rostagabor.mathmaze.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.ninjasquad.springmockk.MockkBean
 import com.rostagabor.mathmaze.requests.ContactRequest
 import com.rostagabor.mathmaze.services.ContactService
+import io.mockk.every
+import io.mockk.just
+import io.mockk.runs
+import io.mockk.unmockkAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
@@ -35,15 +40,29 @@ class ContactControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-    @MockBean
+    @Autowired
+    @MockkBean
     private lateinit var contactService: ContactService
+
+    private lateinit var contactController: ContactController
+
+    @BeforeEach
+    fun setUp() {
+        contactController = ContactController(contactService)
+    }
+
+    @AfterEach
+    fun tearDown() {
+        unmockkAll()
+    }
+
 
     @Test
     fun send() {
         val contactRequest = ContactRequest("name", "test@example.com", "subject", "message")
-        Mockito.doNothing().`when`(contactService).send(contactRequest.name, contactRequest.email, contactRequest.subject, contactRequest.message)
+        every { contactService.send(any(), any(), any(), any()) } just runs
 
-        val response = ContactController(contactService).send(contactRequest)
+        val response = contactController.send(contactRequest)
 
         //Assert...
         assertEquals(HttpStatus.OK, response.statusCode)
@@ -53,10 +72,9 @@ class ContactControllerTest {
     @Test
     fun sendWithException() {
         val contactRequest = ContactRequest("name", "test@example.com", "subject", "message")
-        Mockito.`when`(contactService.send(contactRequest.name, contactRequest.email, contactRequest.subject, contactRequest.message))
-            .thenThrow(Exception::class.java)
+        every { contactService.send(any(), any(), any(), any()) } throws Exception()
 
-        val response = ContactController(contactService).send(contactRequest)
+        val response = contactController.send(contactRequest)
 
         //Assert...
         assertEquals(HttpStatus.BAD_REQUEST, response.statusCode)
@@ -66,7 +84,7 @@ class ContactControllerTest {
     @Test
     fun urlSend() {
         val contactRequest = ContactRequest("name", "test@example.com", "subject", "message")
-        Mockito.doNothing().`when`(contactService).send(contactRequest.name, contactRequest.email, contactRequest.subject, contactRequest.message)
+        every { contactService.send(any(), any(), any(), any()) } just runs
 
         val objectMapper = ObjectMapper()
         val content = objectMapper.writeValueAsString(contactRequest)
