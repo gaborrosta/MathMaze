@@ -191,7 +191,7 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
     }
   };
 
-  const longPressEvent = useLongPress(onLongPress, { isPreventDefault: true, delay: 300 });
+  const longPressEvent = useLongPress(onLongPress, { isPreventDefault: true, delay: 700 });
 
   return (
     <Row className="mb-3">
