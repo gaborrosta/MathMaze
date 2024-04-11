@@ -10,7 +10,7 @@ const GRID_WINDOW_SIZE = 5;
 export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, submitError, initialMaze, initialPath })  {
   const { t } = useTranslation();
 
-  const mazeRef = useRef(null);
+  //const mazeRef = useRef(null);
   const inputRef = useRef(null);
 
   const [mazeSize, setMazeSize] = useState(0);
@@ -33,10 +33,10 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
   const [canMoveLeft, setCanMoveLeft] = useState(false);
   const [canMoveRight, setCanMoveRight] = useState(true);
 
-  useEffect(() => {
+  /*useEffect(() => {
     mazeRef.current.scrollIntoView({ behavior: "smooth" });
     document.getElementById("cell-0-0").focus();
-  }, [mazeRef, mazeSize]);
+  }, [mazeRef, mazeSize]);*/
 
   useEffect(() => {
     if (isInputActive && inputRef.current) {
@@ -44,11 +44,11 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
     }
   }, [isInputActive]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (isKeyActive && mazeRef.current) {
       mazeRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [isKeyActive]);
+  }, [isKeyActive]);*/
 
   const handleCellSelection = (x, y) => {
     if ((x !== start.x || y !== start.y) && (x !== end.x || y !== end.y)) {
@@ -194,7 +194,7 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
   const longPressEvent = useLongPress(onLongPress, { isPreventDefault: true, delay: 300 });
 
   return (
-    <Row ref={mazeRef} className="mb-3">
+    <Row className="mb-3">
       <Col>
         <div>
           <h2>{t("maze-solve-online-instructions")}</h2>
