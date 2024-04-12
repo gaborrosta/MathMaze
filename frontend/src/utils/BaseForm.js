@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Form, Button } from "react-bootstrap";
+import StatelessForm from "./StatelessForm";
 
 /**
  * BaseForm renders a form with validation and error handling.
@@ -27,7 +28,7 @@ import { Form, Button } from "react-bootstrap";
  *   - submitButton: The submit button for the form.
  * @param {string} props.buttonText - The key of the text to display on the submit button. Example: `"reset-password-submit"`
  * @param {Function} props.customValidator - An optional function to perform additional validation on the form. It receives the current form data and should return an object containing a key if there is an error. If the value in the object is an empty string, then the custom error is removed from that field.
- * 
+ *
  * @returns {React.Element} The BaseForm component.
  */
 export default function BaseForm({ onSubmit, initialData, validationSchema, form, buttonText, customValidator }) {
@@ -44,7 +45,6 @@ export default function BaseForm({ onSubmit, initialData, validationSchema, form
 
   //Form data and field errors
   const [formData, setFormData] = useState(initialData);
-  const [fieldErrors, setFieldErrors] = useState({});
 
   //Error and success messages
   const [error, setError] = useState("");
@@ -52,64 +52,6 @@ export default function BaseForm({ onSubmit, initialData, validationSchema, form
 
   //Is the submit button disabled?
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-
-
-  //Handle form field changes
-  const handleChange = (event) => {
-    //Get the name, value of the field
-    let { name, value } = event.target;
-
-    //Update the form data
-    const newFormData = { ...formData, [name]: value };
-    setFormData(newFormData);
-
-    //Update the field errors
-    const newFieldErrors = { ...fieldErrors };
-
-    //Validate the field
-    const fieldSchema = validationSchema[name];
-    if (value === "" && fieldSchema.required) {
-      newFieldErrors[name] = "field-required";
-    } else if (!fieldSchema.regex.test(value)) {
-      newFieldErrors[name] = fieldSchema.regexError;
-    } else {
-      delete newFieldErrors[name];
-    }
-
-    //Call the custom validator 
-    if (customValidator !== undefined) {
-      const customErrors = customValidator(newFormData);
-
-      //Merge the custom errors with the existing errors (it can delete custom errors but not regexErrors or required errors)
-      for (let key in customErrors) {
-        if (!newFieldErrors.hasOwnProperty(key) || (newFieldErrors[key] !== "field-required" && newFieldErrors[key] !== validationSchema[key].regexError)) {
-          newFieldErrors[key] = customErrors[key];
-        }
-      }
-    }
-
-    //Update the field errors
-    setFieldErrors(newFieldErrors);
-  };
-
-
-  //Check if the form is ready to be submitted
-  useEffect(() => {
-    //Check if there are any empty fields
-    const isThereAnyEmptyFields = Object.entries(formData).some(([key, value]) =>
-      (value === undefined || value === null || value === "") && validationSchema[key].required
-    );
-
-    //Check if there are any errors
-    const isThereAnyErrors = Object.entries(fieldErrors).some(([_, value]) => value !== "");
-    
-    //Disable the submit button if there are any errors or empty fields
-    if (isThereAnyErrors || isThereAnyEmptyFields) {
-      setIsSubmitDisabled(true);
-    } else {
-      setIsSubmitDisabled(false);
-    }
-  }, [fieldErrors, formData, validationSchema]);
 
 
   //Handle form submission
@@ -128,16 +70,25 @@ export default function BaseForm({ onSubmit, initialData, validationSchema, form
   //Render the form
   return (
     <Form onSubmit={handleSubmit}>
-      {form(
-        formData,
-        handleChange,
-        fieldErrors,
-        error,
-        success,
-        <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
-          {t(buttonText)}
-        </Button>
-      )}
+      <StatelessForm
+        initialData={formData}
+        validationSchema={validationSchema}
+        setIsThereAnyError={setIsSubmitDisabled}
+        onStateChanged={setFormData}
+        form={(_formData, _handleChange, _fieldErrors) => (
+          form(
+            _formData,
+            _handleChange,
+            _fieldErrors,
+            error,
+            success,
+            <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
+              {t(buttonText)}
+            </Button>
+          )
+        )}
+        customValidator={customValidator}
+      />
     </Form>
   );
 };

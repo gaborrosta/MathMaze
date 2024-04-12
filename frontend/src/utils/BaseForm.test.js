@@ -27,12 +27,6 @@ jest.mock("react-i18next", () => ({
 
 //The test suite
 describe("BaseForm", () => {
-  //Reset the mocks before each test
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-
   it("throws an error if onSubmit is missing", () => {
     expect(() => render(<BaseForm />)).toThrow("onSubmit is required.");
   });
@@ -105,6 +99,11 @@ describe("BaseForm", () => {
 
   it("throws an error if buttonText is missing", () => {
     expect(() => render(<BaseForm onSubmit={(a, b, c, d, e) => {}} initialData={{ name: "" }} validationSchema={{ name: { regex: new RegExp(/.{1,100}/), regexError: "name-error" }}} form={(a, b, c, d, e, f) => {}} />)).toThrow("buttonText is required.");
+  });
+
+
+  it("throws an error if buttonText is not a string", () => {
+    expect(() => render(<BaseForm onSubmit={(a, b, c, d, e) => {}} initialData={{ name: "" }} validationSchema={{ name: { regex: new RegExp(/.{1,100}/), regexError: "name-error" }}} form={(a, b, c, d, e, f) => {}} buttonText={1} />)).toThrow("buttonText must be a string.");
   });
 
 
