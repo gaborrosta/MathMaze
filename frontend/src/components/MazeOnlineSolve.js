@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { Form, Row, Col, Alert } from "react-bootstrap";
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "react-bootstrap-icons";
-import { useLongPress } from "react-use";
+import { useCustomClickHandler } from "../utils/CustomClickHandler";
 import NicknameForm from "./NicknameForm";
 
 const GRID_WINDOW_SIZE = 5;
@@ -10,7 +10,6 @@ const GRID_WINDOW_SIZE = 5;
 export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, submitError, initialMaze, initialPath })  {
   const { t } = useTranslation();
 
-  //const mazeRef = useRef(null);
   const inputRef = useRef(null);
 
   const [mazeSize, setMazeSize] = useState(0);
@@ -33,22 +32,11 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
   const [canMoveLeft, setCanMoveLeft] = useState(false);
   const [canMoveRight, setCanMoveRight] = useState(true);
 
-  /*useEffect(() => {
-    mazeRef.current.scrollIntoView({ behavior: "smooth" });
-    document.getElementById("cell-0-0").focus();
-  }, [mazeRef, mazeSize]);*/
-
   useEffect(() => {
     if (isInputActive && inputRef.current) {
       inputRef.current.focus();
     }
   }, [isInputActive]);
-
-  /*useEffect(() => {
-    if (isKeyActive && mazeRef.current) {
-      mazeRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [isKeyActive]);*/
 
   const handleCellSelection = (x, y) => {
     if ((x !== start.x || y !== start.y) && (x !== end.x || y !== end.y)) {
@@ -163,38 +151,41 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
     handleKeyDown({ key: direction });
   };
 
-  const onClick = (x, y) => {
-    if (!isInputActive) {
-      setSelectedCell({x: x, y: y});
-      setIsKeyActive(true);
-      updateCanMove(x, y);
-    }
-  }
+  const clickHandler = useCustomClickHandler({
+    onClick: (event) => {
+      if (!isInputActive) {
+        const x = Number(event.target.dataset.x);
+        const y = Number(event.target.dataset.y);
+        setSelectedCell({x: x, y: y});
+        setIsKeyActive(true);
+        updateCanMove(x, y);
+      }
+    },
+    onDoubleClick: (event) => {
+      if (!isInputActive) {
+        let {x: shiftX, y: shiftY} = gridShift;
 
-  const onDoubleClick = (x, y) => {
-    if (!isInputActive) {
-      handleCellSelection(x, y);
-      setIsKeyActive(true);
-      updateCanMove(x, y);
-    }
-  }
+        const x = Number(event.target.dataset.x);
+        const y = Number(event.target.dataset.y);
+        handleCellSelection(x + shiftX, y + shiftY);
+        setIsKeyActive(true);
+      }
+    },
+    onLongPress: (event) => {
+      if (!isInputActive) {
+        const x = Number(event.target.dataset.x);
+        const y = Number(event.target.dataset.y);
 
-  const onLongPress = (event) => {
-    if (!isInputActive) {
-      const x = Number(event.target.dataset.x);
-      const y = Number(event.target.dataset.y);
-
-      let {x: shiftX, y: shiftY} = gridShift;
-      setSelectedCell({x: x, y: y});
-      setIsInputActive(true);
-      setTempValue(grid[shiftY + y][shiftX + x]);
-    }
-  };
-
-  const longPressEvent = useLongPress(onLongPress, { isPreventDefault: true, delay: 700 });
+        let {x: shiftX, y: shiftY} = gridShift;
+        setSelectedCell({x: x, y: y});
+        setIsInputActive(true);
+        setTempValue(grid[shiftY + y][shiftX + x]);
+      }
+    },
+  });
 
   return (
-    <Row className="mb-3">
+    <Row>
       <Col>
         <div>
           <h2>{t("maze-solve-online-instructions")}</h2>
@@ -216,6 +207,7 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
                   onClick={() => handleButtonPress("ArrowUp")}
                   className={!canMoveUp ? "text-white" : ""}
                   disabled={!canMoveUp}
+                  role={canMoveUp ? "button" : ""}
                 />
               </td>
               <td></td>
@@ -227,6 +219,7 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
                   onClick={() => handleButtonPress("ArrowLeft")}
                   className={!canMoveLeft ? "text-white" : ""}
                   disabled={!canMoveLeft}
+                  role={canMoveLeft ? "button" : ""}
                 />
               </td>
               <td>
@@ -247,9 +240,7 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
                           className={`maze-cell-solving ${isSelected ? "yellow" : ""} ${isPath ? "path" : ""}`}
                           tabIndex="0"
                           onKeyDown={handleKeyDown}
-                          onClick={() => onClick(j, i)}
-                          onDoubleClick={() => onDoubleClick(j, i)}
-                          {...longPressEvent}
+                          {...clickHandler}
                           style={{ userSelect: "none" }}
                         >
                           <div className="maze-cell-content" style={{ height: "100%" }} data-x={j} data-y={i}>
@@ -262,7 +253,9 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
                                   type="text"
                                   value={tempValue}
                                   onChange={handleInputChange}
-                                  style={{ width: "50%", margin: "auto" }}
+                                  style={{ width: "75%", margin: "auto" }}
+                                  onTouchStart={(e) => e.stopPropagation()}
+                                  onTouchEnd={(e) => e.stopPropagation()}
                                 />
                                 {error && <Form.Text className="text-danger">{t("maze-solve-online-not-number")}</Form.Text>}
                               </> : grid[actualY][actualX]}
@@ -280,6 +273,7 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
                   onClick={() => handleButtonPress("ArrowRight")}
                   className={!canMoveRight ? "text-white" : ""}
                   disabled={!canMoveRight}
+                  role={canMoveRight ? "button" : ""}
                 />
               </td>
             </tr>
@@ -291,6 +285,7 @@ export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, s
                   onClick={() => handleButtonPress("ArrowDown")}
                   className={!canMoveDown ? "text-white" : ""}
                   disabled={!canMoveDown}
+                  role={canMoveDown ? "button" : ""}
                 />
               </td>
               <td></td>
