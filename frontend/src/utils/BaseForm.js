@@ -45,6 +45,7 @@ export default function BaseForm({ onSubmit, initialData, validationSchema, form
 
   //Form data and field errors
   const [formData, setFormData] = useState(initialData);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   //Error and success messages
   const [error, setError] = useState("");
@@ -71,8 +72,10 @@ export default function BaseForm({ onSubmit, initialData, validationSchema, form
   return (
     <Form onSubmit={handleSubmit}>
       <StatelessForm
-        initialData={formData}
+        formData={formData}
         validationSchema={validationSchema}
+        fieldErrors={fieldErrors}
+        setFieldErrors={setFieldErrors}
         setIsThereAnyError={setIsSubmitDisabled}
         onStateChanged={setFormData}
         form={(_formData, _handleChange, _fieldErrors) => (
