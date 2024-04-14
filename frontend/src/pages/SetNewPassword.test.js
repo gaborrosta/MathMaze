@@ -231,7 +231,6 @@ describe("SetNewPassword", () => {
           token: "1234",
           password: "Password123@",
         },
-
         {
           headers: {
             "Content-Type": "application/json",
@@ -284,7 +283,6 @@ describe("SetNewPassword", () => {
           token: "1234",
           password: "Password123@",
         },
-
         {
           headers: {
             "Content-Type": "application/json",
@@ -337,7 +335,6 @@ describe("SetNewPassword", () => {
           token: "1234",
           password: "Password123@",
         },
-
         {
           headers: {
             "Content-Type": "application/json",
@@ -390,7 +387,6 @@ describe("SetNewPassword", () => {
           token: "1234",
           password: "Password123@",
         },
-
         {
           headers: {
             "Content-Type": "application/json",

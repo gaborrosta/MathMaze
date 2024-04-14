@@ -100,6 +100,21 @@ describe("EditLocation", () => {
   });
 
 
+  it("renders and closes when close clicked", () => {
+    //Mock the setVisible function
+    const setVisible = jest.fn((a) => {});
+
+    //Render the component
+    render(<EditLocation visible={true} setVisible={setVisible} location={["/valid/path/", "location"]} changed={(a, b) => {}} />);
+
+    const closeButton = screen.getByRole("button", { name: "Close" });
+
+    fireEvent.click(closeButton);
+
+    expect(setVisible).toHaveBeenCalledWith(false);
+  });
+
+
   it("displays error when value is invalid", async () => {
     //Render the component
     render(

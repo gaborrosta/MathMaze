@@ -3,7 +3,7 @@
  */
 
 import React from "react";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { toBeInTheDocument } from "@testing-library/jest-dom";
 import { MemoryRouter, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -202,6 +202,12 @@ describe("Layout", () => {
     //Check the sessionStorage
     expect(sessionStorage.setItem).toHaveBeenCalledTimes(2);
     expect(sessionStorage.setItem).toHaveBeenCalledWith("token", "");
+
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+
+    waitFor(() => {
+      expect(screen.queryByText("session-expired")).not.toBeInTheDocument();
+    });
   });
 
 
@@ -232,7 +238,7 @@ describe("Layout", () => {
     //Click the logout button
     const logoutButton = screen.getByRole("button", { name: /logout/i });
     fireEvent.click(logoutButton);
-  
+
     //Check the navigation
     expect(mockNavigate).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith("/");

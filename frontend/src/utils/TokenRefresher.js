@@ -22,7 +22,7 @@ export default function TokenRefresher({ token, setToken, refreshMinutes = 30 })
   //Refresh the token after a certain amount of time
   useEffect(() => {
     //Clear the existing timeout when the component updates or unmounts
-    if (timeoutId.current) {
+    if (timeoutId) {
       clearTimeout(timeoutId.current);
     }
 

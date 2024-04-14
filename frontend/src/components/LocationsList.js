@@ -38,9 +38,7 @@ export default function LocationsList({ locations, selectedLocation, onLocationC
 
   //Call the onLocationChange function when the selected location changes
   useEffect(() => {
-    if (onLocationChangeRef.current) {
-      onLocationChangeRef.current(actualSelectedLocation);
-    }
+    onLocationChangeRef.current(actualSelectedLocation);
   }, [actualSelectedLocation]);
 
 
@@ -58,7 +56,7 @@ export default function LocationsList({ locations, selectedLocation, onLocationC
         const displayableLocation = split[split.length - 2] + "/";
 
         return (
-          <ListGroup.Item 
+          <ListGroup.Item
             key={index}
             action
             active={location === actualSelectedLocation}

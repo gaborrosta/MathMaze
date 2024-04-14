@@ -9,7 +9,7 @@ import BaseForm from "../utils/BaseForm";
 
 /**
  * SetNewPassword renders the set new password page.
- * 
+ *
  * @returns {React.Element} The SetNewPassword component.
  */
 export default function SetNewPassword() {
@@ -118,6 +118,9 @@ export default function SetNewPassword() {
       setFormData({ password: "", confirmPassword: "" });
     })
     .catch(error => {
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+
       setSuccess("");
       setFormData({ password: "", confirmPassword: ""});
 
@@ -182,7 +185,7 @@ export default function SetNewPassword() {
         <p>
           {t("set-new-password-text")}
         </p>
-        {tokenError ? <Alert variant="danger">{t(tokenError)}</Alert> : 
+        {tokenError ? <Alert variant="danger">{t(tokenError)}</Alert> :
           <BaseForm
             onSubmit={handleSetNewPassword}
             initialData={initialData}
