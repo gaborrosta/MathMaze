@@ -137,16 +137,16 @@ class MazeServiceTest {
         //Assert...
         assertThrows<InvalidMazeDimensionException> {
             mazeService.generateMaze(
-                width,
-                height,
-                numbersRangeStart,
-                numbersRangeEnd,
-                operation,
-                pathTypeEven,
-                minLength,
-                maxLength,
-                discardedMazes,
-                solutions
+                width = width,
+                height = height,
+                numbersRangeStart = numbersRangeStart,
+                numbersRangeEnd = numbersRangeEnd,
+                operation = operation,
+                pathTypeEven = pathTypeEven,
+                minLength = minLength,
+                maxLength = maxLength,
+                discardedMazes = discardedMazes,
+                solutions = solutions,
             )
         }
     }
@@ -496,13 +496,13 @@ class MazeServiceTest {
         every { userRepository.findByEmail(ADMIN_EMAIL_ADDRESS) } returns admin
         every {
             mazeRepository.findByWidthAndHeightAndNumbersRangeStartAndNumbersRangeEndAndOperationAndPathTypeEvenAndSaved(
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any()
+                width = any(),
+                height = any(),
+                numbersRangeStart = any(),
+                numbersRangeEnd = any(),
+                operation = any(),
+                pathTypeEven = any(),
+                saved = any(),
             )
         } returns listOf(maze)
         every { maze.jsonWhenGeneratedOrSaved } returns JsonObject()

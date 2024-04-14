@@ -134,6 +134,7 @@ data class Maze(
             this["pathLength"] = pathLength - 2
             this["pathTypeEven"] = pathTypeEven
             this["user"] = generatedBy.username
+            this["description"] = description
         }
 
     /**
@@ -142,7 +143,6 @@ data class Maze(
     val jsonWhenGeneratedOrSaved: JsonObject
         get() = jsonForSolving.apply {
             this["location"] = location
-            this["description"] = description
             this["isPrivate"] = isPrivate
             this["passcode"] = passcode
         }

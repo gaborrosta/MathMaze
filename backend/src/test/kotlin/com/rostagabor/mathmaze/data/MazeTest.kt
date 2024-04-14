@@ -202,6 +202,7 @@ class MazeTest {
         assertTrue(json.contains("pathLength") && json["pathLength"] == 7)
         assertTrue(json.contains("pathTypeEven") && json["pathTypeEven"] == true)
         assertTrue(json.contains("user") && json["user"] == "testUser")
+        assertTrue(json.contains("description") && json["description"] == "")
     }
 
     @Test
@@ -233,8 +234,8 @@ class MazeTest {
         assertTrue(json.contains("pathLength") && json["pathLength"] == 7)
         assertTrue(json.contains("pathTypeEven") && json["pathTypeEven"] == true)
         assertTrue(json.contains("user") && json["user"] == "testUser")
-        assertTrue(json.contains("location") && json["location"] == "/")
         assertTrue(json.contains("description") && json["description"] == "")
+        assertTrue(json.contains("location") && json["location"] == "/")
         assertTrue(json.contains("isPrivate") && json["isPrivate"] == true)
         assertTrue(json.contains("passcode") && json["passcode"] == "")
     }
@@ -270,8 +271,8 @@ class MazeTest {
         assertTrue(json.contains("pathLength") && json["pathLength"] == 7)
         assertTrue(json.contains("pathTypeEven") && json["pathTypeEven"] == true)
         assertTrue(json.contains("user") && json["user"] == "testUser")
-        assertTrue(json.contains("location") && json["location"] == "/")
         assertTrue(json.contains("description") && json["description"] == "")
+        assertTrue(json.contains("location") && json["location"] == "/")
         assertTrue(json.contains("isPrivate") && json["isPrivate"] == true)
         assertTrue(json.contains("passcode") && json["passcode"] == "")
         assertTrue(json.contains("numbersRangeStart") && json["numbersRangeStart"] == 1)
