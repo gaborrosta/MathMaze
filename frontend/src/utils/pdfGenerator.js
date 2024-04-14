@@ -23,6 +23,10 @@ import { FRONTEND_URL } from "../utils/constants";
  * @returns {Promise} A promise that resolves when the PDF document has been saved.
  */
 export default async function pdfGenerator(data, t, size) {
+  //Check the parameters
+  checkParameters(data, t, size);
+
+
   //DPI and scale factor
   const dpi = 150;
   const scaleFactor = dpi / 96;
@@ -118,7 +122,7 @@ export default async function pdfGenerator(data, t, size) {
   //Scale the container
   container.style.transform = `scale(${scaleFactor})`;
   container.style.transformOrigin = "top left";
-  
+
   //Create the root (this will contain container)
   let root = document.createElement("div");
   root.style.position = "absolute";
@@ -195,3 +199,120 @@ export default async function pdfGenerator(data, t, size) {
   //Revoke the URL
   URL.revokeObjectURL(url);
 };
+
+
+/**
+ * Checks the parameters passed to pdfGenerator.
+ */
+function checkParameters(data, t, size) {
+  if (data === undefined) {
+    throw new Error("data is required.");
+  }
+  if (typeof data !== "object") {
+    throw new Error("data must be an object.");
+  }
+  if (data.id === undefined) {
+    throw new Error("data.id is required.");
+  }
+  if (typeof data.id !== "number") {
+    throw new Error("data.id must be a number.");
+  }
+  if (data.width === undefined) {
+    throw new Error("data.width is required.");
+  }
+  if (typeof data.width !== "number") {
+    throw new Error("data.width must be a number.");
+  }
+  if (data.height === undefined) {
+    throw new Error("data.height is required.");
+  }
+  if (typeof data.height !== "number") {
+    throw new Error("data.height must be a number.");
+  }
+  if (data.start === undefined) {
+    throw new Error("data.start is required.");
+  }
+  if (!Array.isArray(data.start)) {
+    throw new Error("data.start must be an array.");
+  }
+  if (data.start.length !== 2) {
+    throw new Error("data.start must have 2 elements.");
+  }
+  if (data.end === undefined) {
+    throw new Error("data.end is required.");
+  }
+  if (!Array.isArray(data.end)) {
+    throw new Error("data.end must be an array.");
+  }
+  if (data.end.length !== 2) {
+    throw new Error("data.end must have 2 elements.");
+  }
+  if (data.digits === undefined) {
+    throw new Error("data.digits is required.");
+  }
+  if (typeof data.digits !== "number") {
+    throw new Error("data.digits must be a number.");
+  }
+  if (data.pathTypeEven === undefined) {
+    throw new Error("data.pathTypeEven is required.");
+  }
+  if (typeof data.pathTypeEven !== "boolean") {
+    throw new Error("data.pathTypeEven must be a boolean.");
+  }
+  if (data.pathLength === undefined) {
+    throw new Error("data.pathLength is required.");
+  }
+  if (typeof data.pathLength !== "number") {
+    throw new Error("data.pathLength must be a number.");
+  }
+  if (data.description === undefined) {
+    throw new Error("data.description is required.");
+  }
+  if (typeof data.description !== "string") {
+    throw new Error("data.description must be a string.");
+  }
+  if (data.user === undefined) {
+    throw new Error("data.user is required.");
+  }
+  if (typeof data.user !== "string") {
+    throw new Error("data.user must be a string.");
+  }
+  if (data.data === undefined) {
+    throw new Error("data.data is required.");
+  }
+  if (!Array.isArray(data.data)) {
+    throw new Error("data.data must be an array.");
+  }
+  if (data.data.length !== data.height) {
+    throw new Error("data.data must have the same height as data.height.");
+  }
+  if (data.data.some(row => !Array.isArray(row))) {
+    throw new Error("data.data must be an array of arrays.");
+  }
+  if (data.data.some(row => row.length !== data.width)) {
+    throw new Error("data.data must have the same width as data.width.");
+  }
+  if (data.data.some(row => row.some(cell => typeof cell !== "string"))) {
+    throw new Error("data.data must be an array of arrays of strings.");
+  }
+
+  if (t === undefined) {
+    throw new Error("t is required.");
+  }
+  if (typeof t !== "function") {
+    throw new Error("t must be a function.");
+  }
+  if (t.length !== 1) {
+    throw new Error("t must have 1 parameter.");
+  }
+
+  if (size === undefined) {
+    throw new Error("size is required.");
+  }
+  if (typeof size !== "string") {
+    throw new Error("size must be a string.");
+  }
+  if (size !== "A4" && size !== "A3") {
+    throw new Error("size must be either 'A4' or 'A3'.");
+  }
+}
