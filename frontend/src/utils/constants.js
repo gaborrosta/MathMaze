@@ -14,6 +14,13 @@ export const FRONTEND_URL = process.env.REACT_APP_FRONTEND_URL;
 
 
 /**
+ * Regex for username.
+ *
+ * @type {RegExp}
+ */
+export const USERNAME_REGEX = new RegExp(/^[a-zA-Z0-9]{5,20}$/);
+
+/**
  * Regex for email.
  *
  * @type {RegExp}
@@ -42,8 +49,15 @@ export const NICKNAME_REGEX = new RegExp(/^[A-Za-z0-9ÁÉÍÓÖŐÚÜŰáéíó�
 export const INTEGER_REGEX = new RegExp(/^[1-9]\d*$/);
 
 /**
- * Empty regex.
+ * Regex for anything. It matches any string.
  *
  * @type {RegExp}
  */
-export const EMPTY_REGEX = new RegExp(/.*/);
+export const ANYTHING_REGEX = new RegExp(/.*/);
+
+/**
+ * Regex for empty string.
+ *
+ * @type {RegExp}
+ */
+export const EMPTY_STRING_REGEX = /^$/;

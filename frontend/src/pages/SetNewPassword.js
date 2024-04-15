@@ -4,7 +4,7 @@ import { useSearchParams  } from "react-router-dom"
 import Loading from "react-fullscreen-loading";
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import axios from "axios";
-import { BACKEND_URL, PASSWORD_REGEX, EMPTY_REGEX } from "../utils/constants";
+import { BACKEND_URL, PASSWORD_REGEX, ANYTHING_REGEX } from "../utils/constants";
 import BaseForm from "../utils/BaseForm";
 
 /**
@@ -78,7 +78,7 @@ export default function SetNewPassword() {
     },
     confirmPassword: {
       required: true,
-      regex: EMPTY_REGEX,
+      regex: ANYTHING_REGEX,
       regexError: "-",
     }
   };

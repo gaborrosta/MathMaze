@@ -3,11 +3,11 @@ import { useTranslation } from "react-i18next";
 import { Form, Alert } from "react-bootstrap";
 import BaseForm from "../utils/BaseForm";
 import axios from "axios";
-import { BACKEND_URL, EMAIL_REGEX, EMPTY_REGEX } from "../utils/constants";
+import { BACKEND_URL, EMAIL_REGEX, ANYTHING_REGEX } from "../utils/constants";
 
 /**
  * ContactForm renders the contact form.
- * 
+ *
  * @returns {React.Element} The ContactForm component.
  */
 export default function ContactForm() {
@@ -25,7 +25,7 @@ export default function ContactForm() {
   const validationSchema = {
     name: {
       required: true,
-      regex: EMPTY_REGEX,
+      regex: ANYTHING_REGEX,
       regexError: "-",
     },
     email: {
@@ -35,12 +35,12 @@ export default function ContactForm() {
     },
     subject: {
       required: true,
-      regex: EMPTY_REGEX,
+      regex: ANYTHING_REGEX,
       regexError: "-",
     },
     message: {
       required: true,
-      regex: EMPTY_REGEX,
+      regex: ANYTHING_REGEX,
       regexError: "-",
     },
   };
