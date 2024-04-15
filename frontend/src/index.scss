@@ -1,6 +1,6 @@
 //Font Family
-@import url('https://fonts.googleapis.com/css2?family=Zilla+Slab&display=swap');
-$font-family-base: 'Zilla Slab', serif;
+@import url("https://fonts.googleapis.com/css2?family=Zilla+Slab&display=swap");
+$font-family-base: "Twemoji Country Flags", "Zilla Slab", serif;
 
 //Primary color
 $primary: #7d141d;
@@ -40,6 +40,21 @@ body {
 .red {
 	background-color: #7d141d;
 	color: white;
+}
+
+.carousel-item {
+	position: relative;
+	width: 100%;
+	height: 300px;
+}
+
+.carousel-image {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: scale-down;
 }
 
 
@@ -148,4 +163,4 @@ body {
 
 
 //Import Bootstrap
-@import '~bootstrap/scss/bootstrap';
+@import "~bootstrap/scss/bootstrap";

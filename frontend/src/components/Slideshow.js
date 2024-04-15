@@ -5,10 +5,10 @@ import { ChevronLeft, ChevronRight } from "react-bootstrap-icons";
 
 /**
  * Slideshow  renders a slideshow of images with a title and description for each image.
- * 
+ *
  * @param {Object} props - The properties passed to the component.
  * @param {Object[]} props.data - The data for the slideshow. Each object should have a title, description, image, and alt property. The texts should be the keys for the translated strings and for the localised image. They can also specify the time with the time property (in milliseconds).
- * 
+ *
  * @returns {JSX.Element} The Slideshow component.
  */
 export default function Slideshow({ data }) {
@@ -38,16 +38,16 @@ export default function Slideshow({ data }) {
         <p>{t(data[currentIndex].description)}</p>
       </Col>
       <Col xs={{ span: 12, order: 1 }} md={{ span: 6, order: 2 }}>
-        <Carousel 
-          activeIndex={currentIndex} 
-          onSelect={handleSelect} 
-          prevIcon={<ChevronLeft size={48} />} 
+        <Carousel
+          activeIndex={currentIndex}
+          onSelect={handleSelect}
+          prevIcon={<ChevronLeft size={48} />}
           nextIcon={<ChevronRight size={48} />}
         >
           {data.map((now, index) => (
-            <Carousel.Item key={index} interval={now.time || 5000}>
+            <Carousel.Item key={index} interval={now.time || 5000} className="carousel-item">
               <img
-                className="d-block w-100"
+                className="d-block red carousel-image"
                 src={t(data[index].image)}
                 alt={t(data[index].alt)}
               />
