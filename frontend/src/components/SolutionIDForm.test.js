@@ -76,7 +76,7 @@ describe("SolutionIDForm", () => {
 
     const select = screen.getByRole("combobox");
 
-    const solutionId = screen.getByRole("textbox", { name: "maze-generate-solution-id *" });
+    const solutionId = screen.getByRole("textbox", { name: "maze-generate-solution-id" });
 
     fireEvent.change(solutionId, { target: { value: "asd" } });
 
@@ -95,8 +95,6 @@ describe("SolutionIDForm", () => {
     expect(solutionId.value).toBe("");
 
     expect(screen.queryByText("maze-generate-solution-id-invalid")).not.toBeInTheDocument();
-
-    expect(screen.getByText("field-required")).toBeInTheDocument();
 
     expect(onStateChange).toHaveBeenCalledTimes(2);
     expect(onStateChange).toHaveBeenCalledWith(0, { solutionId: "" })
@@ -128,8 +126,8 @@ describe("SolutionIDForm", () => {
     expect(onErrorChange).toHaveBeenCalledTimes(6);
     expect(onErrorChange).toHaveBeenCalledWith(false);
 
-    const mazeId = screen.getByRole("textbox", { name: "maze-generate-maze-id *" });
-    const nickname = screen.getByRole("textbox", { name: "maze-generate-nickname *" });
+    const mazeId = screen.getByRole("textbox", { name: "maze-generate-maze-id" });
+    const nickname = screen.getByRole("textbox", { name: "maze-generate-nickname" });
 
     fireEvent.change(mazeId, { target: { value: "asd" } });
 
@@ -149,8 +147,6 @@ describe("SolutionIDForm", () => {
 
     expect(screen.queryByText("maze-generate-maze-id-invalid")).not.toBeInTheDocument();
 
-    expect(screen.getByText("field-required")).toBeInTheDocument();
-
     expect(onStateChange).toHaveBeenCalledTimes(6);
     expect(onStateChange).toHaveBeenCalledWith(0, { mazeId: "", nickname: "" })
 
@@ -160,7 +156,7 @@ describe("SolutionIDForm", () => {
 
     expect(mazeId.value).toBe("1");
 
-    expect(screen.queryByText("field-required")).not.toBeInTheDocument();
+    expect(screen.queryByText("field-required2")).toBeInTheDocument();
 
     expect(onStateChange).toHaveBeenCalledTimes(7);
     expect(onStateChange).toHaveBeenCalledWith(0, { mazeId: "1", nickname: "" })
@@ -185,7 +181,7 @@ describe("SolutionIDForm", () => {
 
     expect(screen.queryByText("maze-generate-nickname-invalid")).not.toBeInTheDocument();
 
-    expect(screen.getByText("field-required")).toBeInTheDocument();
+    expect(screen.getByText("field-required2")).toBeInTheDocument();
 
     expect(onStateChange).toHaveBeenCalledTimes(9);
     expect(onStateChange).toHaveBeenCalledWith(0, { mazeId: "1", nickname: "" })
@@ -196,12 +192,23 @@ describe("SolutionIDForm", () => {
 
     expect(nickname.value).toBe("nickname");
 
-    expect(screen.queryByText("field-required")).not.toBeInTheDocument();
+    expect(screen.queryByText("field-required2")).not.toBeInTheDocument();
 
     expect(onStateChange).toHaveBeenCalledTimes(10);
     expect(onStateChange).toHaveBeenCalledWith(0, { mazeId: "1", nickname: "nickname" })
 
     expect(onErrorChange).toHaveBeenCalledTimes(12);
+
+    fireEvent.change(mazeId, { target: { value: "" } });
+
+    expect(mazeId.value).toBe("");
+
+    expect(screen.getByText("field-required2")).toBeInTheDocument();
+
+    expect(onStateChange).toHaveBeenCalledTimes(11);
+    expect(onStateChange).toHaveBeenCalledWith(0, { mazeId: "", nickname: "nickname" });
+
+    expect(onErrorChange).toHaveBeenCalledTimes(13);
 
     fireEvent.change(select, { target: { value: "solutionId" } });
 
@@ -210,24 +217,24 @@ describe("SolutionIDForm", () => {
     expect(mazeId).not.toBeInTheDocument();
     expect(nickname).not.toBeInTheDocument();
 
-    expect(onStateChange).toHaveBeenCalledTimes(11);
+    expect(onStateChange).toHaveBeenCalledTimes(12);
     expect(onStateChange).toHaveBeenCalledWith(0, { solutionId: "" })
 
-    expect(onErrorChange).toHaveBeenCalledTimes(14);
+    expect(onErrorChange).toHaveBeenCalledTimes(15);
 
-    expect(screen.getByRole("textbox", { name: "maze-generate-solution-id *" }).value).toBe("");
+    expect(screen.getByRole("textbox", { name: "maze-generate-solution-id" }).value).toBe("");
 
     fireEvent.change(select, { target: { value: "mazeId" } });
 
     expect(select.value).toBe("mazeId");
 
-    expect(screen.getByRole("textbox", { name: "maze-generate-maze-id *" }).value).toBe("");
+    expect(screen.getByRole("textbox", { name: "maze-generate-maze-id" }).value).toBe("");
 
-    expect(screen.getByRole("textbox", { name: "maze-generate-nickname *" }).value).toBe("");
+    expect(screen.getByRole("textbox", { name: "maze-generate-nickname" }).value).toBe("");
 
-    expect(onStateChange).toHaveBeenCalledTimes(12);
+    expect(onStateChange).toHaveBeenCalledTimes(13);
     expect(onStateChange).toHaveBeenCalledWith(0, { mazeId: "", nickname: "" })
 
-    expect(onErrorChange).toHaveBeenCalledTimes(16);
+    expect(onErrorChange).toHaveBeenCalledTimes(17);
   });
 });

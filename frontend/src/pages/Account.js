@@ -263,7 +263,7 @@ export default function Account() {
       .then(response => {
         setTimeout(() => {
           setToken(response.data.token);
-          setDownloadedSolutions({ ...downloadedSolutions, [id]: { data: response.data.solutions, selectedOption: null, selectedIndex: -1 }});
+          setDownloadedSolutions({ ...downloadedSolutions, [id]: { data: response.data.solutions, selectedIndex: -1 }});
         }, 1000);
       })
       .catch(error => {
@@ -461,7 +461,7 @@ export default function Account() {
               } 
               key={tab}
             >
-              <AccountSolutionsTab data={downloadedSolutions[tab]} error={downloadError} updateData={(newData) => {
+              <AccountSolutionsTab data={downloadedSolutions[tab]} error={downloadError} updateSelected={(newData) => {
                 setDownloadedSolutions({ ...downloadedSolutions, [tab]: newData});
               }} />
             </Tab>

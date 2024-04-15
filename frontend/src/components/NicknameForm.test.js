@@ -92,7 +92,7 @@ describe("NicknameForm", () => {
 
     expect(input.value).toBe("");
 
-    expect(screen.getByText("field-required")).toBeInTheDocument(); //TODO
+    expect(screen.getByText("field-required")).toBeInTheDocument();
 
     expect(setIsSubmitDisabled).toHaveBeenCalledTimes(2);
     expect(setIsSubmitDisabled).toHaveBeenCalledWith(true);

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Form, Row } from "react-bootstrap";
-import { NICKNAME_REGEX, INTEGER_REGEX } from "../utils/constants";
+import { NICKNAME_REGEX, INTEGER_REGEX, EMPTY_STRING_REGEX } from "../utils/constants";
 import StatelessForm from "../utils/StatelessForm";
 
 /**
@@ -29,25 +29,42 @@ export default function SolutionIDForm({ index, onStateChange, onErrorChange }) 
   });
   const validationSchemaForSolutionId = {
     solutionId: {
-      required: true,
-      regex: INTEGER_REGEX,
+      required: false,
+      regex: new RegExp(INTEGER_REGEX.source + '|' + EMPTY_STRING_REGEX.source),
       regexError: "maze-generate-solution-id-invalid",
     },
   };
   const validationSchemaForMazeId = {
     mazeId: {
-      required: true,
-      regex: INTEGER_REGEX,
+      required: false,
+      regex: new RegExp(INTEGER_REGEX.source + '|' + EMPTY_STRING_REGEX.source),
       regexError: "maze-generate-maze-id-invalid",
     },
     nickname: {
-      required: true,
-      regex: NICKNAME_REGEX,
+      required: false,
+      regex: new RegExp(NICKNAME_REGEX.source + '|' + EMPTY_STRING_REGEX.source),
       regexError: "maze-generate-nickname-invalid",
     },
   }
   const [schema, setSchema] = useState(validationSchemaForSolutionId);
   const [fieldErrors, setFieldErrors] = useState({});
+  const customValidator = (formData) => {
+    if (formData.hasOwnProperty("mazeId") && formData.hasOwnProperty("nickname")){
+      if (formData.mazeId !== "" && formData.nickname === "") {
+        return { nickname: "field-required2" };
+      }
+
+      if (formData.mazeId === "" && formData.nickname !== "") {
+        return { mazeId: "field-required2" };
+      }
+
+      if (formData.mazeId === "" && formData.nickname === "") {
+        return { mazeId: "", nickname: "" };
+      }
+    }
+
+    return {};
+  }
 
 
   //Actual option
@@ -99,7 +116,7 @@ export default function SolutionIDForm({ index, onStateChange, onErrorChange }) 
 
         {selectedOption === "solutionId" &&
           <Form.Group controlId="solutionId">
-            <Form.Label>{t("maze-generate-solution-id")} <span className="text-danger">*</span></Form.Label>
+            <Form.Label>{t("maze-generate-solution-id")}</Form.Label>
             <Form.Control name="solutionId" type="text" value={formData.solutionId} onChange={handleChange} aria-describedby="solutionIdHelp fieldErrors.solutionId" />
             <Form.Text id="solutionIdHelp" className="text-muted">
               {t("maze-generate-solution-id-help")}
@@ -110,7 +127,7 @@ export default function SolutionIDForm({ index, onStateChange, onErrorChange }) 
 
         {selectedOption === "mazeId" && <>
           <Form.Group controlId="mazeId">
-            <Form.Label>{t("maze-generate-maze-id")} <span className="text-danger">*</span></Form.Label>
+            <Form.Label>{t("maze-generate-maze-id")}</Form.Label>
             <Form.Control name="mazeId" type="text" value={formData.mazeId} onChange={handleChange} aria-describedby="mazeIdHelp fieldErrors.mazeId" />
             <Form.Text id="mazeIdHelp" className="text-muted">
               {t("maze-generate-maze-id-help")}
@@ -118,7 +135,7 @@ export default function SolutionIDForm({ index, onStateChange, onErrorChange }) 
             {fieldErrors.mazeId && <><br /><Form.Text className="text-danger">{t(fieldErrors.mazeId)}</Form.Text></>}
           </Form.Group>
           <Form.Group controlId="nickname">
-            <Form.Label>{t("maze-generate-nickname")} <span className="text-danger">*</span></Form.Label>
+            <Form.Label>{t("maze-generate-nickname")}</Form.Label>
             <Form.Control name="nickname" type="text" value={formData.nickname} onChange={handleChange} aria-describedby="nicknameHelp fieldErrors.nickname" />
             <Form.Text id="nicknameHelp" className="text-muted">
               {t("maze-generate-nickname-help")}
@@ -141,6 +158,7 @@ export default function SolutionIDForm({ index, onStateChange, onErrorChange }) 
       setIsThereAnyError={onErrorChange}
       onStateChanged={handleDataChange}
       form={form}
+      customValidator={customValidator}
     />
   );
 }

@@ -302,8 +302,8 @@ function checkParameters(data, t, size) {
   if (typeof t !== "function") {
     throw new Error("t must be a function.");
   }
-  if (t.length !== 1) {
-    throw new Error("t must have 1 parameter.");
+  if (t.length !== 2) {
+    throw new Error("t must have 2 parameter.");
   }
 
   if (size === undefined) {

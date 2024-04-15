@@ -111,89 +111,99 @@ describe("MazeGrid", () => {
   });
 
 
+  it("throws an error if data is missing a pathLength", () => {
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}]}} />)).toThrow("data.pathLength is required.");
+  });
+
+
+  it("throws an error if data.pathLength is not a number", () => {
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: "5"}} />)).toThrow("data.pathLength must be a number.");
+  });
+
+
   it("throws an error if data is missing a data", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}]}} />)).toThrow("data.data is required.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2}} />)).toThrow("data.data is required.");
   });
 
 
   it("throws an error if data.data is not an array", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: "test"}} />)).toThrow("data.data must be an array.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: "test"}} />)).toThrow("data.data must be an array.");
   });
 
 
   it("throws an error if data.data does not have the same height as data.height", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: []}} />)).toThrow("data.data must have the same height as data.height.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: []}} />)).toThrow("data.data must have the same height as data.height.");
   });
 
 
   it("throws an error if data.data is not an array of arrays", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [1, 2, 3, 4, 5]}} />)).toThrow("data.data must be an array of arrays.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [1, 2, 3, 4, 5]}} />)).toThrow("data.data must be an array of arrays.");
   });
 
 
   it("throws an error if data.data does not have the same width as data.width", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [[1], [2], [3], [4], [5]]}} />)).toThrow("data.data must have the same width as data.width.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [[1], [2], [3], [4], [5]]}} />)).toThrow("data.data must have the same width as data.width.");
   });
 
 
   it("throws an error if data.data is not an array of arrays of strings", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", 2, "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} />)).toThrow("data.data must be an array of arrays of strings.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", 2, "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} />)).toThrow("data.data must be an array of arrays of strings.");
   });
 
 
   it("throws an error if disabled is missing", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} />)).toThrow("disabled is required.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} />)).toThrow("disabled is required.");
   });
 
 
   it("throws an error if disabled is not a boolean", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled="test" />)).toThrow("disabled must be a boolean.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled="test" />)).toThrow("disabled must be a boolean.");
   });
 
 
   it("throws an error if save is missing", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} />)).toThrow("save is required.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} />)).toThrow("save is required.");
   });
 
 
   it("throws an error if save is not a function", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save="test" />)).toThrow("save must be a function.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save="test" />)).toThrow("save must be a function.");
   });
 
 
   it("throws an error if save has parameters", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={(a) => {}} />)).toThrow("save must have 0 parameters.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={(a) => {}} />)).toThrow("save must have 0 parameters.");
   });
 
 
   it("throws an error if saveError is missing", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} />)).toThrow("saveError is required.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} />)).toThrow("saveError is required.");
   });
 
 
   it("throws an error if saveError is not a string", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} saveError={5} />)).toThrow("saveError must be a string.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} saveError={5} />)).toThrow("saveError must be a string.");
   });
 
 
   it("throws an error is setSaveError is missing", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} saveError="" />)).toThrow("setSaveError is required.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} saveError="" />)).toThrow("setSaveError is required.");
   });
 
 
   it("throws an error if setSaveError is not a function", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} saveError="" setSaveError="test" />)).toThrow("setSaveError must be a function.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} saveError="" setSaveError="test" />)).toThrow("setSaveError must be a function.");
   });
 
 
   it("throws an error if setSaveError has more than 1 parameter", () => {
-    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} saveError="" setSaveError={(a, b) => {}} />)).toThrow("setSaveError must have 1 parameter.");
+    expect(() => render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} saveError="" setSaveError={(a, b) => {}} />)).toThrow("setSaveError must have 1 parameter.");
   });
 
 
   it("renders", () => {
     //Render the component
-    render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} saveError="" setSaveError={(a) => {}} />);
+    render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} saveError="" setSaveError={(a) => {}} />);
 
     expect(screen.getByText("maze-start")).toBeInTheDocument();
     expect(screen.getByText("maze-end")).toBeInTheDocument();
@@ -206,7 +216,7 @@ describe("MazeGrid", () => {
     const mockSetSaveError = jest.fn((a) => {});
 
     //Render the component
-    render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={mockSave} saveError="" setSaveError={mockSetSaveError} />);
+    render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={mockSave} saveError="" setSaveError={mockSetSaveError} />);
 
     fireEvent.click(screen.getByText("maze-generated-use"));
 
@@ -220,7 +230,7 @@ describe("MazeGrid", () => {
 
   it("displays error message when saveError is not empty", () => {
     //Render the component
-    render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} saveError="error" setSaveError={(a) => {}} />);
+    render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} saveError="error" setSaveError={(a) => {}} />);
 
     expect(screen.getByText("error")).toBeInTheDocument();
   });
@@ -228,7 +238,7 @@ describe("MazeGrid", () => {
 
   it("changes showPath state when toggle button is clicked", () => {
     //Render the component
-    render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} saveError="error" setSaveError={(a) => {}} />);
+    render(<MazeGrid data={{id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], path: [{x: 1, y: 1}], pathLength: 2, data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}} disabled={false} save={() => {}} saveError="error" setSaveError={(a) => {}} />);
 
     fireEvent.click(screen.getByText("maze-path-show"));
 

@@ -225,23 +225,23 @@ describe("pdfGenerator", () => {
   });
 
 
-  it("throws an error t has less than 1 parameter", async () => {
-    await expect(() => pdfGenerator({id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], digits: 2, pathTypeEven: true, pathLength: 10, description: "test", user: "test", data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}, () => {})).rejects.toThrow("t must have 1 parameter.");
+  it("throws an error t has less than 2 parameter", async () => {
+    await expect(() => pdfGenerator({id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], digits: 2, pathTypeEven: true, pathLength: 10, description: "test", user: "test", data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}, () => {})).rejects.toThrow("t must have 2 parameter.");
   });
 
 
   it("throws an error if size is missing", async () => {
-    await expect(() => pdfGenerator({id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], digits: 2, pathTypeEven: true, pathLength: 10, description: "test", user: "test", data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}, (a) => {})).rejects.toThrow("size is required.");
+    await expect(() => pdfGenerator({id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], digits: 2, pathTypeEven: true, pathLength: 10, description: "test", user: "test", data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}, (a, b) => {})).rejects.toThrow("size is required.");
   });
 
 
   it("throws an error if size is not a string", async () => {
-    await expect(() => pdfGenerator({id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], digits: 2, pathTypeEven: true, pathLength: 10, description: "test", user: "test", data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}, (a) => {}, 10)).rejects.toThrow("size must be a string.");
+    await expect(() => pdfGenerator({id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], digits: 2, pathTypeEven: true, pathLength: 10, description: "test", user: "test", data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}, (a, b) => {}, 10)).rejects.toThrow("size must be a string.");
   });
 
 
   it("throws an error if size is not A4 or A3", async () => {
-    await expect(() => pdfGenerator({id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], digits: 2, pathTypeEven: true, pathLength: 10, description: "test", user: "test", data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}, (a) => {}, "A5")).rejects.toThrow("size must be either 'A4' or 'A3'.");
+    await expect(() => pdfGenerator({id: 1, width: 5, height: 5, start: [0, 0], end: [4, 4], digits: 2, pathTypeEven: true, pathLength: 10, description: "test", user: "test", data: [["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"], ["1", "2", "3", "4", "5"]]}, (a, b) => {}, "A5")).rejects.toThrow("size must be either 'A4' or 'A3'.");
   });
 
 
@@ -264,7 +264,7 @@ describe("pdfGenerator", () => {
       description: "test",
       user: "test",
     };
-    const t = key => key;
+    const t = (key, _) => key;
     const size = "A4";
 
     await pdfGenerator(data, t, size);
@@ -298,7 +298,7 @@ describe("pdfGenerator", () => {
       description: "",
       user: "test",
     };
-    const t = key => key;
+    const t = (key, _) => key;
     const size = "A3";
 
     await pdfGenerator(data, t, size);

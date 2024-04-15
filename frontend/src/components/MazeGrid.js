@@ -13,6 +13,7 @@ import { Row, Col, ToggleButton, Button, Alert } from "react-bootstrap";
  * - end: The end point of the maze.
  * - data: The maze data.
  * - path: The path list.
+ * - pathLength: The length of the path.
  * - id: The ID of the maze.
  * @param {boolean} props.disabled - A boolean flag indicating whether the save button is disabled.
  * @param {Function} props.save - The function to call when the save button is clicked.
@@ -77,7 +78,7 @@ export default function MazeGrid({ data, disabled, save, saveError, setSaveError
             {showPath ? t("maze-path-hide") : t("maze-path-show")}
           </ToggleButton>
           <p>
-            {t("maze-path-length", { length: data.path.length - 2 })}
+            {t("maze-path-length", { length: data.pathLength })}
           </p>
         </Col>
         <Col>
@@ -162,6 +163,12 @@ function checkParameters(data, disabled, save, saveError, setSaveError) {
   }
   if (!data.path.some(coord => coord.x !== undefined && coord.y !== undefined)) {
     throw new Error("data.path must be an array of objects with x and y properties.");
+  }
+  if (data.pathLength === undefined) {
+    throw new Error("data.pathLength is required.");
+  }
+  if (typeof data.pathLength !== "number") {
+    throw new Error("data.pathLength must be a number.");
   }
   if (data.data === undefined) {
     throw new Error("data.data is required.");
