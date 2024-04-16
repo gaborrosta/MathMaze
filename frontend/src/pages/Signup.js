@@ -2,108 +2,85 @@ import React, { useEffect, useState, useContext } from "react";
 import { useTranslation, Trans } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom"
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
-import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
+import { BACKEND_URL, EMAIL_REGEX, PASSWORD_REGEX, ANYTHING_REGEX, USERNAME_REGEX } from "../utils/constants";
 import TokenContext from "../utils/TokenContext";
+import BaseForm from "../utils/BaseForm";
 
+/**
+ * Signup renders the signup page.
+ *
+ * @returns {React.Element} The Signup component.
+ */
 export default function Signup() {
+  //Localisation
   const { t } = useTranslation();
 
+
+  //Set the page title
   useEffect(() => { document.title = t("signup-title") + " | " + t("app-name"); });
 
-  const { setToken } = useContext(TokenContext);
 
-  const navigate = useNavigate();
-
-  const [isRequestInProgress, setIsRequestInProgress] = useState(false);
-
-  const [formData, setFormData] = useState({
+  //Initial data and validation schema
+  const initialData = {
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
-    username: "",
-  });
+  };
+  const validationSchema = {
+    username: {
+      required: true,
+      regex: USERNAME_REGEX,
+      regexError: "signup-username-error",
+    },
+    email: {
+      required: true,
+      regex: EMAIL_REGEX,
+      regexError: "signup-email-error",
+    },
+    password: {
+      required: true,
+      regex: PASSWORD_REGEX,
+      regexError: "signup-password-error",
+    },
+    confirmPassword: {
+      required: true,
+      regex: ANYTHING_REGEX,
+      regexError: "-",
+    },
+  };
+  const customValidator = (formData) => {
+    if (formData.password !== "" && formData.confirmPassword !== "") {
+      if (formData.password !== formData.confirmPassword) {
+        return { confirmPassword: "signup-confirm-password-error" };
+      } else {
+        return { confirmPassword: "" };
+      }
+    }
+    return { confirmPassword: "" };
+  }
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
-  const [usernameError, setUsernameError] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [confirmPasswordError, setConfirmPasswordError] = useState("");
-
+  //Show password states
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  
-    if (e.target.name === "username") {
-      const usernameRegex = /^[a-zA-Z0-9]{5,20}$/;
-      if (e.target.value && !usernameRegex.test(e.target.value)) {
-        setUsernameError("signup-username-error");
-      } else {
-        setUsernameError("");
-      }
-    }
-    else if (e.target.name === "email") {
-      const emailRegex = /^[\w-.]+@([\w-]+.)+[\w-]{2,4}$/;
-      if (e.target.value && !emailRegex.test(e.target.value)) {
-        setEmailError("signup-email-error");
-      } else {
-        setEmailError("");
-      }
-    }
-    else if (e.target.name === "password") {
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W)[A-Za-z\d\W]{8,20}$/;
-      if (e.target.value) {
-        if (!passwordRegex.test(e.target.value)) {
-          setPasswordError("signup-password-error");
-        } else if (e.target.value === formData.confirmPassword) {
-          setConfirmPasswordError("");
-          setPasswordError("");
-        } else {
-          setConfirmPasswordError("signup-confirm-password-error");
-          setPasswordError("");
-        }
-      } else {
-        setPasswordError("");
+  //Token
+  const { setToken } = useContext(TokenContext);
 
-        if (!formData.confirmPassword) {
-          setConfirmPasswordError("");
-        }
-      }
-    }
-    else if (e.target.name === "confirmPassword") {
-      if (e.target.value !== formData.password) {
-        setConfirmPasswordError("signup-confirm-password-error");
-      } else {
-        setConfirmPasswordError("");
-      }
-    }
-  };
+  //Navigation
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (usernameError || emailError || passwordError || confirmPasswordError ||
-        !formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
-      setIsSubmitDisabled(true);
-    } else {
-      setIsSubmitDisabled(false);
-    }
-  }, [usernameError, emailError, passwordError, confirmPasswordError, formData]);
 
-  const handleSignup = (e) => {
-    e.preventDefault();
-
+  //Handle the signup request
+  const handleSignup = (formData, setError, setSuccess, setFormData, done) => {
     const data = {
       username: formData.username,
       email: formData.email,
       password: formData.password,
     };
-
-    setIsRequestInProgress(true);
 
     //Send data
     axios.post(`${BACKEND_URL}/users/register`, data, {
@@ -112,8 +89,11 @@ export default function Signup() {
       }
     })
     .then(response => {
-      setToken(response.data);
+      setError("");
       setSuccess("success-signup");
+      setFormData({ email: "", password: "", confirmPassword: "", username: "" });
+
+      setToken(response.data);
       setTimeout(() => {
         navigate("/account");
       }, 5000);
@@ -121,6 +101,8 @@ export default function Signup() {
     .catch(error => {
       setShowPassword(false);
       setShowConfirmPassword(false);
+
+      setSuccess("");
       setFormData({ ...formData, password: "", confirmPassword: ""});
 
       if (!error.response) {
@@ -150,61 +132,76 @@ export default function Signup() {
       }
     })
     .finally(() => {
-      setIsRequestInProgress(false);
+      done();
     });
   };
 
-  return (
-    <>
-      <center>
-        <h1>{t("signup-title")}</h1>
-      </center>
-      {success ? <Alert variant="success">{t(success)}</Alert> : <>
-        {error && <Alert variant="danger">{t(error)}</Alert>}
-        <Form onSubmit={handleSignup}>
+
+  //Create the form
+  const form = (formData, handleChange, fieldErrors, error, success, submitButton) => {
+    return (
+      <>
+        {success ? <Alert variant="success">{t(success)}</Alert> : <>
+          {error && <Alert variant="danger">{t(error)}</Alert>}
           <Form.Group className="mb-3" controlId="username">
-            <Form.Label>{t("signup-username")}</Form.Label>
-            <Form.Control required type="text" placeholder={t("signup-username-placeholder")} name="username" value={formData.username} onChange={handleChange} aria-describedby="usernameHelp usernameError" />
+            <Form.Label>{t("signup-username")} <span className="text-danger">*</span></Form.Label>
+            <Form.Control required type="text" placeholder={t("signup-username-placeholder")} name="username" value={formData.username} onChange={handleChange} aria-describedby="usernameHelp fieldErrors.username" />
             <Form.Text id="usernameHelp" className="text-muted">
               {t("signup-username-help")}
             </Form.Text>
-            {usernameError && <><br /><Form.Text id="usernameError" className="text-danger" aria-live="polite">{t(usernameError)}</Form.Text></>}
+            {fieldErrors.username && <><br /><Form.Text className="text-danger">{t(fieldErrors.username)}</Form.Text></>}
           </Form.Group>
           <Form.Group className="mb-3" controlId="email">
-            <Form.Label>{t("email")}</Form.Label>
-            <Form.Control required type="email" placeholder={t("email-placeholder")} name="email" value={formData.email} onChange={handleChange} aria-describedby="emailHelp emailError" />
+            <Form.Label>{t("email")} <span className="text-danger">*</span></Form.Label>
+            <Form.Control required type="email" placeholder={t("email-placeholder")} name="email" value={formData.email} onChange={handleChange} aria-describedby="emailHelp fieldErrors.email" />
             <Form.Text id="emailHelp" className="text-muted">
               {t("signup-email-help")}
             </Form.Text>
-            {emailError && <><br /><Form.Text id="emailError" className="text-danger" aria-live="polite">{t(emailError)}</Form.Text></>}
+            {fieldErrors.email && <><br /><Form.Text className="text-danger">{t(fieldErrors.email)}</Form.Text></>}
           </Form.Group>
           <Form.Group className="mb-3" controlId="password">
-            <Form.Label>{t("password")}</Form.Label>
+            <Form.Label>{t("password")} <span className="text-danger">*</span></Form.Label>
             <InputGroup>
-              <Form.Control required type={showPassword ? "text" : "password"} placeholder={t("signup-password-placeholder")} name="password" value={formData.password} onChange={handleChange} aria-describedby="passwordHelp passwordError" />
+              <Form.Control required type={showPassword ? "text" : "password"} placeholder={t("signup-password-placeholder")} name="password" value={formData.password} onChange={handleChange} aria-describedby="passwordHelp fieldErrors.password" />
               <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>{showPassword ? t("password-hide") : t("password-show")}</Button>
             </InputGroup>
             <Form.Text id="passwordHelp" className="text-muted">
               {t("signup-password-help")}
             </Form.Text>
-            {passwordError && <><br /><Form.Text id="passwordError" className="text-danger" aria-live="polite">{t(passwordError)}</Form.Text></>}
+            {fieldErrors.password && <><br /><Form.Text className="text-danger">{t(fieldErrors.password)}</Form.Text></>}
           </Form.Group>
           <Form.Group className="mb-3" controlId="confirmPassword">
-            <Form.Label>{t("signup-confirm-password")}</Form.Label>
+            <Form.Label>{t("signup-confirm-password")} <span className="text-danger">*</span></Form.Label>
             <InputGroup>
-              <Form.Control required type={showConfirmPassword ? "text" : "password"} placeholder={t("signup-confirm-password-placeholder")} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} aria-describedby="confirmPasswordHelp confirmPasswordError" />
+              <Form.Control required type={showConfirmPassword ? "text" : "password"} placeholder={t("signup-confirm-password-placeholder")} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} aria-describedby="confirmPasswordHelp fieldErrors.confirmPassword" />
               <Button variant="outline-secondary" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>{showConfirmPassword ? t("password-hide") : t("password-show")}</Button>
             </InputGroup>
-            {confirmPasswordError && <Form.Text id="confirmPasswordError" className="text-danger" aria-live="polite">{t(confirmPasswordError)}</Form.Text>}
+            {fieldErrors.confirmPassword && <Form.Text className="text-danger">{t(fieldErrors.confirmPassword)}</Form.Text>}
           </Form.Group>
           <p>
             <Trans i18nKey="signup-privacy-terms-statement">By signing up, I state that I have read and accept the <Link to="/privacy-policy">Privacy Policy</Link> and the <Link to="/terms-and-conditions">Terms and Conditions</Link>.</Trans>
           </p>
-          <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
-            {t("signup-title")}
-          </Button>
-        </Form>
-      </>}
+          {submitButton}
+        </>}
+      </>
+    );
+  };
+
+
+  //Render the page
+  return (
+    <>
+      <center>
+        <h1>{t("signup-title")}</h1>
+      </center>
+      <BaseForm
+        onSubmit={handleSignup}
+        initialData={initialData}
+        validationSchema={validationSchema}
+        form={form}
+        buttonText="signup-title"
+        customValidator={customValidator}
+      />
     </>
   );
 }
