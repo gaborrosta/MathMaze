@@ -17,16 +17,40 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.api.core.optimizer.Adam
 import org.jetbrains.kotlinx.dl.api.core.optimizer.ClipGradientByValue
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
-import org.jetbrains.kotlinx.dl.dataset.embedded.NUMBER_OF_CLASSES
-import org.jetbrains.kotlinx.dl.dataset.embedded.extractImages
-import org.jetbrains.kotlinx.dl.dataset.embedded.extractLabels
 import org.jetbrains.kotlinx.dl.impl.summary.logSummary
+import org.jetbrains.kotlinx.dl.impl.util.toNormalizedVector
+import java.io.DataInputStream
 import java.io.File
+import java.io.FileInputStream
+import java.util.zip.GZIPInputStream
 
 /**
  *   The machine learning model for recognising the numbers in a maze.
  */
 object ML {
+
+    /**
+     *   Whether to create copies of the images and labels in training.
+     */
+    private enum class Copy {
+
+        /**
+         *  Do not create copies.
+         */
+        NO,
+
+        /**
+         *   Create copies next to each other.
+         */
+        NEXT_TO,
+
+        /**
+         *   Create copies far away from each other.
+         */
+        FAR_AWAY,
+
+    }
+
 
     /**
      *   The size of an input image.
@@ -38,6 +62,11 @@ object ML {
      */
     private const val NUM_CHANNELS = 1L
 
+    /**
+     *   The number of classes.
+     */
+    private const val NUM_CLASSES = 10
+
 
     /**
      *   The seed for the kernel initializer.
@@ -48,7 +77,7 @@ object ML {
     /**
      *   The number of epochs to train the model.
      */
-    private const val EPOCHS = 20
+    private const val EPOCHS = 25
 
     /**
      *   The number of images to train the model in one batch.
@@ -75,15 +104,131 @@ object ML {
         val prefix = File("datasets").absolutePath + File.separator
 
         //Create the datasets
-        OnHeapDataset.createTrainAndTestDatasets(
-            trainFeaturesPath = prefix + "extended-train-images.gz",
-            trainLabelsPath = prefix + "extended-train-labels.gz",
-            testFeaturesPath = prefix + "extended-test-images.gz",
-            testLabelsPath = prefix + "extended-test-labels.gz",
-            numClasses = NUMBER_OF_CLASSES,
-            featuresExtractor = ::extractImages,
-            labelExtractor = ::extractLabels,
+        Pair(
+            OnHeapDataset.create(
+                featuresPath = prefix + "extended-train-images.gz",
+                labelsPath = prefix + "extended-train-labels.gz",
+                numClasses = NUM_CLASSES,
+                featuresExtractor = { path -> extractImages(archivePath = path) },
+                labelExtractor = { path, _ -> extractLabels(archivePath = path) },
+            ),
+            OnHeapDataset.create(
+                featuresPath = prefix + "extended-test-images.gz",
+                labelsPath = prefix + "extended-test-labels.gz",
+                numClasses = NUM_CLASSES,
+                featuresExtractor = { path -> extractImages(archivePath = path) },
+                labelExtractor = { path, _ -> extractLabels(archivePath = path) },
+            )
         )
+    }
+
+    /**
+     *   Extracts images from [archivePath].
+     */
+    private fun extractImages(archivePath: String, copy: Copy = Copy.NO): Array<FloatArray> {
+        //Open the archive
+        val archiveStream = DataInputStream(GZIPInputStream(FileInputStream(archivePath)))
+        archiveStream.readInt()
+
+        //Read the metadata
+        val imageCount = archiveStream.readInt()
+        val imageRows = archiveStream.readInt()
+        val imageCols = archiveStream.readInt()
+        println(String.format("Extracting %d images of %dx%d from %s", imageCount, imageRows, imageCols, archivePath))
+
+        //Create the buffer and the array for the images
+        val imageBuffer = ByteArray(imageRows * imageCols)
+        val images = Array(imageCount * if (copy != Copy.NO) 9 else 1) { FloatArray(28 * 28) }
+
+        //Read the images
+        for (i in 0 until imageCount) {
+            //Read the original image and normalise it
+            archiveStream.readFully(imageBuffer)
+            val normalised = toNormalizedVector(imageBuffer)
+
+            //Creating copies of the image?
+            if (copy != Copy.NO) {
+                //Create a 30x30 buffer and copy the original image into the center of it
+                val extendedBuffer = FloatArray(30 * 30) { 0f }
+                for (row in 0 until 28) {
+                    for (col in 0 until 28) {
+                        extendedBuffer[(row + 1) * 30 + (col + 1)] = normalised[row * 28 + col]
+                    }
+                }
+
+                //Create 9 different 28x28 images
+                for (j in 0 until 9) {
+                    val startRow = j / 3
+                    val startCol = j % 3
+                    for (row in 0 until 28) {
+                        for (col in 0 until 28) {
+                            //Copy the image
+                            if (copy == Copy.NEXT_TO) {
+                                images[i * imageCount + j][row * 28 + col] = extendedBuffer[(startRow + row) * 30 + (startCol + col + 1)]
+                            } else if (copy == Copy.FAR_AWAY) {
+                                images[j * imageCount + i][row * 28 + col] = extendedBuffer[(startRow + row) * 30 + (startCol + col + 1)]
+                            }
+                        }
+                    }
+                }
+            }
+            //No copies
+            else {
+                images[i] = normalised
+            }
+        }
+
+        println(images.size)
+
+        //Return the images
+        return images
+    }
+
+    /**
+     *   Extracts labels from [archivePath].
+     */
+    private fun extractLabels(archivePath: String, copy: Copy = Copy.NO): FloatArray {
+        //Open the archive
+        val archiveStream = DataInputStream(GZIPInputStream(FileInputStream(archivePath)))
+        archiveStream.readInt()
+
+        //Read the metadata
+        val labelCount = archiveStream.readInt()
+        println(String.format("Extracting %d labels from %s", labelCount, archivePath))
+
+        //Create the buffer for the labels
+        val labelBuffer = ByteArray(labelCount)
+        archiveStream.readFully(labelBuffer)
+
+        //Create the array for the labels
+        val floats = FloatArray(labelCount * if (copy != Copy.NO) 9 else 1)
+
+        //Read the labels
+        for (i in 0 until labelCount) {
+            //Read the label
+            val label = OnHeapDataset.convertByteToFloat(labelBuffer[i])
+
+            //Creating copies of the labels?
+            if (copy != Copy.NO) {
+                //Save the label 9 times
+                repeat(9) { j ->
+                    if (copy == Copy.NEXT_TO) {
+                        floats[i * labelCount + j] = label
+                    } else if (copy == Copy.FAR_AWAY) {
+                        floats[j * labelCount + i] = label
+                    }
+                }
+            }
+            //No copies
+            else {
+                floats[i] = label
+            }
+        }
+
+        println(floats.size)
+
+        //Return the labels
+        return floats
     }
 
 
