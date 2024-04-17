@@ -14,13 +14,14 @@ import StatelessForm from "./StatelessForm";
  *   - setFormData: A function to set the form data.
  *   - done: A function to set the request in progress state to false (so the form can be submitted again).
  * @param {Object} props.initialData - An object containing the initial form data. The keys should match the keys in validationSchema. Example: `{ name: "", email: "" }`
- * @param {Object} props.validationSchema - An object containing the validation schema for the form. The keys should match the keys in initialData. Each value should be an object with the following properties:
+ * @param {Object} props.validationSchema - An object containing the validation schema for the form. The keys should match the keys in formData. Each value should be an object with the following properties:
  *   - required: A boolean indicating whether the field is required.
  *   - regex: A regular expression to validate the field. Example: `new RegExp(/^[\w-.]+@([\w-]+.)+[\w-]{2,4}$/)` or `new RegExp(/.* /)` for any value (remove the space). Can use regexes from constants.
  *   - regexError: The key of the error message to display if the field does not match the regex. Example: `"email-error"`
- *   - customCheck: An optional function to perform additional validation on the field. It receives the current form data and should return an object containing a key if there is an error.`
+ *   - fileTypes: An array of file types to accept if the field is for files. Only one file handled. Example: `["image/png", "image/jpeg"]`
+ *   - fileError: The key of the error message to display if the file does not have the right type. Example: `"file-error"`
  * @param {Function} props.form - The function to render the form fields. It receives the following parameters:
- *   - formData: The current form data. Example: `{ name: "John Doe", email: "john.doe@example.com" }`
+ *   - formData: The current form data. If the field is a file, then the file and the URL are stored here. Example: `{ name: "John Doe", email: "john.doe@example.com" }`
  *   - handleChange: A function to handle changes to the form fields, it should be called on the `onChange` event of the form fields.
  *   - fieldErrors: An object containing any field errors. Example: `{ name: "", email: "email-error" }`
  *   - error: The key of the current error message for the whole form.
@@ -138,12 +139,9 @@ function checkParameters(onSubmit, initialData, validationSchema, form, buttonTe
       throw new Error(`Every value in validationSchema must be an object. "${key}" is not an object.`);
     }
 
-    if (!fieldSchema.regex || !(fieldSchema.regex instanceof RegExp)) {
-      throw new Error(`Every value in validationSchema must have a regex. "${key}" does not have a regex.`);
-    }
-
-    if (fieldSchema.regexError === undefined) {
-      throw new Error(`Every value in validationSchema must have a regexError. "${key}" does not have a regexError.`);
+    if ((fieldSchema.regex === undefined || !(fieldSchema.regex instanceof RegExp) || fieldSchema.regexError === undefined) &&
+        (fieldSchema.fileTypes === undefined || !Array.isArray(fieldSchema.fileTypes) || fieldSchema.fileError === undefined)) {
+      throw new Error(`Every value in validationSchema must either have a regex with regexError or fileTypes with fileError. "${key}" does not meet this requirement.`);
     }
   }
 

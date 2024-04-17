@@ -73,12 +73,22 @@ describe("BaseForm", () => {
 
 
   it("throws an error if a value in validationSchema does not have a regex", () => {
-    expect(() => render(<BaseForm onSubmit={(a, b, c, d, e) => {}} initialData={{ name: "" }} validationSchema={{ name: {} }} />)).toThrow("Every value in validationSchema must have a regex. \"name\" does not have a regex.");
+    expect(() => render(<BaseForm onSubmit={(a, b, c, d, e) => {}} initialData={{ name: "" }} validationSchema={{ name: {} }} />)).toThrow("Every value in validationSchema must either have a regex with regexError or fileTypes with fileError. \"name\" does not meet this requirement.");
   });
 
 
   it("throws an error if a value in validationSchema does not have a regexError", () => {
-    expect(() => render(<BaseForm onSubmit={(a, b, c, d, e) => {}} initialData={{ name: "" }} validationSchema={{ name: { regex: new RegExp(/.{1,100}/) } }} />)).toThrow("Every value in validationSchema must have a regexError. \"name\" does not have a regexError.");
+    expect(() => render(<BaseForm onSubmit={(a, b, c, d, e) => {}} initialData={{ name: "" }} validationSchema={{ name: { regex: new RegExp(/.{1,100}/) } }} />)).toThrow("Every value in validationSchema must either have a regex with regexError or fileTypes with fileError. \"name\" does not meet this requirement.");
+  });
+
+
+  it("throws an error if a value in validationSchema has wrong fileTypes", () => {
+    expect(() => render(<BaseForm onSubmit={(a, b, c, d, e) => {}} initialData={{ name: "" }} validationSchema={{ name: { fileTypes: "nothing" } }} />)).toThrow("Every value in validationSchema must either have a regex with regexError or fileTypes with fileError. \"name\" does not meet this requirement.");
+  });
+
+
+  it("throws an error if a value in validationSchema does not have fileError but has fileTypes", () => {
+    expect(() => render(<BaseForm onSubmit={(a, b, c, d, e) => {}} initialData={{ name: "" }} validationSchema={{ name: { fileTypes: ["types"] } }} />)).toThrow("Every value in validationSchema must either have a regex with regexError or fileTypes with fileError. \"name\" does not meet this requirement.");
   });
 
 

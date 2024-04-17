@@ -45,12 +45,22 @@ describe("StatelessForm", () => {
 
 
   it("throws an error if a value in validationSchema does not have a regex", () => {
-    expect(() => render(<StatelessForm formData={{ name: "" }} validationSchema={{ name: {} }} />)).toThrow("Every value in validationSchema must have a regex. \"name\" does not have a regex.");
+    expect(() => render(<StatelessForm formData={{ name: "" }} validationSchema={{ name: {} }} />)).toThrow("Every value in validationSchema must either have a regex with regexError or fileTypes with fileError. \"name\" does not meet this requirement.");
   });
 
 
   it("throws an error if a value in validationSchema does not have a regexError", () => {
-    expect(() => render(<StatelessForm formData={{ name: "" }} validationSchema={{ name: { regex: new RegExp(/.{1,100}/) } }} />)).toThrow("Every value in validationSchema must have a regexError. \"name\" does not have a regexError.");
+    expect(() => render(<StatelessForm formData={{ name: "" }} validationSchema={{ name: { regex: new RegExp(/.{1,100}/) } }} />)).toThrow("Every value in validationSchema must either have a regex with regexError or fileTypes with fileError. \"name\" does not meet this requirement.");
+  });
+
+
+  it("throws an error if a value in validationSchema has wrong fileTypes", () => {
+    expect(() => render(<StatelessForm formData={{ name: "" }} validationSchema={{ name: { fileTypes: "nothing" } }} />)).toThrow("Every value in validationSchema must either have a regex with regexError or fileTypes with fileError. \"name\" does not meet this requirement.");
+  });
+
+
+  it("throws an error if a value in validationSchema does not have fileError but has fileTypes", () => {
+    expect(() => render(<StatelessForm formData={{ name: "" }} validationSchema={{ name: { fileTypes: ["types"] } }} />)).toThrow("Every value in validationSchema must either have a regex with regexError or fileTypes with fileError. \"name\" does not meet this requirement.");
   });
 
 
@@ -180,6 +190,32 @@ describe("StatelessForm", () => {
   });
 
 
+  it("starts with fieldErrors", async () => {
+    //Parameters
+    const formData = { name: "" };
+    const validationSchema = { name: { required: true, regex: new RegExp(/.{2,100}/), regexError: "name-error" } };
+    const fieldErrors = { name: "field-required" };
+    const setFieldErrors = jest.fn((a) => {});
+    const setIsThereAnyError = jest.fn((a) => {});
+    const onStateChanged = jest.fn((a) => {});
+    const form = (formData, handleChange, fieldErrors) => {
+      return (
+        <>
+          <Form.Group>
+            <Form.Control required type="text" name="name" value={formData.name} onChange={handleChange} />
+            {fieldErrors.name}
+          </Form.Group>
+        </>
+      );
+    };
+
+    //Render the component
+    render(<StatelessForm formData={formData} validationSchema={validationSchema} fieldErrors={fieldErrors} setFieldErrors={setFieldErrors} setIsThereAnyError={setIsThereAnyError} onStateChanged={onStateChanged} form={form} />);
+
+    expect(screen.getByText("field-required")).toBeInTheDocument();
+  });
+
+
   it("gives field-required error", async () => {
     //Parameters
     const formData = { name: "asd" };
@@ -279,5 +315,69 @@ describe("StatelessForm", () => {
     expect(onStateChanged).toHaveBeenCalledWith({ name: "test", email: "" });
     expect(setFieldErrors).toHaveBeenCalledTimes(4);
     expect(setFieldErrors).toHaveBeenCalledWith({})
+  });
+
+
+  it("handles file upload", async () => {
+    //Mock URL.createObjectURL
+    global.URL.createObjectURL = jest.fn((file) => { return file.name; });
+
+    //Create some files
+    const file1 = new File(["hello"], "hello.png", { type: "image/png" });
+    const file2 = new File(["hello"], "hello.txt", { type: "text" });
+
+    //Parameters
+    const formData = { file: "" };
+    const validationSchema = { file: { fileTypes: [ "image/png" ], fileError: "file-error", required: true } };
+    const fieldErrors = {};
+    const setFieldErrors = jest.fn((a) => {});
+    const setIsThereAnyError = jest.fn((a) => {});
+    const onStateChanged = jest.fn((a) => {});
+    const form = (formData, handleChange, fieldErrors) => {
+      return (
+        <>
+          <Form.Group>
+            <Form.Control required type="file" name="file" value={formData.file} onChange={handleChange} data-testid="file" />
+            {fieldErrors.file}
+          </Form.Group>
+        </>
+      );
+    };
+
+    //Render the component
+    render(<StatelessForm formData={formData} validationSchema={validationSchema} fieldErrors={fieldErrors} setFieldErrors={setFieldErrors} setIsThereAnyError={setIsThereAnyError} onStateChanged={onStateChanged} form={form} />);
+
+    //Get the elements
+    const input = screen.getByTestId("file");
+
+    fireEvent.change(input, { target: { files: [file1] } });
+
+    expect(onStateChanged).toHaveBeenCalledTimes(1);
+    expect(onStateChanged).toHaveBeenCalledWith({ file: { file: file1, url: "hello.png" } });
+    expect(setFieldErrors).toHaveBeenCalledTimes(1);
+    expect(setFieldErrors).toHaveBeenCalledWith({})
+
+    fireEvent.change(input, { target: { files: [file2] } });
+
+    expect(onStateChanged).toHaveBeenCalledTimes(2);
+    expect(onStateChanged).toHaveBeenCalledWith({ file: null });
+    expect(setFieldErrors).toHaveBeenCalledTimes(2);
+    expect(setFieldErrors).toHaveBeenCalledWith({ file: "file-error" });
+
+    fireEvent.change(input, { target: { files: null } });
+
+    expect(onStateChanged).toHaveBeenCalledTimes(3);
+    expect(onStateChanged).toHaveBeenCalledWith({ file: null });
+    expect(setFieldErrors).toHaveBeenCalledTimes(3);
+    expect(setFieldErrors).toHaveBeenCalledWith({ file: "field-required" });
+
+    fireEvent.change(input, { target: { files: [undefined] } });
+
+    expect(onStateChanged).toHaveBeenCalledTimes(4);
+    expect(onStateChanged).toHaveBeenCalledWith({ file: null });
+    expect(setFieldErrors).toHaveBeenCalledTimes(4);
+    expect(setFieldErrors).toHaveBeenCalledWith({ file: "field-required" });
+
+    global.URL.createObjectURL.mockRestore();
   });
 });
