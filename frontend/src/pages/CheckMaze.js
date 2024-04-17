@@ -2,9 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert } from "react-bootstrap";
 import LoadingSpinner from "../components/LoadingSpinner";
-import CheckMazeUpload from "../components/CheckMazeUpload";
-import CheckMazeRecognise from "../components/CheckMazeRecognise";
-import CheckMazeResults from "../components/CheckMazeResults";
+import CheckUploadMaze from "../components/CheckUploadMaze";
+import CheckRecognisedMaze from "../components/CheckRecognisedMaze";
+import CheckResults from "../components/CheckResults";
 import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
 import TokenContext from "../utils/TokenContext";
@@ -143,12 +143,12 @@ export default function CheckMaze() {
         <>
           {error && <Alert variant="danger">{t(error)}</Alert>}
 
-          {step === 0 && <CheckMazeUpload handleSubmit={handleSubmit1} initialId={mazeId}/>}
+          {step === 0 && <CheckUploadMaze handleSubmit={handleSubmit1} initialId={mazeId}/>}
           {step === 1 && <>
             <TokenRefresher token={token} setToken={setToken} />
-            <CheckMazeRecognise data={recognisedData} handleSubmit={handleSubmit2} initialNickname={nickname} />
+            <CheckRecognisedMaze data={recognisedData} initialNickname={nickname} handleSubmit={handleSubmit2} />
           </>}
-          {step === 2 && <CheckMazeResults data={checkData} />}
+          {step === 2 && <CheckResults data={checkData} />}
         </>
       )}
     </>

@@ -7,7 +7,7 @@ import axios from "axios";
 import TokenContext from "../utils/TokenContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import MazeOnlineSolve from "../components/MazeOnlineSolve";
-import CheckMazeResults from "../components/CheckMazeResults";
+import CheckResults from "../components/CheckResults";
 import PDFButtons from "../components/PDFButtons";
 import TokenRefresher from "../utils/TokenRefresher";
 
@@ -118,7 +118,7 @@ export default function SolveMaze() {
       setIsSubmitDisabled(false);
     }
   }, [checkedMazeId, mazeId, mazeIdError, passcode, passcodeError]);
-  
+
   const [nickname, setNickname] = useState("");
   const [sentMaze, setSentMaze] = useState(null);
   const [sentPath, setSentPath] = useState(null);
@@ -257,13 +257,13 @@ export default function SolveMaze() {
             </Col>
           </Row>
 
-          {(showOnline && !checkData) && 
+          {(showOnline && !checkData) &&
           <>
             <MazeOnlineSolve data={maze} submitError={nicknameError} initialNickname={nickname} handleSubmit={handleSubmit} initialPath={sentPath} initialMaze={sentMaze} />
             <TokenRefresher token={token} setToken={setToken} />
           </>
           }
-          {checkData && <CheckMazeResults data={checkData} />}
+          {checkData && <CheckResults data={checkData} />}
         </>}
       </>}
     </>

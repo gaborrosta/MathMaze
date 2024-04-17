@@ -2,7 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, Dropdown, Row } from "react-bootstrap";
 import LoadingSpinner from "./LoadingSpinner";
-import CheckMazeResults from "./CheckMazeResults";
+import CheckResults from "./CheckResults";
 
 /**
  * AccountSolutionsTab displays the solutions to a maze.
@@ -72,7 +72,7 @@ export default function AccountSolutionsTab({ data, updateSelected, error }) {
         }
       </Row>
 
-      {selectedIndex !== -1 && <CheckMazeResults data={solutions[selectedIndex]} />}
+      {selectedIndex !== -1 && <CheckResults data={solutions[selectedIndex]} />}
     </>
   );
 }

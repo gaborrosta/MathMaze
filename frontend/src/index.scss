@@ -121,6 +121,13 @@ body {
 	border-right: none;
 }
 
+.centered-flex-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
 
 //Styles for solution
 .correct {
@@ -159,6 +166,32 @@ body {
 //Style for profile
 .icon:hover {
 	border-width: 3px !important;
+}
+
+
+//Style for uploading a maze
+.image-outer-container {
+	width: 100%;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.image-inner-container {
+	width: 100vh;
+	height: 100vh;
+	overflow: hidden;
+	position: relative;
+}
+
+.rotatedImage {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	height: 100%;
+	width: 100%;
+	object-fit: contain;
 }
 
 

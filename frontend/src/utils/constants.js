@@ -46,7 +46,7 @@ export const NICKNAME_REGEX = new RegExp(/^[A-Za-z0-9ÁÉÍÓÖŐÚÜŰáéíó�
  *
  * @type {RegExp}
  */
-export const INTEGER_REGEX = new RegExp(/^[1-9]\d*$/);
+export const INTEGER_REGEX = new RegExp(/^[0-9]*$/);
 
 /**
  * Regex for anything. It matches any string.

@@ -23,8 +23,8 @@ jest.mock("react-i18next", () => ({
   }
 }));
 
-//Mock the CheckMazeResults component
-jest.mock("./CheckMazeResults", () => () => <div>CheckMazeResults</div>);
+//Mock the CheckResults component
+jest.mock("./CheckResults", () => () => <div>CheckResults</div>);
 
 
 
@@ -111,7 +111,7 @@ describe("AccountSolutionsTab", () => {
     //Render the component
     render(<AccountSolutionsTab data={data} updateSelected={(a) => {}} error="" />);
 
-    expect(screen.getByText("CheckMazeResults")).toBeInTheDocument();
+    expect(screen.getByText("CheckResults")).toBeInTheDocument();
   });
 
 
