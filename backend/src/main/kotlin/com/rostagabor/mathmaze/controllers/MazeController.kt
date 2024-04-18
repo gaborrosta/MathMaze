@@ -115,7 +115,6 @@ class MazeController(
                 }
             )
         } catch (e: Exception) {
-            e.printStackTrace()
             ResponseEntity.badRequest().body(e::class.simpleName)
         }
     }

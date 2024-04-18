@@ -58,6 +58,7 @@ class UserServiceTest {
     @Test
     fun `run creates a new admin user when there is no admin user in the database`() {
         every { userRepository.findByEmail(ADMIN_EMAIL_ADDRESS) } returns null
+        every { userRepository.save(any()) } returns User()
 
         userService.run()
 
