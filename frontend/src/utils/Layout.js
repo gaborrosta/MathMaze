@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Container, Modal } from "react-bootstrap";
@@ -58,7 +58,10 @@ const Layout = () => {
 
 
   //Session expiration function
-  const expired = () => {
+  const expired = useCallback(() => {
+    if (!token) {
+      return;
+    }
     setToken("");
 
     //If the user is on the account page, redirect to the login page
@@ -68,7 +71,7 @@ const Layout = () => {
     } else {
       setSessionExpired(SessionExpired.OTHER_PAGE);
     }
-  }
+  }, [token]);
 
 
   //Check the token after a certain amount of time
@@ -108,7 +111,7 @@ const Layout = () => {
         clearTimeout(timeoutId.current);
       }
     };
-  }, [token]);
+  }, [token, expired]);
 
 
   //Render the layout

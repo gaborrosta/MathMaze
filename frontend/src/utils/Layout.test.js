@@ -153,7 +153,7 @@ describe("Layout", () => {
     expect(screen.getByText("session-expired-log-in")).toBeInTheDocument();
 
     //Check the navigation
-    expect(mockNavigate).toHaveBeenCalledTimes(2);
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith("/login?next=/account");
 
     //Check the sessionStorage
