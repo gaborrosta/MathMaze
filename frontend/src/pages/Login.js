@@ -136,9 +136,11 @@ export default function Login() {
       />
       <p>
         <Trans i18nKey="login-forgot-password">Did you forgot your password? You can create a new one <Link to="/reset-password">here</Link>.</Trans>
-        <br />
+      </p>
+      <p>
         {t("login-no-account")} <Link to="/signup">{t("login-create-account")}</Link>
-        <br />
+      </p>
+      <p>
         <Trans i18nKey="login-privacy-terms-help-link">You can read our <Link to="/privacy-policy">Privacy Policy</Link>, our <Link to="/terms-and-conditions">Terms and Conditions</Link>, and <Link to="/help">more</Link>.</Trans>
       </p>
     </>

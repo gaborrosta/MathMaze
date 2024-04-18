@@ -3,7 +3,7 @@ import { useTranslation, Trans } from "react-i18next";
 import { useNavigate, Link } from "react-router-dom"
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import axios from "axios";
-import { BACKEND_URL, EMAIL_REGEX, PASSWORD_REGEX, ANYTHING_REGEX, USERNAME_REGEX } from "../utils/constants";
+import { BACKEND_URL, EMAIL_REGEX, PASSWORD_REGEX, USERNAME_REGEX } from "../utils/constants";
 import TokenContext from "../utils/TokenContext";
 import BaseForm from "../utils/BaseForm";
 
@@ -26,7 +26,6 @@ export default function Signup() {
     username: "",
     email: "",
     password: "",
-    confirmPassword: "",
   };
   const validationSchema = {
     username: {
@@ -44,27 +43,11 @@ export default function Signup() {
       regex: PASSWORD_REGEX,
       regexError: "signup-password-error",
     },
-    confirmPassword: {
-      required: true,
-      regex: ANYTHING_REGEX,
-      regexError: "-",
-    },
   };
-  const customValidator = (formData) => {
-    if (formData.password !== "" && formData.confirmPassword !== "") {
-      if (formData.password !== formData.confirmPassword) {
-        return { confirmPassword: "signup-confirm-password-error" };
-      } else {
-        return { confirmPassword: "" };
-      }
-    }
-    return { confirmPassword: "" };
-  }
 
 
-  //Show password states
+  //Show password state
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
 
   //Token
@@ -91,7 +74,7 @@ export default function Signup() {
     .then(response => {
       setError("");
       setSuccess("success-signup");
-      setFormData({ email: "", password: "", confirmPassword: "", username: "" });
+      setFormData({ username: "", email: "", password: "" });
 
       setToken(response.data);
       setTimeout(() => {
@@ -100,10 +83,9 @@ export default function Signup() {
     })
     .catch(error => {
       setShowPassword(false);
-      setShowConfirmPassword(false);
 
       setSuccess("");
-      setFormData({ ...formData, password: "", confirmPassword: ""});
+      setFormData({ ...formData, password: ""});
 
       if (!error.response) {
         setError("error-unknown");
@@ -170,14 +152,6 @@ export default function Signup() {
             </Form.Text>
             {fieldErrors.password && <><br /><Form.Text className="text-danger">{t(fieldErrors.password)}</Form.Text></>}
           </Form.Group>
-          <Form.Group className="mb-3" controlId="confirmPassword">
-            <Form.Label>{t("signup-confirm-password")} <span className="text-danger">*</span></Form.Label>
-            <InputGroup>
-              <Form.Control required type={showConfirmPassword ? "text" : "password"} placeholder={t("signup-confirm-password-placeholder")} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} aria-describedby="confirmPasswordHelp fieldErrors.confirmPassword" />
-              <Button variant="outline-secondary" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>{showConfirmPassword ? t("password-hide") : t("password-show")}</Button>
-            </InputGroup>
-            {fieldErrors.confirmPassword && <Form.Text className="text-danger">{t(fieldErrors.confirmPassword)}</Form.Text>}
-          </Form.Group>
           <p>
             <Trans i18nKey="signup-privacy-terms-statement">By signing up, I state that I have read and accept the <Link to="/privacy-policy">Privacy Policy</Link> and the <Link to="/terms-and-conditions">Terms and Conditions</Link>.</Trans>
           </p>
@@ -200,7 +174,6 @@ export default function Signup() {
         validationSchema={validationSchema}
         form={form}
         buttonText="signup-title"
-        customValidator={customValidator}
       />
     </>
   );

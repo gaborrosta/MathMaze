@@ -147,7 +147,6 @@ describe("SetNewPassword", () => {
 
     //Get the elements
     const inputPassword = screen.getByPlaceholderText("signup-password-placeholder");
-    const inputConfirmPassword = screen.getByPlaceholderText("signup-confirm-password-placeholder");
     const button = screen.getByRole("button", { name: "set-new-password-title" });
 
     fireEvent.change(inputPassword, { target: { value: "password" } });
@@ -162,21 +161,7 @@ describe("SetNewPassword", () => {
 
     expect(inputPassword.value).toBe("Password123@");
 
-    expect(button).toBeDisabled();
-
     expect(screen.queryByText("signup-password-error")).not.toBeInTheDocument();
-
-    fireEvent.change(inputConfirmPassword, { target: { value: "password" } });
-
-    expect(inputConfirmPassword.value).toBe("password");
-
-    expect(button).toBeDisabled();
-
-    expect(screen.getByText("signup-confirm-password-error")).toBeInTheDocument();
-
-    fireEvent.change(inputConfirmPassword, { target: { value: "Password123@" } });
-
-    expect(inputConfirmPassword.value).toBe("Password123@");
 
     expect(button).toBeEnabled();
 
@@ -187,8 +172,6 @@ describe("SetNewPassword", () => {
     expect(screen.getByText("field-required")).toBeInTheDocument();
 
     expect(screen.queryByText("signup-password-error")).not.toBeInTheDocument();
-
-    expect(screen.queryByText("signup-confirm-password-error")).not.toBeInTheDocument();
 
     fireEvent.change(inputPassword, { target: { value: "Password123@" } });
 
@@ -218,7 +201,6 @@ describe("SetNewPassword", () => {
 
     //Fill the form
     fireEvent.input(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password123@" } });
-    fireEvent.input(screen.getByPlaceholderText("signup-confirm-password-placeholder"), { target: { value: "Password123@" } });
 
     await act(async () => {
       fireEvent.submit(screen.getByRole("button", { name: "set-new-password-title" }));
@@ -241,10 +223,8 @@ describe("SetNewPassword", () => {
 
     await waitFor(() => {
       expect(screen.getByText("success-set-new-password")).toBeInTheDocument();
+      expect(screen.queryByPlaceholderText("signup-password-placeholder")).not.toBeInTheDocument();
     });
-
-    expect(screen.getByPlaceholderText("signup-password-placeholder").value).toBe("");
-    expect(screen.getByPlaceholderText("signup-confirm-password-placeholder").value).toBe("");
   });
 
 
@@ -270,7 +250,6 @@ describe("SetNewPassword", () => {
 
     //Fill the form
     fireEvent.input(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password123@" } });
-    fireEvent.input(screen.getByPlaceholderText("signup-confirm-password-placeholder"), { target: { value: "Password123@" } });
 
     await act(async () => {
       fireEvent.submit(screen.getByRole("button", { name: "set-new-password-title" }));
@@ -296,7 +275,6 @@ describe("SetNewPassword", () => {
     });
 
     expect(screen.getByPlaceholderText("signup-password-placeholder").value).toBe("");
-    expect(screen.getByPlaceholderText("signup-confirm-password-placeholder").value).toBe("");
   });
 
 
@@ -322,7 +300,6 @@ describe("SetNewPassword", () => {
 
     //Fill the form
     fireEvent.input(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password123@" } });
-    fireEvent.input(screen.getByPlaceholderText("signup-confirm-password-placeholder"), { target: { value: "Password123@" } });
 
     await act(async () => {
       fireEvent.submit(screen.getByRole("button", { name: "set-new-password-title" }));
@@ -348,7 +325,6 @@ describe("SetNewPassword", () => {
     });
 
     expect(screen.getByPlaceholderText("signup-password-placeholder").value).toBe("");
-    expect(screen.getByPlaceholderText("signup-confirm-password-placeholder").value).toBe("");
   });
 
 
@@ -374,7 +350,6 @@ describe("SetNewPassword", () => {
 
     //Fill the form
     fireEvent.input(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password123@" } });
-    fireEvent.input(screen.getByPlaceholderText("signup-confirm-password-placeholder"), { target: { value: "Password123@" } });
 
     await act(async () => {
       fireEvent.submit(screen.getByRole("button", { name: "set-new-password-title" }));
@@ -400,7 +375,6 @@ describe("SetNewPassword", () => {
     });
 
     expect(screen.getByPlaceholderText("signup-password-placeholder").value).toBe("");
-    expect(screen.getByPlaceholderText("signup-confirm-password-placeholder").value).toBe("");
   });
 
 
@@ -424,19 +398,14 @@ describe("SetNewPassword", () => {
     });
 
     const passwordInput = screen.getByPlaceholderText("signup-password-placeholder");
-    const confirmPasswordInput = screen.getByPlaceholderText("signup-confirm-password-placeholder");
     const showPasswordButton = screen.getAllByRole("button", { name: "password-show" })[0];
-    const showConfirmPasswordButton = screen.getAllByRole("button", { name: "password-show" })[1];
 
     expect(passwordInput.type).toBe("password");
-    expect(confirmPasswordInput.type).toBe("password");
 
     act(() => {
       fireEvent.click(showPasswordButton);
-      fireEvent.click(showConfirmPasswordButton);
     });
 
     expect(passwordInput.type).toBe("text");
-    expect(confirmPasswordInput.type).toBe("text");
   });
 });

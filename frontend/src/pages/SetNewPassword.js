@@ -4,7 +4,7 @@ import { useSearchParams  } from "react-router-dom"
 import Loading from "react-fullscreen-loading";
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import axios from "axios";
-import { BACKEND_URL, PASSWORD_REGEX, ANYTHING_REGEX } from "../utils/constants";
+import { BACKEND_URL, PASSWORD_REGEX } from "../utils/constants";
 import BaseForm from "../utils/BaseForm";
 
 /**
@@ -65,10 +65,9 @@ export default function SetNewPassword() {
   }, [params]);
 
 
-  //Initial data, validation schema and custom validator
+  //Initial data and validation schema
   const initialData = {
     password: "",
-    confirmPassword: "",
   };
   const validationSchema = {
     password: {
@@ -76,27 +75,11 @@ export default function SetNewPassword() {
       regex: PASSWORD_REGEX,
       regexError: "signup-password-error",
     },
-    confirmPassword: {
-      required: true,
-      regex: ANYTHING_REGEX,
-      regexError: "-",
-    }
   };
-  const customValidator = (formData) => {
-    if (formData.password !== "" && formData.confirmPassword !== "") {
-      if (formData.password !== formData.confirmPassword) {
-        return { confirmPassword: "signup-confirm-password-error" };
-      } else {
-        return { confirmPassword: "" };
-      }
-    }
-    return { confirmPassword: "" };
-  }
 
 
-  //Show password states
+  //Show password state
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
 
   //Handle the set new password request
@@ -115,14 +98,13 @@ export default function SetNewPassword() {
     .then(_ => {
       setError("");
       setSuccess("success-set-new-password");
-      setFormData({ password: "", confirmPassword: "" });
+      setFormData({ password: "" });
     })
     .catch(error => {
       setShowPassword(false);
-      setShowConfirmPassword(false);
 
       setSuccess("");
-      setFormData({ password: "", confirmPassword: ""});
+      setFormData({ password: "" });
 
       if (!error.response) {
         setError("error-unknown");
@@ -148,28 +130,21 @@ export default function SetNewPassword() {
   const form = (formData, handleChange, fieldErrors, error, success, submitButton) => {
     return (
       <>
-        {error && <Alert variant="danger">{t(error)}</Alert>}
-        {success && <Alert variant="success">{t(success)}</Alert>}
-        <Form.Group className="mb-3" controlId="password">
-          <Form.Label>{t("password")} <span className="text-danger">*</span></Form.Label>
-          <InputGroup>
-            <Form.Control required type={showPassword ? "text" : "password"} placeholder={t("signup-password-placeholder")} name="password" value={formData.password} onChange={handleChange} aria-describedby="passwordHelp fieldErrors.password" />
-            <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>{showPassword ? t("password-hide") : t("password-show")}</Button>
-          </InputGroup>
-          <Form.Text id="passwordHelp" className="text-muted">
-            {t("signup-password-help")}
-          </Form.Text>
-          {fieldErrors.password && <><br /><Form.Text className="text-danger">{t(fieldErrors.password)}</Form.Text></>}
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="confirmPassword">
-          <Form.Label>{t("signup-confirm-password")} <span className="text-danger">*</span></Form.Label>
-          <InputGroup>
-            <Form.Control required type={showConfirmPassword ? "text" : "password"} placeholder={t("signup-confirm-password-placeholder")} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} aria-describedby="confirmPasswordHelp fieldErrors.confirmPassword" />
-            <Button variant="outline-secondary" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>{showConfirmPassword ? t("password-hide") : t("password-show")}</Button>
-          </InputGroup>
-          {fieldErrors.confirmPassword && <Form.Text className="text-danger">{t(fieldErrors.confirmPassword)}</Form.Text>}
-        </Form.Group>
-        {submitButton}
+        {success ? <Alert variant="success">{t(success)}</Alert> : <>
+          {error && <Alert variant="danger">{t(error)}</Alert>}
+          <Form.Group className="mb-3" controlId="password">
+            <Form.Label>{t("password")} <span className="text-danger">*</span></Form.Label>
+            <InputGroup>
+              <Form.Control required type={showPassword ? "text" : "password"} placeholder={t("signup-password-placeholder")} name="password" value={formData.password} onChange={handleChange} aria-describedby="passwordHelp fieldErrors.password" />
+              <Button variant="outline-secondary" onClick={() => setShowPassword(!showPassword)}>{showPassword ? t("password-hide") : t("password-show")}</Button>
+            </InputGroup>
+            <Form.Text id="passwordHelp" className="text-muted">
+              {t("signup-password-help")}
+            </Form.Text>
+            {fieldErrors.password && <><br /><Form.Text className="text-danger">{t(fieldErrors.password)}</Form.Text></>}
+          </Form.Group>
+          {submitButton}
+        </>}
       </>
     );
   };
@@ -192,7 +167,6 @@ export default function SetNewPassword() {
             validationSchema={validationSchema}
             form={form}
             buttonText="set-new-password-title"
-            customValidator={customValidator}
           />
         }
       </>}

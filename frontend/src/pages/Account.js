@@ -45,7 +45,7 @@ export default function Account() {
     setModalVisible(true);
   };
 
-  const closeModal = () => {
+  const closeModal = (_) => {
     setMaze("");
     setModalVisible(false);
   };
@@ -130,16 +130,13 @@ export default function Account() {
   const [formData, setFormData] = useState({
     oldPassword: "",
     newPassword: "",
-    confirmPassword: "",
   });
 
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [oldPasswordError, setOldPasswordError] = useState(null);
   const [newPasswordError, setNewPasswordError] = useState(null);
-  const [confirmPasswordError, setConfirmPasswordError] = useState(null);
 
   const [passwordError, setPasswordError] = useState(null);
   const [passwordSuccess, setPasswordSuccess] = useState(null);
@@ -149,7 +146,7 @@ export default function Account() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  
+
     if (e.target.name === "oldPassword") {
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\W)[A-Za-z\d\W]{8,20}$/;
       if (e.target.value) {
@@ -167,37 +164,22 @@ export default function Account() {
       if (e.target.value) {
         if (!passwordRegex.test(e.target.value)) {
           setNewPasswordError("signup-password-error");
-        } else if (e.target.value === formData.confirmPassword) {
-          setConfirmPasswordError("");
-          setNewPasswordError("");
         } else {
-          setConfirmPasswordError("signup-confirm-password-error");
           setNewPasswordError("");
         }
       } else {
         setNewPasswordError("");
-
-        if (!formData.confirmPassword) {
-          setConfirmPasswordError("");
-        }
-      }
-    }
-    else if (e.target.name === "confirmPassword") {
-      if (e.target.value !== formData.newPassword) {
-        setConfirmPasswordError("signup-confirm-password-error");
-      } else {
-        setConfirmPasswordError("");
       }
     }
   };
 
   useEffect(() => {
-    if (oldPasswordError || newPasswordError || confirmPasswordError || !formData.oldPassword || !formData.newPassword || !formData.confirmPassword) {
+    if (oldPasswordError || newPasswordError || !formData.oldPassword || !formData.newPassword) {
       setIsSubmitDisabled(true);
     } else {
       setIsSubmitDisabled(false);
     }
-  }, [oldPasswordError, newPasswordError, confirmPasswordError, formData]);
+  }, [oldPasswordError, newPasswordError, formData]);
 
   const handleSetNewPassword = (e) => {
     e.preventDefault();
@@ -243,7 +225,7 @@ export default function Account() {
       }
     })
     .finally(() => {
-      setFormData({ oldPassword: "", newPassword: "", confirmPassword: ""});
+      setFormData({ oldPassword: "", newPassword: "" });
       setIsRequestInProgress(false);
     });
   }
@@ -271,7 +253,7 @@ export default function Account() {
           setDownloadError("error-unknown");
           return;
         }
-  
+
         switch (error.response.data) {
           case "InvalidMazeIdException":
             setDownloadError("error-save-maze-invalid-id");
@@ -307,7 +289,7 @@ export default function Account() {
       {error && <Alert variant="danger">{t(error)}</Alert>}
 
       {loading ? <LoadingSpinner /> : error ? null : <>
-        {solutionsTabs.length > 0 && 
+        {solutionsTabs.length > 0 &&
           <div className="text-end">
             <Button className="mb-3" onClick={() => {
               setKey("maze");
@@ -403,7 +385,7 @@ export default function Account() {
                 </Col>
               </Row>
             }
-            <MazeModal data={maze} visible={modalVisible} setVisible={closeModal} locations={locations} mazeChanged={mazeChanged} locationsChanged={locationsChanged} />
+            <MazeModal data={maze} visible={modalVisible} setVisible={closeModal} locations={locations} changed={(maze, locations) => {mazeChanged(maze); locationsChanged(locations) }} />
             <EditLocation location={editLocation} visible={editLocationModalVisible} setVisible={setEditLocationModalVisible} changed={(mazes, locations) => {mazesChanged(mazes); locationsChanged(locations) }} />
           </Tab>
           <Tab eventKey="settings" title={t("account-settings")}>
@@ -431,14 +413,6 @@ export default function Account() {
                   </Form.Text>
                   {newPasswordError && <><br /><Form.Text id="newPasswordError" className="text-danger" aria-live="polite">{t(newPasswordError)}</Form.Text></>}
                 </Form.Group>
-                <Form.Group className="mb-3" controlId="confirmPassword">
-                  <Form.Label>{t("account-confirm-new-password")}</Form.Label>
-                  <InputGroup>
-                    <Form.Control required type={showConfirmPassword ? "text" : "password"} placeholder={t("account-confirm-new-password-placeholder")} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} aria-describedby="confirmPasswordHelp confirmPasswordError" />
-                    <Button variant="outline-secondary" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>{showConfirmPassword ? t("password-hide") : t("password-show")}</Button>
-                  </InputGroup>
-                  {confirmPasswordError && <Form.Text id="confirmPasswordError" className="text-danger" aria-live="polite">{t(confirmPasswordError)}</Form.Text>}
-                </Form.Group>
                 <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
                   {t("set-new-password-title")}
                 </Button>
@@ -446,7 +420,7 @@ export default function Account() {
             </Col>
           </Tab>
           {solutionsTabs.map(tab => (
-            <Tab 
+            <Tab
               eventKey={tab}
               title={
                 <div>
@@ -458,7 +432,7 @@ export default function Account() {
                     }}
                   />
                 </div>
-              } 
+              }
               key={tab}
             >
               <AccountSolutionsTab data={downloadedSolutions[tab]} error={downloadError} updateSelected={(newData) => {

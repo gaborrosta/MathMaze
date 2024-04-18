@@ -60,7 +60,6 @@ describe("Signup", () => {
     const inputUsername = screen.getByPlaceholderText("signup-username-placeholder");
     const inputEmail = screen.getByPlaceholderText("email-placeholder");
     const inputPassword = screen.getByPlaceholderText("signup-password-placeholder");
-    const inputConfirmPassword = screen.getByPlaceholderText("signup-confirm-password-placeholder");
     const button = screen.getByRole("button", { name: "signup-title" });
 
     fireEvent.change(inputUsername, { target: { value: "user" } });
@@ -135,44 +134,6 @@ describe("Signup", () => {
 
     expect(screen.queryByText("field-required")).not.toBeInTheDocument();
 
-    expect(button).toBeDisabled();
-
-    fireEvent.change(inputConfirmPassword, { target: { value: "invalid" } });
-
-    expect(inputConfirmPassword.value).toBe("invalid");
-
-    expect(screen.getByText("signup-confirm-password-error")).toBeInTheDocument();
-
-    expect(button).toBeDisabled();
-
-    fireEvent.change(inputPassword, { target: { value: "" } });
-
-    expect(inputPassword.value).toBe("");
-
-    expect(screen.getByText("field-required")).toBeInTheDocument();
-
-    expect(screen.queryByText("signup-confirm-password-error")).not.toBeInTheDocument();
-
-    expect(button).toBeDisabled();
-
-    fireEvent.change(inputPassword, { target: { value: "Password@123" } });
-
-    expect(inputPassword.value).toBe("Password@123");
-
-    fireEvent.change(inputConfirmPassword, { target: { value: "" } });
-
-    expect(inputConfirmPassword.value).toBe("");
-
-    expect(screen.getByText("field-required")).toBeInTheDocument();
-
-    expect(button).toBeDisabled();
-
-    fireEvent.change(inputConfirmPassword, { target: { value: "Password@123" } });
-
-    expect(inputConfirmPassword.value).toBe("Password@123");
-
-    expect(screen.queryByText("field-required")).not.toBeInTheDocument();
-
     expect(button).toBeEnabled();
   });
 
@@ -195,7 +156,6 @@ describe("Signup", () => {
     fireEvent.change(screen.getByPlaceholderText("signup-username-placeholder"), { target: { value: "username" } });
     fireEvent.change(screen.getByPlaceholderText("email-placeholder"), { target: { value: "test@example.com" } });
     fireEvent.change(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password@123" } });
-    fireEvent.change(screen.getByPlaceholderText("signup-confirm-password-placeholder"), { target: { value: "Password@123" } });
 
     await act(async () => {
       fireEvent.submit(screen.getByRole("button", { name: "signup-title" }));
@@ -226,7 +186,6 @@ describe("Signup", () => {
     expect(screen.queryByPlaceholderText("signup-username-placeholder")).not.toBeInTheDocument();
     expect(screen.queryByPlaceholderText("email-placeholder")).not.toBeInTheDocument();
     expect(screen.queryByPlaceholderText("signup-password-placeholder")).not.toBeInTheDocument();
-    expect(screen.queryByPlaceholderText("signup-confirm-password-placeholder")).not.toBeInTheDocument();
 
     await act(async () => {
       //Fast-forward timers
@@ -252,7 +211,6 @@ describe("Signup", () => {
     fireEvent.change(screen.getByPlaceholderText("signup-username-placeholder"), { target: { value: "username" } });
     fireEvent.change(screen.getByPlaceholderText("email-placeholder"), { target: { value: "test@example.com" } });
     fireEvent.change(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password@123" } });
-    fireEvent.change(screen.getByPlaceholderText("signup-confirm-password-placeholder"), { target: { value: "Password@123" } });
 
     await act(async () => {
       fireEvent.submit(screen.getByRole("button", { name: "signup-title" }));
@@ -279,7 +237,6 @@ describe("Signup", () => {
     });
 
     expect(screen.getByPlaceholderText("signup-password-placeholder").value).toBe("");
-    expect(screen.getByPlaceholderText("signup-confirm-password-placeholder").value).toBe("");
   });
 
 
@@ -298,7 +255,6 @@ describe("Signup", () => {
     fireEvent.change(screen.getByPlaceholderText("signup-username-placeholder"), { target: { value: "username" } });
     fireEvent.change(screen.getByPlaceholderText("email-placeholder"), { target: { value: "test@example.com" } });
     fireEvent.change(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password@123" } });
-    fireEvent.change(screen.getByPlaceholderText("signup-confirm-password-placeholder"), { target: { value: "Password@123" } });
 
     await act(async () => {
       fireEvent.submit(screen.getByRole("button", { name: "signup-title" }));
@@ -325,7 +281,6 @@ describe("Signup", () => {
     });
 
     expect(screen.getByPlaceholderText("signup-password-placeholder").value).toBe("");
-    expect(screen.getByPlaceholderText("signup-confirm-password-placeholder").value).toBe("");
   });
 
 
@@ -344,7 +299,6 @@ describe("Signup", () => {
     fireEvent.change(screen.getByPlaceholderText("signup-username-placeholder"), { target: { value: "username" } });
     fireEvent.change(screen.getByPlaceholderText("email-placeholder"), { target: { value: "test@example.com" } });
     fireEvent.change(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password@123" } });
-    fireEvent.change(screen.getByPlaceholderText("signup-confirm-password-placeholder"), { target: { value: "Password@123" } });
 
     await act(async () => {
       fireEvent.submit(screen.getByRole("button", { name: "signup-title" }));
@@ -371,7 +325,6 @@ describe("Signup", () => {
     });
 
     expect(screen.getByPlaceholderText("signup-password-placeholder").value).toBe("");
-    expect(screen.getByPlaceholderText("signup-confirm-password-placeholder").value).toBe("");
   });
 
 
@@ -390,7 +343,6 @@ describe("Signup", () => {
     fireEvent.change(screen.getByPlaceholderText("signup-username-placeholder"), { target: { value: "username" } });
     fireEvent.change(screen.getByPlaceholderText("email-placeholder"), { target: { value: "test@example.com" } });
     fireEvent.change(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password@123" } });
-    fireEvent.change(screen.getByPlaceholderText("signup-confirm-password-placeholder"), { target: { value: "Password@123" } });
 
     await act(async () => {
       fireEvent.submit(screen.getByRole("button", { name: "signup-title" }));
@@ -417,7 +369,6 @@ describe("Signup", () => {
     });
 
     expect(screen.getByPlaceholderText("signup-password-placeholder").value).toBe("");
-    expect(screen.getByPlaceholderText("signup-confirm-password-placeholder").value).toBe("");
   });
 
 
@@ -436,7 +387,6 @@ describe("Signup", () => {
     fireEvent.change(screen.getByPlaceholderText("signup-username-placeholder"), { target: { value: "username" } });
     fireEvent.change(screen.getByPlaceholderText("email-placeholder"), { target: { value: "test@example.com" } });
     fireEvent.change(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password@123" } });
-    fireEvent.change(screen.getByPlaceholderText("signup-confirm-password-placeholder"), { target: { value: "Password@123" } });
 
     await act(async () => {
       fireEvent.submit(screen.getByRole("button", { name: "signup-title" }));
@@ -463,7 +413,6 @@ describe("Signup", () => {
     });
 
     expect(screen.getByPlaceholderText("signup-password-placeholder").value).toBe("");
-    expect(screen.getByPlaceholderText("signup-confirm-password-placeholder").value).toBe("");
   });
 
 
@@ -482,7 +431,6 @@ describe("Signup", () => {
     fireEvent.change(screen.getByPlaceholderText("signup-username-placeholder"), { target: { value: "username" } });
     fireEvent.change(screen.getByPlaceholderText("email-placeholder"), { target: { value: "test@example.com" } });
     fireEvent.change(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password@123" } });
-    fireEvent.change(screen.getByPlaceholderText("signup-confirm-password-placeholder"), { target: { value: "Password@123" } });
 
     await act(async () => {
       fireEvent.submit(screen.getByRole("button", { name: "signup-title" }));
@@ -509,7 +457,6 @@ describe("Signup", () => {
     });
 
     expect(screen.getByPlaceholderText("signup-password-placeholder").value).toBe("");
-    expect(screen.getByPlaceholderText("signup-confirm-password-placeholder").value).toBe("");
   });
 
 
@@ -528,7 +475,6 @@ describe("Signup", () => {
     fireEvent.change(screen.getByPlaceholderText("signup-username-placeholder"), { target: { value: "username" } });
     fireEvent.change(screen.getByPlaceholderText("email-placeholder"), { target: { value: "test@example.com" } });
     fireEvent.change(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password@123" } });
-    fireEvent.change(screen.getByPlaceholderText("signup-confirm-password-placeholder"), { target: { value: "Password@123" } });
 
     await act(async () => {
       fireEvent.submit(screen.getByRole("button", { name: "signup-title" }));
@@ -555,7 +501,6 @@ describe("Signup", () => {
     });
 
     expect(screen.getByPlaceholderText("signup-password-placeholder").value).toBe("");
-    expect(screen.getByPlaceholderText("signup-confirm-password-placeholder").value).toBe("");
   });
 
 
@@ -568,19 +513,14 @@ describe("Signup", () => {
     );
 
     const passwordInput = screen.getByPlaceholderText("signup-password-placeholder");
-    const confirmPasswordInput = screen.getByPlaceholderText("signup-confirm-password-placeholder");
     const showPasswordButton = screen.getAllByRole("button", { name: "password-show" })[0];
-    const showConfirmPasswordButton = screen.getAllByRole("button", { name: "password-show" })[1];
 
     expect(passwordInput.type).toBe("password");
-    expect(confirmPasswordInput.type).toBe("password");
 
     act(() => {
       fireEvent.click(showPasswordButton);
-      fireEvent.click(showConfirmPasswordButton);
     });
 
     expect(passwordInput.type).toBe("text");
-    expect(confirmPasswordInput.type).toBe("text");
   });
 });
