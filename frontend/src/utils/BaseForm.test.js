@@ -127,6 +127,16 @@ describe("BaseForm", () => {
   });
 
 
+  it("throws an error if extraCheckForSubmitButton is not a function", () => {
+    expect(() => render(<BaseForm onSubmit={(a, b, c, d, e) => {}} initialData={{ name: "" }} validationSchema={{ name: { regex: new RegExp(/.{1,100}/), regexError: "name-error" }}} form={(a, b, c, d, e, f) => {}} buttonText="test" extraCheckForSubmitButton="test" />)).toThrow("extraCheckForSubmitButton must be a function.");
+  });
+
+
+  it("throws an error if extraCheckForSubmitButton has less than 1 parameter", () => {
+    expect(() => render(<BaseForm onSubmit={(a, b, c, d, e) => {}} initialData={{ name: "" }} validationSchema={{ name: { regex: new RegExp(/.{1,100}/), regexError: "name-error" }}} form={(a, b, c, d, e, f) => {}} buttonText="test" extraCheckForSubmitButton={() => {}} />)).toThrow("extraCheckForSubmitButton must have 1 parameter.");
+  });
+
+
   it("handles form field changes correctly", async () => {
     //Parameters
     const onSubmit = jest.fn((a, b, c, d, e) => {});
@@ -311,6 +321,40 @@ describe("BaseForm", () => {
     expect(screen.getByText("success")).toBeInTheDocument();
 
     expect(input.value).toBe("done");
+
+    expect(button).toBeDisabled();
+  });
+
+
+  it("handles submit button status with extraCheckForSubmitButton", async () => {
+    //Parameters
+    const onSubmit = jest.fn((a, b, c, d, e) => {});
+    const initialData = { name: "" };
+    const validationSchema = { name: { required: true, regex: new RegExp(/.{2,100}/), regexError: "name-error" } };
+    const form = (formData, handleChange, fieldErrors, error, success, submitButton) => {
+      return (
+        <>
+          <Form.Group>
+            <Form.Control required type="text" name="name" value={formData.name} onChange={handleChange} />
+            {fieldErrors.name}
+          </Form.Group>
+          {submitButton}
+        </>
+      );
+    };
+    const buttonText = "Submit";
+    const extraCheckForSubmitButton = (formData) => true;
+
+    //Render the component
+    render(<BaseForm onSubmit={onSubmit} initialData={initialData} validationSchema={validationSchema} form={form} buttonText={buttonText} extraCheckForSubmitButton={extraCheckForSubmitButton} />);
+
+    //Get the elements
+    const input = screen.getByRole("textbox");
+    const button = screen.getByRole("button");
+
+    fireEvent.change(input, { target: { value: "test" } });
+
+    expect(input.value).toBe("test");
 
     expect(button).toBeDisabled();
   });

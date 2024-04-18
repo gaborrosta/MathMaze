@@ -29,12 +29,13 @@ import StatelessForm from "./StatelessForm";
  *   - submitButton: The submit button for the form.
  * @param {string} props.buttonText - The key of the text to display on the submit button. Example: `"reset-password-submit"`
  * @param {Function} props.customValidator - An optional function to perform additional validation on the form. It receives the current form data and should return an object containing a key if there is an error. If the value in the object is an empty string, then the custom error is removed from that field.
+ * @param {Function} props.extraCheckForSubmitButton - An optional function to perform additional checks on the form data before enabling the submit button. It receives the current form data and should return a boolean indicating whether the submit button should be disabled.
  *
  * @returns {React.Element} The BaseForm component.
  */
-export default function BaseForm({ onSubmit, initialData, validationSchema, form, buttonText, customValidator }) {
+export default function BaseForm({ onSubmit, initialData, validationSchema, form, buttonText, customValidator, extraCheckForSubmitButton }) {
   //Check the parameters
-  checkParameters(onSubmit, initialData, validationSchema, form, buttonText, customValidator);
+  checkParameters(onSubmit, initialData, validationSchema, form, buttonText, customValidator, extraCheckForSubmitButton);
 
 
   //Localisation
@@ -86,7 +87,16 @@ export default function BaseForm({ onSubmit, initialData, validationSchema, form
             _fieldErrors,
             error,
             success,
-            <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
+            <Button
+              className="mb-3"
+              variant="primary"
+              type="submit"
+              disabled={
+                isSubmitDisabled ||
+                isRequestInProgress ||
+                (extraCheckForSubmitButton !== undefined && extraCheckForSubmitButton(_formData))
+              }
+            >
               {t(buttonText)}
             </Button>
           )
@@ -101,7 +111,7 @@ export default function BaseForm({ onSubmit, initialData, validationSchema, form
 /**
  * Checks the parameters passed to the BaseForm component.
  */
-function checkParameters(onSubmit, initialData, validationSchema, form, buttonText, customValidator) {
+function checkParameters(onSubmit, initialData, validationSchema, form, buttonText, customValidator, extraCheckForSubmitButton) {
   if (onSubmit === undefined) {
     throw new Error("onSubmit is required.");
   }
@@ -168,6 +178,15 @@ function checkParameters(onSubmit, initialData, validationSchema, form, buttonTe
     }
     if (customValidator.length !== 1) {
       throw new Error("customValidator must have 1 parameter.");
+    }
+  }
+
+  if (extraCheckForSubmitButton !== undefined) {
+    if (typeof extraCheckForSubmitButton !== "function") {
+      throw new Error("extraCheckForSubmitButton must be a function.");
+    }
+    if (extraCheckForSubmitButton.length !== 1) {
+      throw new Error("extraCheckForSubmitButton must have 1 parameter.");
     }
   }
 }

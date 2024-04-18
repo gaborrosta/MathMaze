@@ -41,7 +41,7 @@ export default function StatelessForm({ formData, validationSchema, fieldErrors,
 
     //Validate the field
     const fieldSchema = validationSchema[name];
-    if (fieldSchema.fileTypes !== undefined) { //files !== null &&
+    if (fieldSchema.fileTypes !== undefined) {
       //It is a file, so delete the saved value.
       delete newFormData[name];
 
