@@ -1,48 +1,77 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert } from "react-bootstrap";
+import axios from "axios";
+import { BACKEND_URL } from "../utils/constants";
+import TokenContext from "../utils/TokenContext";
+import TokenRefresher from "../utils/TokenRefresher";
 import LoadingSpinner from "../components/LoadingSpinner";
 import CheckUploadMaze from "../components/CheckUploadMaze";
 import CheckRecognisedMaze from "../components/CheckRecognisedMaze";
 import CheckResults from "../components/CheckResults";
-import { BACKEND_URL } from "../utils/constants";
-import axios from "axios";
-import TokenContext from "../utils/TokenContext";
-import TokenRefresher from "../utils/TokenRefresher";
 
+/**
+ * CheckMaze renders the maze checker page to upload a scanned maze.
+ *
+ * @returns {React.Element} The CheckMaze component.
+ */
 export default function CheckMaze() {
+  //Localisation
   const { t } = useTranslation();
 
+
+  //Set the page title
   useEffect(() => { document.title = t("maze-check-title") + " | " + t("app-name"); });
 
+
+  //Token
   const { token, setToken } = useContext(TokenContext);
 
+
+  //Actual step
   const [step, setStep] = useState(0);
+
+  //Recognised maze data
   const [recognisedData, setRecognisedData] = useState({});
+
+  //Checked maze data
   const [checkData, setCheckData] = useState({});
 
+  //Maze ID
   const [mazeId, setMazeId] = useState("");
+
+  //Nickname
   const [nickname, setNickname] = useState("");
 
+
+  //Loading and error handling
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit1 = async (data) => {
+
+  //Upload the image
+  const uploadImage = async (data) => {
+    //Loading
     setLoading(true);
 
+    //Add token
     data.append("token", token);
 
+    //Save maze ID
     setMazeId(data.get("mazeId"));
 
+    //Send data
     axios.post(`${BACKEND_URL}/maze/recognise`, data, {
       headers: {
         "Content-Type": "multipart/form-data"
       }
     })
     .then(response => {
-      setError("");
-      setToken(response.data.token);
       setLoading(false);
+      setError("");
+
+      //Move to the next step
+      setToken(response.data.token);
       setRecognisedData(response.data.recognisedMaze);
       setStep(1);
     })
@@ -74,27 +103,36 @@ export default function CheckMaze() {
     });
   };
 
-  const handleSubmit2 = async (data) => {
+  //Check the maze
+  const checkMaze = async (data) => {
+    //Loading
     setLoading(true);
 
-    data["token"] = token;
+    //Add token
+    data.token = token;
 
+    //Save nickname
     setNickname(data.nickname);
+
+    //Save data
     setRecognisedData(prevData => ({
       ...prevData,
       data: data.data,
       path: data.path,
     }));
 
+    //Send data
     axios.post(`${BACKEND_URL}/maze/check`, data, {
       headers: {
         "Content-Type": "application/json"
       }
     })
     .then(response => {
-      setError("");
-      setToken(response.data.token);
       setLoading(false);
+      setError("");
+
+      //Move to the next step
+      setToken(response.data.token);
       setCheckData(response.data.checkedMaze);
       setStep(2);
     })
@@ -132,25 +170,26 @@ export default function CheckMaze() {
     });
   }
 
+
+  //Render the page
   return (
     <>
       <center>
         <h1>{t("maze-check-title")}</h1>
       </center>
+
       <p>{t("maze-check-info")}</p>
 
-      {loading ? <LoadingSpinner /> : (
-        <>
-          {error && <Alert variant="danger">{t(error)}</Alert>}
+      {loading ? <LoadingSpinner /> : <>
+        {error && <Alert variant="danger">{t(error)}</Alert>}
 
-          {step === 0 && <CheckUploadMaze handleSubmit={handleSubmit1} initialId={mazeId}/>}
-          {step === 1 && <>
-            <TokenRefresher token={token} setToken={setToken} />
-            <CheckRecognisedMaze data={recognisedData} initialNickname={nickname} handleSubmit={handleSubmit2} />
-          </>}
-          {step === 2 && <CheckResults data={checkData} />}
-        </>
-      )}
+        {step === 0 && <CheckUploadMaze initialId={mazeId} handleSubmit={uploadImage} />}
+        {step === 1 && <>
+          <CheckRecognisedMaze data={recognisedData} initialNickname={nickname} handleSubmit={checkMaze} />
+          <TokenRefresher token={token} setToken={setToken} />
+        </>}
+        {step === 2 && <CheckResults data={checkData} />}
+      </>}
     </>
   );
 };

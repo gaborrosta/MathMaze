@@ -125,7 +125,8 @@ describe("CheckUploadMaze", () => {
     fireEvent.click(submit);
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledTimes(1); //The actual parameter cannot be tested.
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledWith(expect.any(FormData));
     });
 
     global.URL.createObjectURL.mockRestore();

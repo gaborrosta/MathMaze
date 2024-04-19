@@ -197,3 +197,49 @@ body {
 
 //Import Bootstrap
 @import "~bootstrap/scss/bootstrap";
+
+
+//Styles for MazeModal
+.until-md {
+	display: none;
+}
+
+@include media-breakpoint-down(md) {
+	.until-md {
+		display: block;
+	}
+}
+
+.modal-container {
+	width: 100%;
+}
+
+@include media-breakpoint-up(sm) {
+	.modal-container {
+		max-width: 540px;
+	}
+}
+
+@include media-breakpoint-up(md) {
+	.modal-container {
+		max-width: 720px;
+	}
+}
+
+@include media-breakpoint-up(lg) {
+	.modal-container {
+		max-width: 960px;
+	}
+}
+
+@include media-breakpoint-up(xl) {
+	.modal-container {
+		max-width: 1140px;
+	}
+}
+
+@include media-breakpoint-up(xxl) {
+	.modal-container {
+		max-width: 1320px;
+	}
+}
