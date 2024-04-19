@@ -168,7 +168,7 @@ function EditLocationContent({ location, changed }) {
 /**
  * Checks the parameters passed to the EditLocation component.
  */
-function checkParameters1(visible, setVisible, location, changed) {
+function checkParameters1(visible, setVisible) {
   if (visible === undefined) {
     throw new Error("visible is required.");
   }

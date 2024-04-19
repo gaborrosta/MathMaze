@@ -138,7 +138,7 @@ describe("Login", () => {
 
   it("renders and submits the form when the form is valid with nextPage", async () => {
     //Mock the useLocation hook
-    jest.spyOn(require('react-router-dom'), 'useLocation').mockReturnValue({ search: "?next=/accoun" })
+    jest.spyOn(require("react-router-dom"), "useLocation").mockReturnValue({ search: "?next=/accoun" })
 
     //Mock the API call
     axios.post.mockResolvedValue({ response: { data: "" } });

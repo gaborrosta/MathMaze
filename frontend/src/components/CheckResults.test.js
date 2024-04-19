@@ -328,42 +328,42 @@ describe("CheckResults", () => {
     //Render the component
     const { container } = render(<CheckResults data={{width: 5, height: 5, start: [0, 0], end: [4, 4], data: [[{}, {isUserPath: true, isMazePath: true}, {isUserPath: true, isMazePath: false, result:4, expectedResult:4, operation: "1 + 1"},  {isUserPath: true, isMazePath: false}, {isUserPath: false, isMazePath: true}], [{isUserPath: false, isMazePath: false}, {isUserPath: true, isMazePath: true, result:4, expectedResult:4, operation: "1 + 1"}, {}, {}, {}], [{isUserPath: true, isMazePath: true, result:4, expectedResult:5, operation: "1 + 1"}, {}, {}, {}, {}], [{isUserPath: false, isMazePath: false, result:4, expectedResult:5, operation: "1 + 1"}, {isUserPath: false, isMazePath: true, result:4, expectedResult:5, operation: "1 + 1"}, {}, {}, {}], [{}, {}, {isUserPath: true, isMazePath: false, result:4, expectedResult:4, operation: "1 + 1"}, {}, {}]], info: {nickname: "test", correct: 0, incorrect: 0, correctPath: 0, missedPath: 0, wrongPath: 0}}} />);
 
-    expect(container.querySelectorAll('.correct-path').length).toBe(0);
+    expect(container.querySelectorAll(".correct-path").length).toBe(0);
 
-    expect(container.querySelectorAll('.missed-path').length).toBe(0);
+    expect(container.querySelectorAll(".missed-path").length).toBe(0);
 
-    expect(container.querySelectorAll('.wrong-path').length).toBe(0);
+    expect(container.querySelectorAll(".wrong-path").length).toBe(0);
 
-    expect(container.querySelectorAll('.correct').length).toBe(3);
+    expect(container.querySelectorAll(".correct").length).toBe(3);
 
-    expect(container.querySelectorAll('.wrong').length).toBe(4);
+    expect(container.querySelectorAll(".wrong").length).toBe(4);
 
     expect(screen.getByRole("button", { name: "maze-check-result-type-computations" })).toBeDisabled();
 
     fireEvent.click(screen.getByRole("button", { name: "maze-check-result-type-path" }));
 
-    expect(container.querySelectorAll('.correct-path').length).toBe(3);
+    expect(container.querySelectorAll(".correct-path").length).toBe(3);
 
-    expect(container.querySelectorAll('.missed-path').length).toBe(3);
+    expect(container.querySelectorAll(".missed-path").length).toBe(3);
 
-    expect(container.querySelectorAll('.wrong-path').length).toBe(4);
+    expect(container.querySelectorAll(".wrong-path").length).toBe(4);
 
     expect(screen.getByRole("button", { name: "maze-check-result-type-path" })).toBeDisabled();
 
     fireEvent.click(screen.getByRole("button", { name: "maze-check-result-type-computations" }));
 
-    expect(container.querySelectorAll('.correct-path').length).toBe(0);
+    expect(container.querySelectorAll(".correct-path").length).toBe(0);
 
-    expect(container.querySelectorAll('.missed-path').length).toBe(0);
+    expect(container.querySelectorAll(".missed-path").length).toBe(0);
 
-    expect(container.querySelectorAll('.wrong-path').length).toBe(0);
+    expect(container.querySelectorAll(".wrong-path").length).toBe(0);
 
-    expect(container.querySelectorAll('.correct').length).toBe(3);
+    expect(container.querySelectorAll(".correct").length).toBe(3);
 
-    expect(container.querySelectorAll('.wrong').length).toBe(4);
+    expect(container.querySelectorAll(".wrong").length).toBe(4);
 
     expect(screen.getByRole("button", { name: "maze-check-result-type-computations" })).toBeDisabled();
 
-    expect(container.querySelectorAll('.yellow').length).toBe(17);
+    expect(container.querySelectorAll(".yellow").length).toBe(17);
   });
 });

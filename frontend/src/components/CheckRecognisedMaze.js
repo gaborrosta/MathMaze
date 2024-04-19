@@ -39,7 +39,7 @@ export default function CheckRecognisedMaze({ data, initialNickname, handleSubmi
 
 
   //Regex for cells
-  const regex = new RegExp(INTEGER_REGEX.source + '|' + EMPTY_STRING_REGEX.source);
+  const regex = new RegExp(INTEGER_REGEX.source + "|" + EMPTY_STRING_REGEX.source);
 
 
   //Handle the path data change

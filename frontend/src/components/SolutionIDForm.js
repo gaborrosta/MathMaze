@@ -30,19 +30,19 @@ export default function SolutionIDForm({ index, onStateChange, onErrorChange }) 
   const validationSchemaForSolutionId = {
     solutionId: {
       required: false,
-      regex: new RegExp(INTEGER_REGEX.source + '|' + EMPTY_STRING_REGEX.source),
+      regex: new RegExp(INTEGER_REGEX.source + "|" + EMPTY_STRING_REGEX.source),
       regexError: "maze-generate-solution-id-invalid",
     },
   };
   const validationSchemaForMazeId = {
     mazeId: {
       required: false,
-      regex: new RegExp(INTEGER_REGEX.source + '|' + EMPTY_STRING_REGEX.source),
+      regex: new RegExp(INTEGER_REGEX.source + "|" + EMPTY_STRING_REGEX.source),
       regexError: "maze-generate-maze-id-invalid",
     },
     nickname: {
       required: false,
-      regex: new RegExp(NICKNAME_REGEX.source + '|' + EMPTY_STRING_REGEX.source),
+      regex: new RegExp(NICKNAME_REGEX.source + "|" + EMPTY_STRING_REGEX.source),
       regexError: "maze-generate-nickname-invalid",
     },
   }
