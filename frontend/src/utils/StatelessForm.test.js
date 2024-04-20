@@ -380,4 +380,51 @@ describe("StatelessForm", () => {
 
     global.URL.createObjectURL.mockRestore();
   });
+
+
+  it("handles form field changes with more", async () => {
+    //Parameters
+    const formData = { name: "", email: "" };
+    const validationSchema = {
+      name: { required: true, regex: new RegExp(/.{2,100}/), regexError: "name-error" },
+      email: { required: true, regex: new RegExp(/^[\w-.]+@([\w-]+.)+[\w-]{2,4}$/), regexError: "email-error" },
+    };
+    const fieldErrors = {};
+    const setFieldErrors = jest.fn((a) => {});
+    const setIsThereAnyError = jest.fn((a) => {});
+    const onStateChanged = jest.fn((a) => {});
+    const form = (formData, handleChange, fieldErrors) => {
+      const handle = (e) => {
+        const value = e.target.value;
+        handleChange({ target: { name: "name", value: "test", more: [{ name: "email", value: value }] } });
+      }
+
+      return (
+        <>
+          <Form.Group>
+            <Form.Control required type="text" name="name" value={formData.name} onChange={handle} aria-label="name" />
+            {fieldErrors.name}
+          </Form.Group>
+          <Form.Group>
+            <Form.Control required type="email" name="email" value={formData.email} onChange={handleChange} aria-label="email" />
+            {fieldErrors.email}
+          </Form.Group>
+        </>
+      );
+    };
+
+    //Render the component
+    render(<StatelessForm formData={formData} validationSchema={validationSchema} fieldErrors={fieldErrors} setFieldErrors={setFieldErrors} setIsThereAnyError={setIsThereAnyError} onStateChanged={onStateChanged} form={form} />);
+
+    //Get the elements
+    const inputName = screen.getByRole("textbox", { name: "name" });
+    const inputEmail = screen.getByRole("textbox", { name: "email" });
+
+    fireEvent.change(inputName, { target: { value: "test" } });
+
+    expect(onStateChanged).toHaveBeenCalledTimes(1);
+    expect(onStateChanged).toHaveBeenCalledWith({ name: "test", email: "test" });
+    expect(setFieldErrors).toHaveBeenCalledTimes(1);
+    expect(setFieldErrors).toHaveBeenCalledWith({ email: "email-error" })
+  });
 });

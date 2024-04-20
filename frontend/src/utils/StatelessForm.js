@@ -31,45 +31,59 @@ export default function StatelessForm({ formData, validationSchema, fieldErrors,
   //Handle form field changes
   const handleChange = (event) => {
     //Get the name, value, files of the field
-    let { name, value, files } = event.target;
+    let { name, value, files, more } = event.target;
 
-    //Update the form data
-    const newFormData = { ...formData, [name]: value };
+    //Initialize new form data and field errors
+    let newFormData = { ...formData };
+    let newFieldErrors = { ...fieldErrors };
 
-    //Update the field errors
-    const newFieldErrors = { ...fieldErrors };
+    //Function to update form data and field errors
+    const updateDataAndErrors = (name, value, files) => {
+      //Update the form data
+      newFormData[name] = value;
 
-    //Validate the field
-    const fieldSchema = validationSchema[name];
-    if (fieldSchema.fileTypes !== undefined) {
-      //It is a file, so delete the saved value.
-      delete newFormData[name];
+      //Validate the field
+      const fieldSchema = validationSchema[name];
+      if (fieldSchema.fileTypes !== undefined) {
+        //It is a file, so delete the saved value.
+        delete newFormData[name];
 
-      if (files === null) {
-        newFieldErrors[name] = "field-required";
-        newFormData[name] = null;
-      } else {
-        //Only one file is handled
-        const file = files[0];
-
-        //Validate the file
-        if (file === undefined && fieldSchema.required) {
+        if (files === null) {
           newFieldErrors[name] = "field-required";
           newFormData[name] = null;
-        } else if (fieldSchema.fileTypes.includes(file.type)) {
-          delete newFieldErrors[name];
-          newFormData[name] = { file: file, url: URL.createObjectURL(file) };
         } else {
-          newFieldErrors[name] = fieldSchema.fileError;
-          newFormData[name] = null;
+          //Only one file is handled
+          const file = files[0];
+
+          //Validate the file
+          if (file === undefined && fieldSchema.required) {
+            newFieldErrors[name] = "field-required";
+            newFormData[name] = null;
+          } else if (fieldSchema.fileTypes.includes(file.type)) {
+            delete newFieldErrors[name];
+            newFormData[name] = { file: file, url: URL.createObjectURL(file) };
+          } else {
+            newFieldErrors[name] = fieldSchema.fileError;
+            newFormData[name] = null;
+          }
         }
+      } else if (value === "" && fieldSchema.required) {
+        newFieldErrors[name] = "field-required";
+      } else if (!fieldSchema.regex.test(value)) {
+        newFieldErrors[name] = fieldSchema.regexError;
+      } else {
+        delete newFieldErrors[name];
       }
-    } else if (value === "" && fieldSchema.required) {
-      newFieldErrors[name] = "field-required";
-    } else if (!fieldSchema.regex.test(value)) {
-      newFieldErrors[name] = fieldSchema.regexError;
-    } else {
-      delete newFieldErrors[name];
+    };
+
+    //Update form data and field errors for the main target
+    updateDataAndErrors(name, value, files);
+
+    //If the more property exists, update form data and field errors for each item in the more array
+    if (more) {
+      more.forEach((item) => {
+        updateDataAndErrors(item.name, item.value, item.files);
+      });
     }
 
     //Call the custom validator
