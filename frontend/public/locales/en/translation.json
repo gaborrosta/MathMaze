@@ -53,7 +53,7 @@
     "email-error": "Please enter your valid email address.",
     "login-password-placeholder": "Enter your password",
     "login-password-error": "Please enter your password.",
-    "login-forgot-password": "Did you forgot your password? You can create a new one <1>here</1>.",
+    "login-forgot-password": "Did you forget your password? You can create a new one <1>here</1>.",
     "login-no-account": "Don't have an account?",
     "login-create-account": "Create one!",
     "login-privacy-terms-help-link": "You can read our <1>Privacy Policy</1>, our <3>Terms and Conditions</3>, and <5>can get help</5>.",

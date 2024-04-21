@@ -135,7 +135,7 @@ export default function Login() {
         buttonText="login-title"
       />
       <p>
-        <Trans i18nKey="login-forgot-password">Did you forgot your password? You can create a new one <Link to="/reset-password">here</Link>.</Trans>
+        <Trans i18nKey="login-forgot-password">Did you forget your password? You can create a new one <Link to="/reset-password">here</Link>.</Trans>
       </p>
       <p>
         {t("login-no-account")} <Link to="/signup">{t("login-create-account")}</Link>
