@@ -1,212 +1,188 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
 import { Row, Col, Alert, Form, Button } from "react-bootstrap";
+import axios from "axios";
+import { BACKEND_URL, ANYTHING_REGEX, INTEGER_REGEX } from "../utils/constants";
+import TokenContext from "../utils/TokenContext";
+import BaseForm from "../utils/BaseForm";
+import SolutionIDForm from "../components/SolutionIDForm";
 import MazeGrid from "../components/MazeGrid";
 import MazeModal from "../components/MazeModal";
-import SolutionIDForm from "../components/SolutionIDForm";
-import { BACKEND_URL } from "../utils/constants";
-import axios from "axios";
-import TokenContext from "../utils/TokenContext";
 
+/**
+ * GenerateMaze renders the generator page.
+ *
+ * @returns {React.Element} The GenerateMaze component.
+ */
 export default function GenerateMaze() {
+  //Localisation
   const { t } = useTranslation();
 
+
+  //Set the page title
   useEffect(() => { document.title = t("maze-generate-title") + " | " + t("app-name"); });
 
+
+  //Token
   const { token, setToken } = useContext(TokenContext);
 
-  const [isRequestInProgress, setIsRequestInProgress] = useState(false);
 
+  //Helpers for operation
   const isAdditionOrSubtraction = value => value === "ADDITION" || value === "SUBTRACTION" || value === "BOTH_ADDITION_AND_SUBTRACTION";
   const isMultiplicationOrDivision = value => value === "MULTIPLICATION" || value === "DIVISION" || value === "BOTH_MULTIPLICATION_AND_DIVISION";
 
-  const [maze, setMaze] = useState("");
-  const [locations, setLocations] = useState(null);
 
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [showPreviousMazesOptions, setShowPreviousMazesOptions] = useState(false);
-
-  const handleShowAdvancedClick = () => {
-    setShowAdvanced(!showAdvanced);
-  };
-
-  const handleShowPreviousMazesOptionsClick = () => {
-    setShowPreviousMazesOptions(!showPreviousMazesOptions);
-  };
-
-  const [formData, setFormData] = useState({
-    operation: "ADDITION",
-    numbersRangeStart: 1,
-    numbersRangeEnd: 10,
-    minLength: "",
-    maxLength: "",
+  //Initial data, validation schema and customValidator
+  const initialData = {
     width: 11,
     height: 11,
+    operation: "ADDITION",
+    range: "1-10",
     numberType: "even",
+    minLength: "",
+    maxLength: "",
+  };
+  const validationSchema = {
+    width: {
+      required: true,
+      regex: ANYTHING_REGEX,
+      regexError: "-",
+    },
+    height: {
+      required: true,
+      regex: ANYTHING_REGEX,
+      regexError: "-",
+    },
+    operation: {
+      required: true,
+      regex: ANYTHING_REGEX,
+      regexError: "-",
+    },
+    range: {
+      required: true,
+      regex: ANYTHING_REGEX,
+      regexError: "-",
+    },
+    numberType: {
+      required: true,
+      regex: new RegExp(/^(even|odd)$/),
+      regexError: "maze-number-type-error",
+    },
+    minLength: {
+      required: false,
+      regex: INTEGER_REGEX,
+      regexError: "maze-generate-min-length-error-not-number",
+    },
+    maxLength: {
+      required: false,
+      regex: INTEGER_REGEX,
+      regexError: "maze-generate-max-length-error-not-number",
+    },
+  };
+  const customValidator = (formData) => {
+    let results = {};
+
+    if (formData.width < 11 || formData.width > 49 || formData.width % 2 === 0) {
+      results.width = "maze-generate-width-error";
+    } else {
+      results.width = "";
+    }
+
+    if (formData.height < 11 || formData.height > 49 || formData.height % 2 === 0) {
+      results.height = "maze-generate-height-error";
+    } else {
+      results.height = "";
+    }
+
+    if (!isAdditionOrSubtraction(formData.operation) && !isMultiplicationOrDivision(formData.operation)) {
+      results.operation = "maze-operation-error";
+    } else {
+      results.operation = "";
+    }
+
+    const validRanges = isAdditionOrSubtraction(formData.operation) ? ["1-10", "1-20", "1-100"] : ["1-10", "1-20", "11-20"];
+    if (!validRanges.includes(formData.range)) {
+      results.range = "maze-range-error";
+    } else {
+      results.range = "";
+    }
+
+    if (formData.minLength && !isNaN(formData.minLength)){
+      const number = Number(formData.minLength);
+      const max = (formData.maxLength && !isNaN(formData.maxLength)) ? Number(formData.maxLength) : formData.width * formData.height;
+      if (number < Math.min(formData.width, formData.height) || number > max) {
+        results.minLength = "maze-min-length-error";
+      } else {
+        results.minLength = "";
+      }
+    }
+    else {
+      results.minLength = "";
+    }
+
+    if (formData.maxLength && !isNaN(formData.maxLength)){
+      const number = Number(formData.maxLength);
+      const min = (formData.minLength && !isNaN(formData.minLength)) ? Number(formData.minLength) : 0;
+      if (number < min || number > formData.width * formData.height) {
+        results.maxLength = "maze-max-length-error";
+      } else {
+        results.maxLength = "";
+      }
+    } else {
+      results.maxLength = "";
+    }
+
+    return results;
+  }
+
+
+  //Extra form data (not handled by this form)
+  const [extraFormData, setExtraFormData] = useState({
     discardedMazes: [],
     solution1: {},
     solution2: {},
     solution3: {},
-  });
+  })
 
-  const [error, setError] = useState("");
-
-  const [widthError, setWidthError] = useState("");
-  const [heightError, setHeightError] = useState("");
-  const [operationError, setOperationError] = useState("");
-  const [rangeError, setRangeError] = useState("");
-  const [numberTypeError, setNumberTypeError] = useState("");
-  const [minLengthError, setMinLengthError] = useState("");
-  const [maxLengthError, setMaxLengthError] = useState("");
+  //Errors for solutions
   const [solution1Error, setSolution1Error] = useState("");
   const [solution2Error, setSolution2Error] = useState("");
   const [solution3Error, setSolution3Error] = useState("");
 
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+  //Handles updates for solutions
+  const updateSolutionIDForm = (index, data) => {
+    let newExtraFormData = { ...extraFormData };
+    newExtraFormData[`solution${index}`] = data;
+    setExtraFormData(newExtraFormData);
+  }
 
-  const handleChange = (event) => {
-    let name = event.target.name;
-    let value = event.target.value;
 
-    if (name === "range") {
-      value = value.split("-").map(Number);
-      setFormData({
-        ...formData,
-        numbersRangeStart: value[0],
-        numbersRangeEnd: value[1],
-      });
+  //Generated maze
+  const [maze, setMaze] = useState("");
 
-      //Check if the value meets the conditions based on the operation
-      const validRanges = isAdditionOrSubtraction(formData.operation) ? ["1-10", "1-20", "1-100"] : ["1-10", "1-20", "11-20"];
-      if (!validRanges.includes(event.target.value)) {
-        setRangeError("maze-range-error");
-      } else {
-        setRangeError("");
-      }
-    } else if (name === "minLength" || name === "maxLength") {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
 
-      let number = Number(value);
-      let min = formData.minLength ? Number(formData.minLength) : 0;
-      let max = formData.maxLength ? Number(formData.maxLength) : formData.width * formData.height;
+  //Is a request in progress?
+  const [isRequestInProgress, setIsRequestInProgress] = useState(false);
 
-      //Check if the value meets the conditions
-      if (value) {
-        if (name === "minLength") {
-          if (number < Math.min(formData.width, formData.height) || number > max) {
-            setMinLengthError("maze-min-length-error");
-          } else {
-            setMinLengthError("");
-          }
-        } else {
-          if (number < min || number > formData.width * formData.height) {
-            setMaxLengthError("maze-max-length-error");
-          } else {
-            setMaxLengthError("");
-          }
-        }
-      } else {
-        if (name === "minLength") {
-          setMinLengthError("");
-        } else {
-          setMaxLengthError("");
-        }
-      }
-    } else if (name === "operation") {
-      let oldValue = formData.operation;
 
-      if ((isAdditionOrSubtraction(oldValue) && isMultiplicationOrDivision(value)) || 
-          (isMultiplicationOrDivision(oldValue) && isAdditionOrSubtraction(value))) {
-          setFormData({
-          ...formData,
-          operation: value,
-          numbersRangeStart: 1,
-          numbersRangeEnd: 10,
-        });
-      } else {
-        setFormData({
-          ...formData,
-          operation: value,
-        });
-      }
-
-      //Check if the value is one of the specified values
-      if (!isAdditionOrSubtraction(value) && !isMultiplicationOrDivision(value)) {
-        setOperationError("maze-operation-error");
-      } else {
-        setOperationError(null);
-      }
-    } else if (name === "width") {
-      setFormData({
-        ...formData,
-        width: value,
-      });
-
-      //Check if the value is between 11 and 49 and odd
-      if (value < 11 || value > 49 || value % 2 === 0) {
-        setWidthError("maze-generate-width-error");
-      } else {
-        setWidthError("");
-      }
-    } else if (name === "height") {
-      setFormData({
-        ...formData,
-        height: value,
-      });
-
-      //Check if the value is between 11 and 49 and odd
-      if (value < 11 || value > 49 || value % 2 === 0) {
-        setHeightError("maze-generate-height-error");
-      } else {
-        setHeightError("");
-      }
-    } else if (name === "numberType") {
-      setFormData({
-        ...formData,
-        numberType: value,
-      });
-
-      //Check if the value is "even" or "odd"
-      if (value !== "even" && value !== "odd") {
-        setNumberTypeError("maze-number-type-error");
-      } else {
-        setNumberTypeError("");
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (widthError || heightError || operationError || rangeError || numberTypeError || minLengthError || maxLengthError
-      || solution1Error || solution2Error || solution3Error) {
-      setIsSubmitDisabled(true);
-    } else {
-      setIsSubmitDisabled(false);
-    }
-  }, [widthError, heightError, operationError, rangeError, numberTypeError, minLengthError, maxLengthError,
-    solution1Error, solution2Error, solution3Error, formData]);
-
-  const handleGenerateMaze = (e) => {
-    e.preventDefault();
-
+  //Handle the generation request
+  const handleGenerateMaze = (formData, setError, setSuccess, setFormData, done) => {
     //Discard the maze
     if (maze) {
-      formData.discardedMazes = [...formData.discardedMazes, maze.id];
+      extraFormData.discardedMazes = [...extraFormData.discardedMazes, maze.id];
     }
 
     let data = {
       width: formData.width,
       height: formData.height,
       operation: formData.operation,
-      numbersRangeStart: formData.numbersRangeStart,
-      numbersRangeEnd: formData.numbersRangeEnd,
+      numbersRangeStart: Number(formData.range.split("-")[0]),
+      numbersRangeEnd: Number(formData.range.split("-")[1]),
       pathTypeEven: formData.numberType === "even",
-      discardedMazes: formData.discardedMazes,
-      solution1: formData.solution1,
-      solution2: formData.solution2,
-      solution3: formData.solution3,
+      discardedMazes: extraFormData.discardedMazes,
+      solution1: extraFormData.solution1,
+      solution2: extraFormData.solution2,
+      solution3: extraFormData.solution3,
       token: token,
     };
 
@@ -228,6 +204,7 @@ export default function GenerateMaze() {
     })
     .then(response => {
       setError("");
+
       setToken(response.data.token);
       setMaze(response.data.maze);
     })
@@ -268,15 +245,195 @@ export default function GenerateMaze() {
     })
     .finally(() => {
       setTimeout(() => {
+        done();
         setIsRequestInProgress(false);
       }, 1000);
     });
   };
 
-  const [modalVisible, setModalVisible] = useState(false);
 
+  //Advanced settings visible?
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  //Change Advanced settings secion's visibility
+  const handleShowAdvancedClick = () => setShowAdvanced(!showAdvanced);
+
+  //Previous mazes settings visible?
+  const [showPreviousMazesOptions, setShowPreviousMazesOptions] = useState(false);
+
+  //Change Previous mazes settings secion's visibility
+  const handleShowPreviousMazesOptionsClick = () => setShowPreviousMazesOptions(!showPreviousMazesOptions);
+
+
+  //Create the form
+  const form = (formData, handleChange, fieldErrors, error, success, submitButton) => {
+    const handleOperationChange = (e) => {
+      const value = e.target.value;
+
+      if ((isAdditionOrSubtraction(formData.operation) && isMultiplicationOrDivision(value)) ||
+          (isMultiplicationOrDivision(formData.operation) && isAdditionOrSubtraction(value))) {
+        handleChange({ target: { name: "range", value: "1-10", more: [{ name: "operation", value: value }] } });
+      } else {
+        handleChange({ target: { name: "operation", value: value } });
+      }
+    };
+
+    return (
+      <>
+        <Row>
+          <Col xs={12} md={4}>
+            <Form.Group controlId="width" className="mb-3">
+              <Form.Label>{t("maze-width")} <span className="text-danger">*</span></Form.Label>
+              <Form.Control name="width" as="select" value={formData.width} onChange={handleChange} aria-describedby="widthHelp fieldErrors.width">
+                {[...Array(20).keys()].map(i => <option key={i}>{i * 2 + 11}</option>)}
+              </Form.Control>
+              <Form.Text id="widthHelp" className="text-muted">
+                {t("maze-generate-width-help")}
+              </Form.Text>
+              {fieldErrors.width && <><br /><Form.Text className="text-danger">{t(fieldErrors.width)}</Form.Text></>}
+            </Form.Group>
+            <Form.Group controlId="height" className="mb-3">
+              <Form.Label>{t("maze-height")} <span className="text-danger">*</span></Form.Label>
+              <Form.Control name="height" as="select" value={formData.height} onChange={handleChange} aria-describedby="heightHelp fieldErrors.height">
+                {[...Array(20).keys()].map(i => <option key={i}>{i * 2 + 11}</option>)}
+              </Form.Control>
+              <Form.Text id="heightHelp" className="text-muted">
+                {t("maze-generate-height-help")}
+              </Form.Text>
+              {fieldErrors.height && <><br /><Form.Text className="text-danger">{t(fieldErrors.height)}</Form.Text></>}
+            </Form.Group>
+          </Col>
+          <Col xs={12} md={4}>
+            <Form.Group controlId="operation" className="mb-3">
+              <Form.Label>{t("maze-operation-type")} <span className="text-danger">*</span></Form.Label>
+              <Form.Control name="operation" as="select" value={formData.operation} onChange={handleOperationChange} aria-describedby="operationHelp fieldErrors.operation">
+                <option value="ADDITION">{t("operation-addition")}</option>
+                <option value="SUBTRACTION">{t("operation-subtraction")}</option>
+                <option value="BOTH_ADDITION_AND_SUBTRACTION">{t("operation-addition-subtraction")}</option>
+                <option value="MULTIPLICATION">{t("operation-multiplication")}</option>
+                <option value="DIVISION">{t("operation-division")}</option>
+                <option value="BOTH_MULTIPLICATION_AND_DIVISION">{t("operation-multiplication-division")}</option>
+              </Form.Control>
+              <Form.Text id="operationHelp" className="text-muted">
+                {t("maze-generate-operation-type-help")}
+              </Form.Text>
+              {fieldErrors.operation && <><br /><Form.Text className="text-danger">{t(fieldErrors.operation)}</Form.Text></>}
+            </Form.Group>
+            <Form.Group controlId="range" className="mb-3">
+              <Form.Label>{t("maze-generate-range")} <span className="text-danger">*</span></Form.Label>
+              <Form.Control name="range" as="select" value={formData.range} onChange={handleChange} aria-describedby="rangeHelp fieldErrors.range">
+                {isMultiplicationOrDivision(formData.operation) ?
+                  ["1-10", "1-20", "11-20"].map(range => <option key={range}>{range}</option>)
+                :
+                  ["1-10", "1-20", "1-100"].map(range => <option key={range}>{range}</option>)
+                }
+              </Form.Control>
+              <Form.Text id="rangeHelp" className="text-muted">
+                {t("maze-generate-range-help")}
+              </Form.Text>
+              {fieldErrors.range && <><br /><Form.Text className="text-danger">{t(fieldErrors.range)}</Form.Text></>}
+            </Form.Group>
+          </Col>
+          <Col xs={12} md={4} className="mb-3">
+            {!token && <Alert variant="warning">{t("maze-generate-info-not-logged-in")}</Alert>}
+            {error && <Alert variant="danger">{t(error)}</Alert>}
+            {submitButton}
+          </Col>
+        </Row>
+        <hr />
+        <Row>
+          <Col xs={12} md={6}>
+            <Button variant="link" onClick={handleShowPreviousMazesOptionsClick} className="mb-3">
+              <span className={`mr-2 pr-2 arrow ${showPreviousMazesOptions ? "rotate" : ""}`}>
+                &#9654;
+              </span>
+            {t("maze-generate-previous-mazes-options")}
+            </Button>
+            {showPreviousMazesOptions && (
+              <>
+                <p>{t("maze-generate-generated-from-help")}</p>
+                <SolutionIDForm onErrorChange={setSolution1Error} onStateChange={updateSolutionIDForm} index={1}/>
+                <br />
+                <SolutionIDForm onErrorChange={setSolution2Error} onStateChange={updateSolutionIDForm} index={2}/>
+                <br />
+                <SolutionIDForm onErrorChange={setSolution3Error} onStateChange={updateSolutionIDForm} index={3}/>
+              </>
+            )}
+          </Col>
+          <Col xs={12} className="until-md">
+            <hr  />
+          </Col>
+          <Col xs={12} md={6}>
+            <Button variant="link" onClick={handleShowAdvancedClick} className="mb-3">
+              <span className={`mr-2 pr-2 arrow ${showAdvanced ? "rotate" : ""}`}>
+                &#9654;
+              </span>
+              {t("maze-generate-advanced-options")}
+            </Button>
+            {showAdvanced && (
+              <>
+                <Form.Group className="mb-3">
+                  <Form.Label>{t("maze-generate-path-type")} <span className="text-danger">*</span></Form.Label>
+                  <Form.Check
+                    type="radio"
+                    id="evenNumbers"
+                    name="numberType"
+                    label={t("maze-generate-path-type-even")}
+                    value="even"
+                    checked={formData.numberType === "even"}
+                    onChange={handleChange}
+                    aria-describedby="numberTypeHelp fieldErrors.numberType"
+                  />
+                  <Form.Check
+                    type="radio"
+                    id="oddNumbers"
+                    name="numberType"
+                    label={t("maze-generate-path-type-odd")}
+                    value="odd"
+                    checked={formData.numberType === "odd"}
+                    onChange={handleChange}
+                    aria-describedby="numberTypeHelp fieldErrors.numberType"
+                  />
+                  <Form.Text id="numberTypeHelp" className="text-muted">
+                    {t("maze-generate-path-type-help")}
+                  </Form.Text>
+                  {fieldErrors.numberType && <><br /><Form.Text className="text-danger">{t(fieldErrors.numberType)}</Form.Text></>}
+                </Form.Group>
+                <Form.Group controlId="minLength" className="mb-3">
+                  <Form.Label>{t("maze-generate-path-min-length")}</Form.Label>
+                  <Form.Control name="minLength" type="text" value={formData.minLength} onChange={handleChange} aria-describedby="minLengthHelp fieldErrors.minLength" />
+                  <Form.Text id="minLengthHelp" className="text-muted">
+                    {t("maze-generate-path-min-length-help")}
+                  </Form.Text>
+                  {fieldErrors.minLength && <><br /><Form.Text className="text-danger">{t(fieldErrors.minLength)}</Form.Text></>}
+                </Form.Group>
+                <Form.Group controlId="maxLength" className="mb-3">
+                  <Form.Label>{t("maze-generate-path-max-length")}</Form.Label>
+                  <Form.Control name="maxLength" type="text" value={formData.maxLength} onChange={handleChange} aria-describedby="maxLengthHelp fieldErrors.maxLength" />
+                  <Form.Text id="maxLengthHelp" className="text-muted">
+                    {t("maze-generate-path-max-length-help")}
+                  </Form.Text>
+                  {fieldErrors.maxLength && <><br /><Form.Text className="text-danger">{t(fieldErrors.maxLength)}</Form.Text></>}
+                </Form.Group>
+              </>
+            )}
+          </Col>
+        </Row>
+      </>
+    );
+  };
+
+
+  //Save error
   const [saveError, setSaveError] = useState("");
 
+  //Locations for editing the maze
+  const [locations, setLocations] = useState(null);
+
+  //Is the modal visible?
+  const [modalVisible, setModalVisible] = useState(false);
+
+  //Save maze
   const saveMaze = () => {
     const data = {
       mazeId: maze.id,
@@ -308,161 +465,35 @@ export default function GenerateMaze() {
     });
   };
 
-  const updateSolutionIDForm = (index, data) => {
-    let newFormData = { ...formData };
-    newFormData[`solution${index}`] = data;
-    setFormData(newFormData);
-  }
 
+  //Render the component
   return (
     <>
       <center>
         <h1>{t("maze-generate-title")}</h1>
       </center>
       <p>{t("maze-generate-info")}</p>
-      <Row>
-        <Col xs={12} md={4}>
-          <div className="border p-3 m-2">
-            {!token && <Alert variant="warning">{t("maze-generate-info-not-logged-in")}</Alert>}
-            {error && <Alert variant="danger">{t(error)}</Alert>}
-            <Form onSubmit={handleGenerateMaze}>
-              <Button variant="primary" type="submit" disabled={isSubmitDisabled || isRequestInProgress}>
-                {maze ? t("maze-generate-path-regenerate") : t("maze-generate-path-generate")}
-              </Button>
-              <br />
-              <hr />
-              <Form.Group controlId="width">
-                <Form.Label>{t("maze-width")}</Form.Label>
-                <Form.Control name="width" as="select" value={formData.width} onChange={handleChange} aria-describedby="widthHelp widthError">
-                  {[...Array(20).keys()].map(i => <option key={i}>{i * 2 + 11}</option>)}
-                </Form.Control>
-                <Form.Text id="widthHelp" className="text-muted">
-                  {t("maze-generate-width-help")}
-                </Form.Text>
-                {widthError && <><br /><Form.Text className="text-danger">{t(widthError)}</Form.Text></>}
-              </Form.Group>
-              <br />
-              <Form.Group controlId="height">
-                <Form.Label>{t("maze-height")}</Form.Label>
-                <Form.Control name="height" as="select" value={formData.height} onChange={handleChange} aria-describedby="heightHelp heightError">
-                  {[...Array(20).keys()].map(i => <option key={i}>{i * 2 + 11}</option>)}
-                </Form.Control>
-                <Form.Text id="heightHelp" className="text-muted">
-                  {t("maze-generate-height-help")}
-                </Form.Text>
-                {heightError && <><br /><Form.Text className="text-danger">{t(heightError)}</Form.Text></>}
-              </Form.Group>
-              <br />
-              <Form.Group controlId="operation">
-                <Form.Label>{t("maze-operation-type")}</Form.Label>
-                <Form.Control name="operation" as="select" value={formData.operation} onChange={handleChange} aria-describedby="operationHelp operationError">
-                  <option value="ADDITION">{t("operation-addition")}</option>
-                  <option value="SUBTRACTION">{t("operation-subtraction")}</option>
-                  <option value="BOTH_ADDITION_AND_SUBTRACTION">{t("operation-addition-subtraction")}</option>
-                  <option value="MULTIPLICATION">{t("operation-multiplication")}</option>
-                  <option value="DIVISION">{t("operation-division")}</option>
-                  <option value="BOTH_MULTIPLICATION_AND_DIVISION">{t("operation-multiplication-division")}</option>
-                </Form.Control>
-                <Form.Text id="operationHelp" className="text-muted">
-                  {t("maze-generate-operation-type-help")}
-                </Form.Text>
-                {operationError && <><br /><Form.Text className="text-danger">{t(operationError)}</Form.Text></>}
-              </Form.Group>
-              <br />
-              <Form.Group controlId="range">
-                <Form.Label>{t("maze-generate-range")}</Form.Label>
-                <Form.Control name="range" as="select" value={`${formData.numbersRangeStart}-${formData.numbersRangeEnd}`} onChange={handleChange} aria-describedby="rangeHelp rangeError">
-                  {isMultiplicationOrDivision(formData.operation) ? 
-                      ["1-10", "1-20", "11-20"].map(range => <option key={range}>{range}</option>) :
-                      ["1-10", "1-20", "1-100"].map(range => <option key={range}>{range}</option>)
-                  }
-                </Form.Control>
-                <Form.Text id="rangeHelp" className="text-muted">
-                  {t("maze-generate-range-help")}
-                </Form.Text>
-                {rangeError && <><br /><Form.Text className="text-danger">{t(rangeError)}</Form.Text></>}
-              </Form.Group>
-              <hr />
-              <Button variant="link" onClick={handleShowPreviousMazesOptionsClick}>
-                <span className={`mr-2 pr-2 arrow ${showPreviousMazesOptions ? "rotate" : ""}`}>
-                  &#9654;
-                </span>
-                {t("maze-generate-previous-mazes-options")}
-              </Button>
-              {showPreviousMazesOptions && (
-                <>
-                  <p>{t("maze-generate-generated-from-help")}</p>
-                  <SolutionIDForm onErrorChange={setSolution1Error} onStateChange={updateSolutionIDForm} index={1}/>
-                  <br />
-                  <SolutionIDForm onErrorChange={setSolution2Error} onStateChange={updateSolutionIDForm} index={2}/>
-                  <br />
-                  <SolutionIDForm onErrorChange={setSolution3Error} onStateChange={updateSolutionIDForm} index={3}/>
-                </>
-              )}
-              <hr />
-              <Button variant="link" onClick={handleShowAdvancedClick}>
-                <span className={`mr-2 pr-2 arrow ${showAdvanced ? "rotate" : ""}`}>
-                  &#9654;
-                </span>
-                {t("maze-generate-advanced-options")}
-              </Button>
-              {showAdvanced && (
-                <>
-                  <Form.Group>
-                    <Form.Label>{t("maze-generate-path-type")}</Form.Label>
-                    <Form.Check
-                      type="radio"
-                      id="evenNumbers"
-                      name="numberType"
-                      label={t("maze-generate-path-type-even")}
-                      value="even"
-                      checked={formData.numberType === "even"}
-                      onChange={handleChange}
-                      aria-describedby="numberTypeHelp numberTypeError"
-                    />
-                    <Form.Check
-                      type="radio"
-                      id="oddNumbers"
-                      name="numberType"
-                      label={t("maze-generate-path-type-odd")}
-                      value="odd"
-                      checked={formData.numberType === "odd"}
-                      onChange={handleChange}
-                      aria-describedby="numberTypeHelp numberTypeError"
-                    />
-                    <Form.Text id="numberTypeHelp" className="text-muted">
-                      {t("maze-generate-path-type-help")}
-                    </Form.Text>
-                    {numberTypeError && <><br /><Form.Text className="text-danger">{t(numberTypeError)}</Form.Text></>}
-                  </Form.Group>
-                  <br />
-                  <Form.Group controlId="minLength">
-                    <Form.Label>{t("maze-generate-path-min-length")}</Form.Label>
-                    <Form.Control name="minLength" type="number" value={formData.minLength} onChange={handleChange} aria-describedby="minLengthHelp minLengthError" />
-                    <Form.Text id="minLengthHelp" className="text-muted">
-                      {t("maze-generate-path-min-length-help")}
-                    </Form.Text>
-                    {minLengthError && <><br /><Form.Text className="text-danger">{t(minLengthError)}</Form.Text></>}
-                  </Form.Group>
-                  <br />
-                  <Form.Group controlId="maxLength">
-                    <Form.Label>{t("maze-generate-path-max-length")}</Form.Label>
-                    <Form.Control name="maxLength" type="number" value={formData.maxLength} onChange={handleChange} aria-describedby="maxLengthHelp maxLengthError" />
-                    <Form.Text id="maxLengthHelp" className="text-muted">
-                      {t("maze-generate-path-max-length-help")}
-                    </Form.Text>
-                    {maxLengthError && <><br /><Form.Text className="text-danger">{t(maxLengthError)}</Form.Text></>}
-                  </Form.Group>
-                </>
-              )}
-            </Form>
-          </div>
-        </Col>
-        <Col xs={12} md={8}>
-          <div className="border p-3 m-2">
-          {maze ? <MazeGrid data={maze} disabled={isRequestInProgress} save={saveMaze} saveError={saveError} setSaveError={setSaveError} /> : <Alert variant="info">{t("maze-generate-not-yet-generated-info")}</Alert>}
-          </div>
-        </Col>
+      <Row className="m-2">
+        <div className="border p-3">
+          <BaseForm
+            onSubmit={handleGenerateMaze}
+            initialData={initialData}
+            validationSchema={validationSchema}
+            form={form}
+            buttonText={maze ? t("maze-generate-path-regenerate") : t("maze-generate-path-generate")}
+            customValidator={customValidator}
+            extraCheckForSubmitButton={(_) => solution1Error || solution2Error || solution3Error || isRequestInProgress}
+          />
+        </div>
+      </Row>
+      <Row className="m-2">
+        <div className="border p-3">
+          {maze ?
+            <MazeGrid data={maze} disabled={isRequestInProgress} save={saveMaze} saveError={saveError} setSaveError={setSaveError} />
+          :
+            <Alert variant="info">{t("maze-generate-not-yet-generated-info")}</Alert>
+          }
+        </div>
       </Row>
       <MazeModal data={maze} visible={modalVisible} setVisible={setModalVisible} locations={locations} />
     </>
