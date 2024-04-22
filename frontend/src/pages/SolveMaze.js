@@ -1,139 +1,234 @@
 import React, { useEffect, useState, useContext, useCallback } from "react";
-import { useSearchParams  } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useSearchParams  } from "react-router-dom";
 import { Form, Button, Alert, Row, Col } from "react-bootstrap";
-import { BACKEND_URL } from "../utils/constants";
 import axios from "axios";
+import { BACKEND_URL, INTEGER_REGEX } from "../utils/constants";
 import TokenContext from "../utils/TokenContext";
+import StatelessForm from "../utils/StatelessForm";
+import BaseForm from "../utils/BaseForm";
 import LoadingSpinner from "../components/LoadingSpinner";
-import MazeOnlineSolve from "../components/MazeOnlineSolve";
-import CheckResults from "../components/CheckResults";
 import PDFButtons from "../components/PDFButtons";
+import MazeOnlineSolve from "../components/MazeOnlineSolve";
 import TokenRefresher from "../utils/TokenRefresher";
+import CheckResults from "../components/CheckResults";
 
+/**
+ * SolveMaze renders the online solver page with buttons to download the maze.
+ *
+ * @returns {React.Element} The SolveMaze component.
+ */
 export default function SolveMaze() {
+  //Localisation
   const { t } = useTranslation();
 
+
+  //Set the page title
   useEffect(() => { document.title = t("maze-solve-title") + " | " + t("app-name"); });
 
+
+  //Token
   const { token, setToken } = useContext(TokenContext);
 
+
+  //Params for the maze ID
   const [params] = useSearchParams();
 
+
+  //Loading state
   const [loading, setLoading] = useState(true);
 
-  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-
-  const [mazeId, setMazeId] = useState("");
-  const [mazeIdError, setMazeIdError] = useState("");
-  const [mazeIdFormError, setMazeIdFormError] = useState("");
-
-  const [passcode, setPasscode] = useState("");
-  const [passcodeError, setPasscodeError] = useState("");
-  const [passcodeFormError, setPasscodeFormError] = useState("");
-
-  const [checkedMazeId, setCheckedMazeId] = useState("");
-  const [checkedPasscode, setCheckedPasscode] = useState("");
-
-  const [maze, setMazeData] = useState({});
-
-  const [showOnline, setShowOnline] = useState(false);
-
+  //Function to set loading to false after 1 second
   const loadingDone = () => {
     setTimeout(() => {
       setLoading(false);
     }, 1000);
   }
 
-  const checkMaze = useCallback((mazeId, passcode) => {
-    setLoading(true);
-    setMazeIdError("");
-    setMazeIdFormError("");
-    setPasscodeError("");
-    setPasscodeFormError("");
 
-    let url = `${BACKEND_URL}/maze/open?mazeId=${mazeId}&token=${token}`;
-    if (passcode) {
-      url += `&passcode=${passcode}`;
+  //Initial data, validation schema and everything for MAZE ID
+  const [formDataForMazeId, setFormDataForMazeId] = useState({ mazeId: "" });
+  const validationSchemaForMazeId = {
+    mazeId: {
+      required: true,
+      regex: INTEGER_REGEX,
+      regexError: "error-invalid-maze-id",
+    },
+  };
+  const [mazeIdError, setMazeIdError] = useState("");
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+  const [fieldErrors, setFieldErrors] = useState({});
+
+
+  //Initial data and validation schema for MAZE ID and PASSCODE
+  const [formDataForBoth, setFormDataForBoth] = useState({
+    mazeId: "",
+    passcode: "",
+  });
+  const validationSchemaForBoth = {
+    mazeId: {
+      required: true,
+      regex: INTEGER_REGEX,
+      regexError: "error-invalid-maze-id",
+    },
+    passcode: {
+      required: true,
+      regex: new RegExp(/^[0-9]{8,20}$/),
+      regexError: "error-invalid-passcode",
+    },
+  };
+
+
+  //Validated maze ID and passcode
+  const [checkedMazeId, setCheckedMazeId] = useState("");
+  const [checkedPasscode, setCheckedPasscode] = useState("");
+
+
+  //Returned maze
+  const [maze, setMazeData] = useState({});
+
+
+  //Handle the check request for the maze ID
+  const loadMazeWrapperForForm = (event) => {
+    event.preventDefault();
+    loadMaze(formDataForMazeId, setMazeIdError, null, null, () => {});
+  }
+
+  //Handle the check request
+  const loadMaze = useCallback((formData, setError, setSuccess, setFormData, done) => {
+    //Loading
+    setLoading(true);
+
+    //Create url
+    let url = `${BACKEND_URL}/maze/open?mazeId=${formData.mazeId}&token=${token}`;
+    if (formData.passcode) {
+      url += `&passcode=${formData.passcode}`;
     }
 
     axios.get(url)
     .then(response => {
       loadingDone();
+
       setToken(response.data.token);
       setMazeData(response.data.maze);
-      setCheckedMazeId(mazeId);
+      setCheckedMazeId(formData.mazeId);
+      setFormDataForBoth({ mazeId: formData.mazeId, passcode: formData.passcode ? formData.passcode : "" });
 
-      if (passcode) {
+      //Passcode?
+      if (formData.passcode) {
         if (response.data.maze.passcode === false) {
-          setPasscodeFormError("error-invalid-passcode-solve");
+          setError("error-invalid-passcode-solve");
           return;
         }
-        setCheckedPasscode(passcode);
+        setCheckedPasscode(formData.passcode);
       }
+
+      setError("");
     })
     .catch(error => {
       loadingDone();
 
       if (!error.response) {
-        setMazeIdFormError("error-unknown");
+        setError("error-unknown");
         return;
       }
 
       switch (error.response.data) {
         case "InvalidMazeIdException":
-          setMazeIdFormError("error-invalid-maze-id-or-private");
+          setError("error-invalid-maze-id-or-private");
           break;
         default:
-          setMazeIdFormError("error-unknown-form");
+          setError("error-unknown-form");
           break;
       }
+    })
+    .finally(() => {
+      done();
     });
   }, [token, setToken]);
 
+
+  //Create the form for maze ID
+  const formForMazeId = (formData, handleChange, fieldErrors) => {
+    return (
+      <>
+        {mazeIdError && <Alert variant="danger">{t(mazeIdError)}</Alert>}
+        <Form.Group controlId="mazeId" className="mb-3">
+          <Form.Label>{t("maze-check-id-label")} <span className="text-danger">*</span></Form.Label>
+          <Form.Control name="mazeId" type="text" value={formData.mazeId} onChange={handleChange} aria-describedby="mazeIdHelp fieldErrors.mazeId" />
+          <Form.Text id="mazeIdHelp" className="text-muted">
+            {t("maze-solve-id-help")}
+          </Form.Text>
+          {fieldErrors.mazeId && <><br /><Form.Text className="text-danger">{t(fieldErrors.mazeId)}</Form.Text></>}
+        </Form.Group>
+      </>
+    );
+  };
+
+
+  //Create the form for passcode
+  const formForPasscode = (formData, handleChange, fieldErrors, error, success, submitButton) => {
+    return (
+      <>
+        {error && <Alert variant="danger">{t(error)}</Alert>}
+        <Form.Group controlId="passcode" className="mb-3">
+          <Form.Label>{t("maze-passcode")} <span className="text-danger">*</span></Form.Label>
+          <Form.Control name="passcode" type="text" value={formData.passcode} onChange={handleChange} aria-describedby="passcodeHelp fieldErrors.passcode" />
+          <Form.Text id="passcodeHelp" className="text-muted">
+            {t("maze-solve-passcode-help")}
+          </Form.Text>
+        {fieldErrors.passcode && <><br /><Form.Text className="text-danger">{t(fieldErrors.passcode)}</Form.Text></>}
+        </Form.Group>
+        {submitButton}
+      </>
+    );
+  };
+
+
+  //Check the maze ID
   useEffect(() => {
     const id = params.get("id");
+
     if (!id) {
       setLoading(false);
     } else {
-      setMazeId(id);
-      setMazeIdError("");
-      checkMaze(id);
+      setFormDataForMazeId({ mazeId: id });
+      loadMaze({ mazeId: id }, setMazeIdError, null, null, () => {});
     }
-  }, [params, checkMaze]);
+  }, [params, loadMaze]);
 
-  const handleMazeIdChange = (e) => {
-    setMazeId(e.target.value);
-    if (!e.target.value) {
-      setMazeIdError(t("error-invalid-maze-id"));
-    } else {
-      setMazeIdError("");
-    }
-  };
 
-  useEffect(() => {
-    if ((!checkedMazeId && (!mazeId || mazeIdError)) || (checkedMazeId && (!passcode || passcodeError))) {
-      setIsSubmitDisabled(true);
-    } else {
-      setIsSubmitDisabled(false);
-    }
-  }, [checkedMazeId, mazeId, mazeIdError, passcode, passcodeError]);
+  //Show online solver?
+  const [showOnline, setShowOnline] = useState(false);
 
+  //Nickname
   const [nickname, setNickname] = useState("");
+
+  //Sent maze and path
   const [sentMaze, setSentMaze] = useState(null);
   const [sentPath, setSentPath] = useState(null);
-  const [nicknameError, setNicknameError] = useState("");
-  const [checkData, setCheckData] = useState(null);
 
-  const handleSubmit = async (data) => {
+  //Error for the check
+  const [checkError, setCheckError] = useState("");
+
+  //Checked maze data
+  const [checkedData, SetCheckedData] = useState(null);
+
+
+  //Check the maze
+  const checkMaze = async (data) => {
+    //Loading
     setLoading(true);
 
-    data["token"] = token;
+    //Add token
+    data.token = token;
 
+    //Save nickname, maze, path
     setNickname(data.nickname);
     setSentMaze(data.data);
     setSentPath(data.path);
 
+    //Send data
     axios.post(`${BACKEND_URL}/maze/check`, data, {
       headers: {
         "Content-Type": "application/json"
@@ -141,44 +236,47 @@ export default function SolveMaze() {
     })
     .then(response => {
       loadingDone();
-      setNicknameError("");
+      setCheckError("");
+
       setToken(response.data.token);
-      setCheckData(response.data.checkedMaze);
+      SetCheckedData(response.data.checkedMaze);
     })
     .catch(error => {
       loadingDone();
 
       if (!error.response) {
-        setNicknameError("error-unknown");
+        setCheckError("error-unknown");
         return;
       }
 
       switch (error.response.data) {
         case "NicknameInvalidFormatException":
-          setNicknameError("error-nickname-invalid-format");
+          setCheckError("error-nickname-invalid-format");
           break;
         case "NicknameNotUniqueException":
-          setNicknameError("error-nickname-not-unique");
+          setCheckError("error-nickname-not-unique");
           break;
         case "InvalidMazeIdException":
-          setNicknameError("error-invalid-maze-id");
+          setCheckError("error-invalid-maze-id");
           break;
         case "InvalidPathException":
-          setNicknameError("error-invalid-path");
+          setCheckError("error-invalid-path");
           break;
         case "InvalidMazeDimensionException":
-          setNicknameError("error-invalid-maze-dimension");
+          setCheckError("error-invalid-maze-dimension");
           break;
         case "NotNumberInMazeException":
-          setNicknameError("error-not-number-in-maze");
+          setCheckError("error-not-number-in-maze");
           break;
         default:
-          setNicknameError("error-unknown-form");
+          setCheckError("error-unknown-form");
           break;
       }
     });
   }
 
+
+  //Render the page
   return (
     <>
       <center>
@@ -186,63 +284,67 @@ export default function SolveMaze() {
       </center>
       <p>{t("maze-solve-info")}</p>
 
-      {loading ? <LoadingSpinner /> : <>
-        {((!params.get("id") && !checkedMazeId) || mazeIdFormError) && <>
-          {mazeIdFormError && <Alert variant="danger">{t(mazeIdFormError)}</Alert>}
-          <Form.Group controlId="mazeId">
-            <Form.Label>{t("maze-check-id-label")}</Form.Label>
-            <Form.Control name="mazeId" type="number" value={mazeId} onChange={handleMazeIdChange} aria-describedby="mazeIdHelp mazeIdError" />
-            <Form.Text id="mazeIdHelp" className="text-muted">
-              {t("maze-solve-id-help")}
-            </Form.Text>
-            {mazeIdError && <><br /><Form.Text className="text-danger">{t(mazeIdError)}</Form.Text></>}
-          </Form.Group>
-          <br />
-          <Button disabled={isSubmitDisabled} onClick={() => checkMaze(mazeId)} className="mb-3">{t("maze-solve-submit-id")}</Button>
-        </>}
+      {loading && <LoadingSpinner />}
 
-        {(Object.keys(maze).length !== 0 && maze.passcode === false && !checkedPasscode) && <>
-          {passcodeFormError && <Alert variant="danger">{t(passcodeFormError)}</Alert>}
-          <Form.Group controlId="passcode">
-            <Form.Label>{t("maze-passcode")}</Form.Label>
-            <Form.Control name="passcode" type="text" value={passcode} onChange={(e) => setPasscode(e.target.value)} aria-describedby="passcodeHelp" />
-            <Form.Text id="passcodeHelp" className="text-muted">
-              {t("maze-solve-passcode-help")}
-            </Form.Text>
-          </Form.Group>
-          <br />
-          <Button disabled={isSubmitDisabled} onClick={() => checkMaze(checkedMazeId, passcode)} className="mb-3">{t("maze-solve-submit-passcode")}</Button>
-        </>}
+      <div style={{ display: loading ? "none" : "block" }}>
+        {!checkedMazeId &&
+          <Form onSubmit={loadMazeWrapperForForm}>
+            <StatelessForm
+              formData={formDataForMazeId}
+              validationSchema={validationSchemaForMazeId}
+              fieldErrors={fieldErrors}
+              setFieldErrors={setFieldErrors}
+              setIsThereAnyError={setIsSubmitDisabled}
+              onStateChanged={setFormDataForMazeId}
+              form={formForMazeId}
+            />
+            <br />
+            <Button className="mb-3" variant="primary" type="submit" disabled={isSubmitDisabled}>
+              {t("maze-solve-submit-id")}
+            </Button>
+          </Form>
+        }
+
+        {(Object.keys(maze).length !== 0 && maze.passcode === false && !checkedPasscode) &&
+          <BaseForm
+            onSubmit={loadMaze}
+            initialData={formDataForBoth}
+            validationSchema={validationSchemaForBoth}
+            form={formForPasscode}
+            buttonText="maze-solve-submit-passcode"
+          />
+        }
 
         {(Object.keys(maze).length !== 0 && !maze.hasOwnProperty("passcode")) && <>
           <Alert variant="info">
-          <div>
-            <Row className="mb-1">
-              <Col xs={12} md={3}>
-                {t("maze-check-id-label")}: {maze.id}
-              </Col>
-              <Col xs={12} md={3}>
-                {t("maze-size", { height: maze.height, width: maze.width })}
-              </Col>
-              <Col xs={12} md={3}>
-                {t("maze-length-of-the-path", { length: maze.pathLength })}
-              </Col>
-              <Col xs={12} md={3}>
-                {t("maze-generate-path-type")}: {maze.pathTypeEven ? t("maze-generate-path-type-even") : t("maze-generate-path-type-odd")}
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <p>{t("maze-description")}: {maze.description ? maze.description : "-"}</p>
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <p>{t("maze-generated-by", { username: maze.user })}</p>
-              </Col>
-            </Row>
-          </div>
+            <div>
+              <Row className="mb-1">
+                <Col xs={12} md={3}>
+                  {t("maze-check-id-label")}: {maze.id}
+                </Col>
+                <Col xs={12} md={3}>
+                  {t("maze-size", { height: maze.height, width: maze.width })}
+                </Col>
+                <Col xs={12} md={3}>
+                  {t("maze-length-of-the-path", { length: maze.pathLength })}
+                </Col>
+                <Col xs={12} md={3}>
+                  {t("maze-generate-path-type")}: {maze.pathTypeEven ? t("maze-generate-path-type-even") : t("maze-generate-path-type-odd")}
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <p>{t("maze-description")}: {maze.description ? maze.description : "-"}</p>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <p>{t("maze-generated-by", { username: maze.user })}</p>
+                </Col>
+              </Row>
+            </div>
           </Alert>
+
           <Row className="mb-3">
             <Col className="mx-auto text-center" xs={12} md={6}>
               <PDFButtons actualData={maze} />
@@ -257,15 +359,14 @@ export default function SolveMaze() {
             </Col>
           </Row>
 
-          {(showOnline && !checkData) &&
-          <>
-            <MazeOnlineSolve data={maze} submitError={nicknameError} initialNickname={nickname} handleSubmit={handleSubmit} initialPath={sentPath} initialMaze={sentMaze} />
+          {(showOnline && !checkedData) && <>
+            <MazeOnlineSolve data={maze} initialNickname={nickname} initialMaze={sentMaze} initialPath={sentPath} handleSubmit={checkMaze} submitError={checkError} />
             <TokenRefresher token={token} setToken={setToken} />
-          </>
-          }
-          {checkData && <CheckResults data={checkData} />}
+          </>}
+
+          {checkedData && <CheckResults data={checkedData} />}
         </>}
-      </>}
+      </div>
     </>
   );
 }
