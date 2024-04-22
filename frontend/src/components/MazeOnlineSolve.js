@@ -7,7 +7,7 @@ import NicknameForm from "./NicknameForm";
 
 const GRID_WINDOW_SIZE = 5;
 
-export default function MazeOnlineSolve({ data, initialNickname, handleSubmit, submitError, initialMaze, initialPath })  {
+export default function MazeOnlineSolve({ data, initialNickname, initialMaze, initialPath, handleSubmit, submitError })  {
   const { t } = useTranslation();
 
   const inputRef = useRef(null);

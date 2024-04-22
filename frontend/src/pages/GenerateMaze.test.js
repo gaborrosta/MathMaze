@@ -28,13 +28,13 @@ jest.mock("react-i18next", () => ({
 jest.useFakeTimers();
 
 //Mock SolutionIDForm
-jest.mock("../components/SolutionIDForm", () => ({onErrorChange, onStateChange, index}) => <button data-testid="solution-id" type="button" onClick={() => onStateChange(1, { nickname: "noone" })}>{index}</button>);;
+jest.mock("../components/SolutionIDForm", () => ({onErrorChange, onStateChange, index}) => <button data-testid="solution-id" type="button" onClick={() => onStateChange(1, { nickname: "noone" })}>{index}</button>);
 
 //Mock MazeGrid
-jest.mock("../components/MazeGrid", () => ({data, disabled, save, saveError, setSaveError}) => <button data-testid="maze-grid" type="button" onClick={() => save()} disabled={disabled}>{data.id}</button>);;
+jest.mock("../components/MazeGrid", () => ({data, disabled, save, saveError, setSaveError}) => <button data-testid="maze-grid" type="button" onClick={() => save()} disabled={disabled}>{data.id}</button>);
 
 //Mock MazeModal
-jest.mock("../components/MazeModal", () => ({visible, setVisible, data, locations, changed}) => <div data-testid="maze-modal" />);;
+jest.mock("../components/MazeModal", () => ({visible, setVisible, data, locations, changed}) => <div data-testid="maze-modal" />);
 
 //Mock axios to control API calls
 jest.mock("axios");
@@ -248,7 +248,7 @@ describe("GenerateMaze", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "maze-generate-path-max-length" }), { target: { value: "20" } });
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "maze-generate-path-generate" }));
+      fireEvent.click(screen.getByRole("button", { name: "maze-generate-path-generate" }));
     });
 
     await waitFor(() => {
@@ -338,7 +338,7 @@ describe("GenerateMaze", () => {
     );
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "maze-generate-path-generate" }));
+      fireEvent.click(screen.getByRole("button", { name: "maze-generate-path-generate" }));
     });
 
     await waitFor(() => {
@@ -383,7 +383,7 @@ describe("GenerateMaze", () => {
     );
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "maze-generate-path-generate" }));
+      fireEvent.click(screen.getByRole("button", { name: "maze-generate-path-generate" }));
     });
 
     await waitFor(() => {
@@ -428,7 +428,7 @@ describe("GenerateMaze", () => {
     );
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "maze-generate-path-generate" }));
+      fireEvent.click(screen.getByRole("button", { name: "maze-generate-path-generate" }));
     });
 
     await waitFor(() => {
@@ -473,7 +473,7 @@ describe("GenerateMaze", () => {
     );
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "maze-generate-path-generate" }));
+      fireEvent.click(screen.getByRole("button", { name: "maze-generate-path-generate" }));
     });
 
     await waitFor(() => {
@@ -518,7 +518,7 @@ describe("GenerateMaze", () => {
     );
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "maze-generate-path-generate" }));
+      fireEvent.click(screen.getByRole("button", { name: "maze-generate-path-generate" }));
     });
 
     await waitFor(() => {
@@ -563,7 +563,7 @@ describe("GenerateMaze", () => {
     );
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "maze-generate-path-generate" }));
+      fireEvent.click(screen.getByRole("button", { name: "maze-generate-path-generate" }));
     });
 
     await waitFor(() => {
@@ -608,7 +608,7 @@ describe("GenerateMaze", () => {
     );
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "maze-generate-path-generate" }));
+      fireEvent.click(screen.getByRole("button", { name: "maze-generate-path-generate" }));
     });
 
     await waitFor(() => {
@@ -653,7 +653,7 @@ describe("GenerateMaze", () => {
     );
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "maze-generate-path-generate" }));
+      fireEvent.click(screen.getByRole("button", { name: "maze-generate-path-generate" }));
     });
 
     await waitFor(() => {
@@ -698,7 +698,7 @@ describe("GenerateMaze", () => {
     );
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "maze-generate-path-generate" }));
+      fireEvent.click(screen.getByRole("button", { name: "maze-generate-path-generate" }));
     });
 
     await waitFor(() => {
@@ -743,7 +743,7 @@ describe("GenerateMaze", () => {
     );
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "maze-generate-path-generate" }));
+      fireEvent.click(screen.getByRole("button", { name: "maze-generate-path-generate" }));
     });
 
     await waitFor(() => {
@@ -815,7 +815,7 @@ describe("GenerateMaze", () => {
     );
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "maze-generate-path-generate" }));
+      fireEvent.click(screen.getByRole("button", { name: "maze-generate-path-generate" }));
     });
 
     await waitFor(() => {

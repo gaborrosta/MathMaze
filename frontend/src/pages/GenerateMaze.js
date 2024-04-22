@@ -255,13 +255,13 @@ export default function GenerateMaze() {
   //Advanced settings visible?
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  //Change Advanced settings secion's visibility
+  //Change Advanced settings section's visibility
   const handleShowAdvancedClick = () => setShowAdvanced(!showAdvanced);
 
   //Previous mazes settings visible?
   const [showPreviousMazesOptions, setShowPreviousMazesOptions] = useState(false);
 
-  //Change Previous mazes settings secion's visibility
+  //Change Previous mazes settings section's visibility
   const handleShowPreviousMazesOptionsClick = () => setShowPreviousMazesOptions(!showPreviousMazesOptions);
 
 
@@ -466,7 +466,7 @@ export default function GenerateMaze() {
   };
 
 
-  //Render the component
+  //Render the page
   return (
     <>
       <center>

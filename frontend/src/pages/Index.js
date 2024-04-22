@@ -7,7 +7,7 @@ import ContactForm from "../components/ContactForm";
 
 /**
  * Index renders the index page.
- * 
+ *
  * @returns {React.Element} The Index component.
  */
 export default function Index() {
@@ -27,7 +27,7 @@ export default function Index() {
   ];
 
 
-  //Return the page
+  //Render the page
   return (
     <>
       <div className="layout-container">

@@ -142,7 +142,7 @@ export default function CheckResults({ data }) {
         </Button>
       </center>
 
-      <div className="maze" style={{gridTemplateColumns: `repeat(${data.width}, 1fr)`, minWidth: `${75 * data.width}px`}}>
+      <div className="maze mb-3" style={{gridTemplateColumns: `repeat(${data.width}, 1fr)`, minWidth: `${75 * data.width}px`}}>
         {Array.from({length: data.height}).map((_, i) => (
           Array.from({length: data.width}).map((__, j) => {
             const isStart = data.start[0] === j && data.start[1] === i;

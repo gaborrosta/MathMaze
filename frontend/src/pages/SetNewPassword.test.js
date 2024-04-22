@@ -25,7 +25,7 @@ jest.mock("react-i18next", () => ({
 
 // Mock the useSearchParams hook
 jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"), // use actual for all non-hook parts
+  ...jest.requireActual("react-router-dom"),
   useSearchParams: jest.fn(),
 }));
 
@@ -203,7 +203,7 @@ describe("SetNewPassword", () => {
     fireEvent.input(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password123@" } });
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "set-new-password-title" }));
+      fireEvent.click(screen.getByRole("button", { name: "set-new-password-title" }));
     });
 
     await waitFor(() => {
@@ -252,7 +252,7 @@ describe("SetNewPassword", () => {
     fireEvent.input(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password123@" } });
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "set-new-password-title" }));
+      fireEvent.click(screen.getByRole("button", { name: "set-new-password-title" }));
     });
 
     await waitFor(() => {
@@ -302,7 +302,7 @@ describe("SetNewPassword", () => {
     fireEvent.input(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password123@" } });
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "set-new-password-title" }));
+      fireEvent.click(screen.getByRole("button", { name: "set-new-password-title" }));
     });
 
     await waitFor(() => {
@@ -352,7 +352,7 @@ describe("SetNewPassword", () => {
     fireEvent.input(screen.getByPlaceholderText("signup-password-placeholder"), { target: { value: "Password123@" } });
 
     await act(async () => {
-      fireEvent.submit(screen.getByRole("button", { name: "set-new-password-title" }));
+      fireEvent.click(screen.getByRole("button", { name: "set-new-password-title" }));
     });
 
     await waitFor(() => {

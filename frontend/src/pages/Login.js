@@ -40,7 +40,7 @@ export default function Login() {
   };
 
 
-  //Show password states
+  //Show password state
   const [showPassword, setShowPassword] = useState(false);
 
 
