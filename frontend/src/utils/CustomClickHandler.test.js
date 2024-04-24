@@ -3,7 +3,7 @@
  */
 
 import { renderHook, act, waitFor } from "@testing-library/react";
-import { useCustomClickHandler } from "./CustomClickHandler";
+import useCustomClickHandler from "./CustomClickHandler";
 
 //Mock console.error
 jest.spyOn(console, "error").mockImplementation(() => jest.fn());

@@ -123,7 +123,6 @@ export default function CheckRecognisedMaze({ data, initialNickname, handleSubmi
 
 
 
-
 /**
  * Checks the parameters passed to the CheckRecognisedMaze component.
  */

@@ -12,7 +12,7 @@ import { useLongPress } from "react-use";
  *
  * @returns {Object} - The handlers for various events.
  */
-export function useCustomClickHandler({ onClick, onDoubleClick, onLongPress, doubleClickThreshold = 300, longPressThreshold = 600 }) {
+export default function useCustomClickHandler({ onClick, onDoubleClick, onLongPress, doubleClickThreshold = 300, longPressThreshold = 600 }) {
   //Check the parameters
   checkParameters(onClick, onDoubleClick, onLongPress, doubleClickThreshold, longPressThreshold);
 
