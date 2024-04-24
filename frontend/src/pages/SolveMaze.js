@@ -205,8 +205,8 @@ export default function SolveMaze() {
   const [nickname, setNickname] = useState("");
 
   //Sent maze and path
-  const [sentMaze, setSentMaze] = useState(null);
-  const [sentPath, setSentPath] = useState(null);
+  const [sentMaze, setSentMaze] = useState();
+  const [sentPath, setSentPath] = useState();
 
   //Error for the check
   const [checkError, setCheckError] = useState("");
