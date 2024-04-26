@@ -124,6 +124,8 @@ object ML {
 
     /**
      *   Extracts images from [archivePath].
+     *
+     *   The function is based on the one from the KotlinDL library.
      */
     private fun extractImages(archivePath: String, copy: Copy = Copy.NO): Array<FloatArray> {
         //Open the archive
@@ -186,6 +188,8 @@ object ML {
 
     /**
      *   Extracts labels from [archivePath].
+     *
+     *   The function is based on the one from the KotlinDL library.
      */
     private fun extractLabels(archivePath: String, copy: Copy = Copy.NO): FloatArray {
         //Open the archive
