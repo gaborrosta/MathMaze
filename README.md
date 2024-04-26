@@ -9,7 +9,7 @@
 
 The project is divided into two main parts: the backend and the frontend. The backend is responsible for managing the database and providing an API, while the frontend is responsible for the user interface.
 
-### The backend
+### Backend
 
 The backend is a Spring Boot application written in Kotlin. It is built with IntelliJ IDEA and Gradle. The project is hosted on Heroku.
 
@@ -19,14 +19,18 @@ If you want to train the model, you can run the `main` function in the `Trainer.
 
 You can run the tests with the `./gradlew test` command.
 
-### The frontend
+### Frontend
 
 The frontend is a React application. It is built with Visual Studio Code and npm. The project is hosted with Firebase Hosting at [`https://mathmaze.rostagabor.com`](https://mathmaze.rostagabor.com).
 
-For development, you can run the application locally by executing the `npm start` command. The application will be available at `http://localhost:3000`. But first, you need to install the dependencies with the `npm install` command.
+For development, you can run the application locally by executing the `npm start` command after you installed npm. The application will be available at `http://localhost:3000`. But first, you need to install the dependencies with the `npm install` command.
 
 You can run the tests with the `npm test` command. Running the `npm test -- --coverage` command will create a coverage folder.
 
 To generate a production build, you can run the `npm run build` command.
 
 To deploy the application to Firebase, you can run the `firebase deploy` command.
+
+## Digits folder
+
+The digits folder contains the data and Python scripts used to extend the MNIST dataset with the collected numbers.
