@@ -65,6 +65,17 @@ export default function Index() {
         </Row>
         <Slideshow data={slideshow} />
         <ContactForm />
+        <div className="text-center mt-3">
+          <hr />
+          <p>
+            Maze icon by <a href="https://thenounproject.com/icon/maze-129940/" target="_blank" rel="noreferrer">Sergey Demushkin</a> from the Noun Project, CC BY 3.0
+          </p>
+          <p>
+            Copyright (c) 2024 Gábor Rosta<br />
+            All rights reserved.<br />
+            <a href="https://github.com/gaborrosta/MathMaze" target="_blank" rel="noreferrer">GitHub project</a>
+          </p>
+        </div>
       </Container>
     </>
   );
