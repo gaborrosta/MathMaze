@@ -146,12 +146,12 @@ const Help = () => {
             </p>
 
             <p>
-              <b>To access your profile page</b>, locate the 'Profile' button in the navigation bar if you are logged in. Alternatively, you can click here: <Link to="/profile">Profile</Link>.
+              <b>To access your profile page</b>, locate the 'Your Account' button in the navigation bar if you are logged in. Alternatively, you can click here: <Link to="/account">Profile</Link>.
             </p>
 
             <b>To change your password</b>, follow these simple steps:
             <ol>
-              <li>Locate the 'Profile' button in the navigation bar if you are logged in. Alternatively, you can click here: <Link to="/profile">Profile</Link>.</li>
+              <li>Locate the 'Your Account' button in the navigation bar if you are logged in. Alternatively, you can click here: <Link to="/account">Profile</Link>.</li>
               <li>Click on the 'Settings' tab.</li>
               <li>Enter your current password and the new password.</li>
               <li>Click on the 'Set new password' button.</li>
@@ -168,7 +168,7 @@ const Help = () => {
 
             <b>To view the solutions for a maze</b>, follow these simple steps:
             <ol>
-              <li>Locate the 'Profile' button in the navigation bar if you are logged in. Alternatively, you can click here: <Link to="/profile">Profile</Link>.</li>
+              <li>Locate the 'Your Account' button in the navigation bar if you are logged in. Alternatively, you can click here: <Link to="/account">Profile</Link>.</li>
               <li>Find the maze you want to check the solutions for.</li>
               <li>Click on the 'Check solutions' button. It is only visible if there is at least one solution.</li>
               <li>The website will add a new tab with the maze ID to the page.</li>
@@ -178,7 +178,7 @@ const Help = () => {
 
             <b>To rename a folder</b>, follow these simple steps:
             <ol>
-              <li>Locate the 'Profile' button in the navigation bar if you are logged in. Alternatively, you can click here: <Link to="/profile">Profile</Link>.</li>
+              <li>Locate the 'Your Account' button in the navigation bar if you are logged in. Alternatively, you can click here: <Link to="/account">Profile</Link>.</li>
               <li>On the left, find the folder you want to rename.</li>
               <li>Click on the edit icon.</li>
               <li>Enter the new name.</li>
