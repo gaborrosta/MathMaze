@@ -73,7 +73,7 @@ export default function Index() {
           <p>
             Copyright (c) 2024 Gábor Rosta<br />
             All rights reserved.<br />
-            <a href="https://github.com/gaborrosta/MathMaze" target="_blank" rel="noreferrer">GitHub project</a>
+            {/*<a href="https://github.com/gaborrosta/MathMaze" target="_blank" rel="noreferrer">GitHub project</a>*/}
           </p>
         </div>
       </Container>
