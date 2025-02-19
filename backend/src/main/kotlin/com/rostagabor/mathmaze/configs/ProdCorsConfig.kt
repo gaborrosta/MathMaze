@@ -17,7 +17,7 @@ class ProdCorsConfig : WebMvcConfigurer {
      */
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**")
-            .allowedOrigins("https://mathmaze.rostagabor.com")
+            .allowedOrigins("https://mathmaze-rg.web.app")
             .allowedMethods("GET", "POST", "OPTIONS")
     }
 
