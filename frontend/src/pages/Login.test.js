@@ -24,10 +24,10 @@ jest.mock("react-i18next", () => ({
   Trans: ({ i18nKey }) => i18nKey
 }));
 
-//Mock the useNavigate, useLocation hooks from react-router-dom
+//Mock the useNavigate, useLocation hooks from react-router
 const mockNavigate = jest.fn();
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
+jest.mock("react-router", () => ({
+  ...jest.requireActual("react-router"),
   useNavigate: () => mockNavigate,
   useLocation: () => ({ search: "" }), // Default return value
   Link: ({ children }) => children
@@ -138,7 +138,7 @@ describe("Login", () => {
 
   it("renders and submits the form when the form is valid with nextPage", async () => {
     //Mock the useLocation hook
-    jest.spyOn(require("react-router-dom"), "useLocation").mockReturnValue({ search: "?next=/accoun" })
+    jest.spyOn(require("react-router"), "useLocation").mockReturnValue({ search: "?next=/accoun" })
 
     //Mock the API call
     axios.post.mockResolvedValue({ response: { data: "" } });

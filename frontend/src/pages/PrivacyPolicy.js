@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { FRONTEND_URL } from "../utils/constants";
 
 /**
  * PrivacyPolicy displays the privacy policy of the application.
- * 
+ *
  * @returns {React.Element} The PrivacyPolicy component.
  */
 const PrivacyPolicy = () => {

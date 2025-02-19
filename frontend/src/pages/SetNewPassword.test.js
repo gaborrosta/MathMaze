@@ -5,7 +5,7 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { toBeInTheDocument } from "@testing-library/jest-dom";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router";
 import axios from "axios";
 import { BACKEND_URL } from "../utils/constants";
 import SetNewPassword from "./SetNewPassword";
@@ -24,8 +24,8 @@ jest.mock("react-i18next", () => ({
 }));
 
 // Mock the useSearchParams hook
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
+jest.mock("react-router", () => ({
+  ...jest.requireActual("react-router"),
   useSearchParams: jest.fn(),
 }));
 

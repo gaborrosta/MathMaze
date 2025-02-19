@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router";
 import { Container, Modal } from "react-bootstrap";
 import { ArrowUp } from "react-bootstrap-icons";
 import ScrollToTop from "react-scroll-to-top";

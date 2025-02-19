@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams  } from "react-router-dom"
+import { useSearchParams  } from "react-router"
 import Loading from "react-fullscreen-loading";
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import axios from "axios";

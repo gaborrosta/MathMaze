@@ -5,16 +5,16 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { toBeInTheDocument } from "@testing-library/jest-dom";
-import { MemoryRouter  } from "react-router-dom";
+import { MemoryRouter  } from "react-router";
 import TokenContext from "./TokenContext";
 import AuthChecker from "./AuthChecker";
 
 //Mock console.error
 jest.spyOn(console, "error").mockImplementation(() => jest.fn());
 
-//Mock the Navigate component from react-router-dom
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
+//Mock the Navigate component from react-router
+jest.mock("react-router", () => ({
+  ...jest.requireActual("react-router"),
   Navigate: (props) => {
     return <div>{props.to} {props.replace ? "replace" : "" }</div>;
   },

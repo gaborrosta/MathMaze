@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { FRONTEND_URL } from "../utils/constants";
 
 /**
  * TermsAndConditions displays the terms and conditions of the application.
- * 
+ *
  * @returns {React.Element} The TermsAndConditions component.
  */
 const TermsAndConditions = () => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useTranslation, Trans } from "react-i18next";
-import { useNavigate, Link, useLocation } from "react-router-dom"
+import { useNavigate, Link, useLocation } from "react-router"
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import axios from "axios";
 import { BACKEND_URL, EMAIL_REGEX, ANYTHING_REGEX } from "../utils/constants";

@@ -5,7 +5,7 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { toBeInTheDocument } from "@testing-library/jest-dom";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import TokenContext from "../utils/TokenContext";
 import Menu from "./Menu";
 

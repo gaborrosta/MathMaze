@@ -24,10 +24,10 @@ jest.mock("react-i18next", () => ({
   Trans: ({ i18nKey }) => i18nKey
 }));
 
-//Mock the useNavigate, useLocation hooks from react-router-dom
+//Mock the useNavigate, useLocation hooks from react-router
 const mockNavigate = jest.fn();
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
+jest.mock("react-router", () => ({
+  ...jest.requireActual("react-router"),
   useNavigate: () => mockNavigate,
   useLocation: () => ({ search: "" }), // Default return value
   Link: ({ children }) => children

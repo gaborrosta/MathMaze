@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { Alert } from "react-bootstrap";
 
 /**
  * NoPage displays the 404 page.
- * 
+ *
  * @returns {React.Element} The NoPage component.
  */
 const NoPage = () => {

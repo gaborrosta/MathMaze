@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { Modal, Form, Button, Alert, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import { BACKEND_URL, FRONTEND_URL, ANYTHING_REGEX } from "../utils/constants";

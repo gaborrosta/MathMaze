@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router";
 import Loading from "react-fullscreen-loading";
 import { useTranslation } from "react-i18next";
 import Layout from "./utils/Layout";

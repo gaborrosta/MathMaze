@@ -5,7 +5,7 @@
 import React from "react";
 import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { toBeInTheDocument } from "@testing-library/jest-dom";
-import { MemoryRouter, useLocation, useNavigate } from "react-router-dom";
+import { MemoryRouter, useLocation, useNavigate } from "react-router";
 import axios from "axios";
 import Layout from "./Layout";
 
@@ -42,8 +42,8 @@ Object.defineProperty(window, "sessionStorage", {
 });
 
 //Mock the useLocation, useNavigate hooks
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
+jest.mock("react-router", () => ({
+  ...jest.requireActual("react-router"),
   useLocation: jest.fn(),
   useNavigate: jest.fn(),
 }));

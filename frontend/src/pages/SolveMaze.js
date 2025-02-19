@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams  } from "react-router-dom";
+import { useSearchParams  } from "react-router";
 import { Form, Button, Alert, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import { BACKEND_URL, INTEGER_REGEX } from "../utils/constants";

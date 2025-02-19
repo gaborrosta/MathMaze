@@ -32,9 +32,9 @@ jest.mock("../components/PDFButtons", () => () => <div data-testid="pdf-buttons"
 //Mock LocationsList
 jest.mock("../components/LocationsList", () => ({locations, selectedLocation, onLocationChange}) => <button data-testid="locations-list" type="button" onClick={() => onLocationChange("/sth/")}>{selectedLocation}</button>);
 
-//Mock the Link from react-router-dom
-jest.mock("react-router-dom", () => ({
-  ...jest.requireActual("react-router-dom"),
+//Mock the Link from react-router
+jest.mock("react-router", () => ({
+  ...jest.requireActual("react-router"),
   Link: ({ children }) => children
 }));
 
