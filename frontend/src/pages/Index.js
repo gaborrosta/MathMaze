@@ -71,9 +71,8 @@ export default function Index() {
             Maze icon by <a href="https://thenounproject.com/icon/maze-129940/" target="_blank" rel="noreferrer">Sergey Demushkin</a> from the Noun Project, CC BY 3.0
           </p>
           <p>
-            Copyright (c) 2024 Gábor Rosta<br />
+            Copyright (c) {new Date().getFullYear()}<br />
             All rights reserved.<br />
-            {/*<a href="https://github.com/gaborrosta/MathMaze" target="_blank" rel="noreferrer">GitHub project</a>*/}
           </p>
         </div>
       </Container>
