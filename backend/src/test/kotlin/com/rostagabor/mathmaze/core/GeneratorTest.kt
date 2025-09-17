@@ -56,7 +56,7 @@ class GeneratorTest {
                     if (point != endpoint && point != Point.START) {
                         assertTrue(cell.isNotEmpty())
                         assertEquals(2, cell.count { it == ' ' })
-                        assertTrue(cell.contains('*') || cell.contains('+') || cell.contains('-') || cell.contains('/'))
+                        assertTrue(cell.contains('×') || cell.contains('+') || cell.contains('-') || cell.contains('÷'))
                     }
                 }
             }

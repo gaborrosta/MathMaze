@@ -239,9 +239,9 @@ object Generator {
 
         //Return the operation
         return if (multiplication) {
-            "${selected.first} * ${selected.second}" to selected
+            "${selected.first} × ${selected.second}" to selected
         } else {
-            "${selected.third} / ${selected.first}" to selected
+            "${selected.third} ÷ ${selected.first}" to selected
         }
     }
 
