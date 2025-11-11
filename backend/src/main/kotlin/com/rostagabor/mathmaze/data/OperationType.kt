@@ -52,8 +52,8 @@ enum class OperationType {
         fun from(operation: String) = when (operation.split(" ")[1]) {
             "+" -> ADDITION
             "-" -> SUBTRACTION
-            "*" -> MULTIPLICATION
-            "/" -> DIVISION
+            "*", "×" -> MULTIPLICATION
+            "/", "÷" -> DIVISION
             else -> throw IllegalArgumentException("Invalid operation type: $operation")
         }
 

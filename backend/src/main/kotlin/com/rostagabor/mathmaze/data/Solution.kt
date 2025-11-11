@@ -95,8 +95,8 @@ data class Solution @JvmOverloads constructor(
                     val expectedResult = when (operation) {
                         "+" -> leftNumber.toInt() + rightNumber.toInt()
                         "-" -> leftNumber.toInt() - rightNumber.toInt()
-                        "*" -> leftNumber.toInt() * rightNumber.toInt()
-                        "/" -> leftNumber.toInt() / rightNumber.toInt()
+                        "*", "×" -> leftNumber.toInt() * rightNumber.toInt()
+                        "/", "÷" -> leftNumber.toInt() / rightNumber.toInt()
                         else -> throw IllegalArgumentException("Invalid operation type: $operation")
                     }
 
