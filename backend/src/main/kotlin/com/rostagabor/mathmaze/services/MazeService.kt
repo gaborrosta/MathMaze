@@ -107,8 +107,8 @@ class MazeService(
             //Try to find the maze
             val maze = mazeRepository.findById(mazeId).getOrNull()
 
-            //If there is a maze, and it was based on a solution, delete it
-            if (maze != null && (maze.basedOn1 != null || maze.basedOn2 != null || maze.basedOn3 != null)) {
+            //If there is a maze, and it was based on a solution and was not saved, delete it
+            if (maze != null && !maze.saved && (maze.basedOn1 != null || maze.basedOn2 != null || maze.basedOn3 != null)) {
                 mazeRepository.delete(maze)
             }
         }
