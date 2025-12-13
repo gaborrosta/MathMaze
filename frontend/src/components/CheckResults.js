@@ -71,6 +71,7 @@ export default function CheckResults({ data }) {
         {data.info.solvedAt &&
           <p>
             {t("maze-generate-nickname")}: <b>{data.info.nickname}</b><br />
+            {t("maze-generate-solution-id")}: <b>{data.info.solutionId}</b><br />
             {t("maze-check-solved-at", { date: new Date(data.info.solvedAt).toLocaleString(i18n.resolvedLanguage) })}
           </p>
         }

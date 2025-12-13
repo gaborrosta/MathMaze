@@ -320,6 +320,7 @@ describe("CheckResults", () => {
     render(<CheckResults data={{width: 5, height: 5, start: [0, 0], end: [4, 4], data: [[{}, {isUserPath: true, isMazePath: false}, {isUserPath: true, isMazePath: false, result:4, expectedResult:5, operation: "1 + 1"}, {}, {}], [{}, {}, {}, {}, {}], [{}, {}, {}, {}, {}], [{}, {}, {}, {}, {}], [{}, {},  {}, {}, {}]], info: {nickname: "test", correct: 0, incorrect: 0, correctPath: 0, missedPath: 0, wrongPath: 0, userType: "SB", solvedAt: 1}}} />);
 
     expect(screen.getByText(/maze-generate-nickname:/i)).toBeInTheDocument();
+    expect(screen.getByText(/maze-generate-solution-id:/i)).toBeInTheDocument();
     expect(screen.getByText(/maze-check-solved-at/i)).toBeInTheDocument();
   });
 
