@@ -132,7 +132,9 @@ object Generator {
         val neighbours = Array(height) { Array<Triple<Int, Int, Int>?>(width) { null } }
 
         //Generate the possible values for the products
-        val possibleValues = numbersRange.flatMap { a -> numbersRange.map { b -> Triple(a, b, a * b) } }
+        val possibleValues = numbersRange.flatMap { a -> numbersRange.map { b -> Triple(a, b, a * b) } }.let {
+            if (numbersRange.last == 10) it.filter { v -> v.third != 100 } else it
+        }
 
         //Populate the maze with numbers and operations
         return maze.mapIndexed { y, row ->
