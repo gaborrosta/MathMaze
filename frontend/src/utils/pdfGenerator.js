@@ -1,5 +1,5 @@
 import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import jsPDF from "jspdf/dist/jspdf.umd.min.js";
 import { FRONTEND_URL } from "../utils/constants";
 
 /**
