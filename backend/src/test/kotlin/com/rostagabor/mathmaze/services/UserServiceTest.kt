@@ -156,7 +156,7 @@ class UserServiceTest {
 
     @Test
     fun `login returns the user when the email and password are correct`() {
-        val user = User(username = "username", email = "test@example.com", password = BCryptPasswordEncoder().encode("TestPassword@123"))
+        val user = User(username = "username", email = "test@example.com", password = BCryptPasswordEncoder().encode("TestPassword@123")!!)
 
         every { userRepository.findByEmail(any()) } returns user
 
@@ -358,7 +358,7 @@ class UserServiceTest {
         val email = "test@example.com"
         val oldPassword = "OldValidPassword@123"
         val newPassword = "NewValidPassword@123"
-        val user = User(username = "username", email = email, password = BCryptPasswordEncoder().encode(oldPassword))
+        val user = User(username = "username", email = email, password = BCryptPasswordEncoder().encode(oldPassword)!!)
 
         every { userRepository.save(any()) } returns user
         every { userRepository.findByEmail(any()) } returns user
@@ -390,7 +390,7 @@ class UserServiceTest {
         val oldPassword = "OldValidPassword@123"
         val wrongOldPassword = "WrongOldPassword"
         val newPassword = "NewValidPassword@123"
-        val user = User(username = "username", email = email, password = BCryptPasswordEncoder().encode(oldPassword))
+        val user = User(username = "username", email = email, password = BCryptPasswordEncoder().encode(oldPassword)!!)
 
         every { userRepository.findByEmail(any()) } returns user
 
@@ -405,7 +405,7 @@ class UserServiceTest {
         val email = "test@example.com"
         val oldPassword = "OldValidPassword@123"
         val newPassword = "invalidPassword"
-        val user = User(username = "username", email = email, password = BCryptPasswordEncoder().encode(oldPassword))
+        val user = User(username = "username", email = email, password = BCryptPasswordEncoder().encode(oldPassword)!!)
 
         every { userRepository.findByEmail(any()) } returns user
 

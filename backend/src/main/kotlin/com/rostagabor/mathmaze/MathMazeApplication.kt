@@ -17,7 +17,7 @@ class MathMazeApplication(
     /**
      *   Loads the weights for the machine learning model.
      */
-    override fun run(args: ApplicationArguments?) {
+    override fun run(args: ApplicationArguments) {
         //Skip loading the weights in test environment
         if (env.activeProfiles.contains("test")) return
 

@@ -15,7 +15,7 @@ class JwtConfig {
     /**
      *   The secret key.
      */
-    @Value("\${app.secret-key}")
+    @Value($$"${app.secret-key}")
     private lateinit var secretKey: String
 
 

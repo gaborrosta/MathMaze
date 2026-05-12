@@ -15,7 +15,7 @@ class DevMailService : MailService {
     /**
      *   The base URL of the application.
      */
-    @Value("\${app.base-url}")
+    @Value($$"${app.base-url}")
     private lateinit var baseUrl: String
 
 

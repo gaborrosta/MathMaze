@@ -75,7 +75,7 @@ data class Solution @JvmOverloads constructor(
                     wrongPath++
                 } else if (!isUserPath && isMazePath) {
                     missedPath++
-                } else if (isUserPath && isMazePath && p != Point.START && p != maze.endPoint) {
+                } else if (isUserPath && p != Point.START && p != maze.endPoint) {
                     correctPath++
                 }
 

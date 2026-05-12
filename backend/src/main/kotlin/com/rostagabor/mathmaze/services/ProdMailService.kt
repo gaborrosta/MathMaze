@@ -17,14 +17,14 @@ class ProdMailService(private val emailSender: JavaMailSender) : MailService {
     /**
      *   The base URL of the application.
      */
-    @Value("\${app.base-url}")
+    @Value($$"${app.base-url}")
     private lateinit var baseUrl: String
 
 
     /**
      *   The email of the admin.
      */
-    @Value("\${app.admin-contact-email}")
+    @Value($$"${app.admin-contact-email}")
     private lateinit var adminEmail: String
 
 

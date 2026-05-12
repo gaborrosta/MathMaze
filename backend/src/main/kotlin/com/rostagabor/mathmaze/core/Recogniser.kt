@@ -6,6 +6,7 @@ import org.opencv.core.*
 import org.opencv.imgcodecs.Imgcodecs
 import org.opencv.imgproc.Imgproc
 import org.springframework.web.multipart.MultipartFile
+import kotlin.math.roundToInt
 
 /**
  *   Algorithms for recognising the numbers in a maze.
@@ -329,7 +330,7 @@ object Recogniser {
         return blocks.asSequence().filter { it.size > config.linesMinWidthToKeepFirst }.map {
             val removable = ((it.size - config.linesReducedMinWidth) / 2).coerceAtLeast(0)
             it.drop(removable).dropLast(removable)
-        }.filterIndexed(filter).map { listOf(it.first() - 1, it.last() + 1) }.flatten().toList()
+        }.filterIndexed(filter).flatMap { listOf(it.first() - 1, it.last() + 1) }.toList()
     }
 
 
@@ -578,8 +579,8 @@ object Recogniser {
         val width = image.cols()
 
         //Find the shift needed
-        val shiftX = Math.round(width / 2.0 - centerX).toInt()
-        val shiftY = Math.round(height / 2.0 - centerY).toInt()
+        val shiftX = (width / 2.0 - centerX).roundToInt()
+        val shiftY = (height / 2.0 - centerY).roundToInt()
 
         //Transformation matrix
         val m = Mat(2, 3, CvType.CV_32F)

@@ -33,21 +33,21 @@ class UserService(
     /**
      *   The password for admin account.
      */
-    @Value("\${app.admin-password}")
+    @Value($$"${app.admin-password}")
     private lateinit var adminPassword: String
 
 
     /**
      *   Checks if there is an admin user in the database. If not, it creates one.
      */
-    override fun run(vararg args: String?) {
+    override fun run(vararg args: String) {
         userRepository.findByEmail(ADMIN_EMAIL_ADDRESS)?.let {
             println("Admin user already exists.")
             return
         }
 
         try {
-            userRepository.save(User(username = "MathMaze Admin", email = ADMIN_EMAIL_ADDRESS, password = passwordEncoder.encode(adminPassword)))
+            userRepository.save(User(username = "MathMaze Admin", email = ADMIN_EMAIL_ADDRESS, password = passwordEncoder.encode(adminPassword)!!))
             println("Admin user was created successfully.")
         } catch (e: Exception) {
             e.printStackTrace()
@@ -72,7 +72,7 @@ class UserService(
         userRepository.findByEmail(user.email)?.let { throw EmailNotUniqueException() }
 
         //Hash the password
-        user.password = passwordEncoder.encode(user.password)
+        user.password = passwordEncoder.encode(user.password)!!
 
         //Save the user
         return userRepository.save(user)
@@ -119,7 +119,7 @@ class UserService(
         return try {
             val email = Jwts.parser().verifyWith(jwtConfig.key).build().parseSignedClaims(token).payload.subject
             Pair(email, generateToken(email))
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             "" to ""
         }
     }
@@ -178,7 +178,7 @@ class UserService(
         val user = passwordResetToken.user
 
         //Hash the password and save the user
-        user.password = passwordEncoder.encode(newPassword)
+        user.password = passwordEncoder.encode(newPassword)!!
         userRepository.save(user)
 
         //Mark the token as used and save it
@@ -203,7 +203,7 @@ class UserService(
         validatePassword(newPassword).let { if (!it) throw PasswordInvalidFormatException() }
 
         //Hash the password and save the user
-        user.password = passwordEncoder.encode(newPassword)
+        user.password = passwordEncoder.encode(newPassword)!!
         userRepository.save(user)
     }
 

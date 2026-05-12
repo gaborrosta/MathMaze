@@ -4,7 +4,7 @@ package com.rostagabor.mathmaze.utils
  *   Generates a displayable list of the possible locations of the mazes.
  */
 fun generateLocationsList(locations: List<String>): List<String> {
-    return locations.distinct().map { location ->
+    return locations.distinct().flatMap { location ->
         val parts = location.split("/")
 
         val results = arrayListOf<String>()
@@ -13,5 +13,5 @@ fun generateLocationsList(locations: List<String>): List<String> {
         }
 
         results
-    }.flatten().distinct()
+    }.distinct()
 }
