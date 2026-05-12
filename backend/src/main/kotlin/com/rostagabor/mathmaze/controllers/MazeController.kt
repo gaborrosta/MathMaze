@@ -35,8 +35,8 @@ class MazeController(
                 numbersRangeEnd = mazeGenerationRequest.numbersRangeEnd,
                 operation = mazeGenerationRequest.operation,
                 pathTypeEven = mazeGenerationRequest.pathTypeEven,
-                minLength = mazeGenerationRequest.minLength,
-                maxLength = mazeGenerationRequest.maxLength,
+                minLength = mazeGenerationRequest.resolvedMinLength,
+                maxLength = mazeGenerationRequest.resolvedMaxLength,
                 discardedMazes = mazeGenerationRequest.discardedMazes,
                 solutions = listOf(
                     mazeGenerationRequest.solution1,
