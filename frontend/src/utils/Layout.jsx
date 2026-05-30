@@ -6,7 +6,7 @@ import { ArrowUp } from "react-bootstrap-icons";
 import ScrollToTop from "react-scroll-to-top";
 import axios from "axios";
 import Menu from "../components/Menu";
-import { BACKEND_URL } from "./constants";
+import { BACKEND_URL } from "../utils/constants";
 import TokenContext from "./TokenContext";
 
 //Session expiration states

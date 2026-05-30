@@ -1,4 +1,4 @@
-import { useLongPress } from "react-use";
+import useLongPress from "./useLongPress";
 
 /**
  * Detects single, double, and long clicks on a component.

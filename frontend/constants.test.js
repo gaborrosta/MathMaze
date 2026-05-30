@@ -3,14 +3,14 @@
  *
  * @type {string}
  */
-export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+export const BACKEND_URL = process.env.VITE_BACKEND_URL;
 
 /**
  * FRONTEND_URL is the URL of the frontend application.
  *
  * @type {string}
  */
-export const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL;
+export const FRONTEND_URL = process.env.VITE_FRONTEND_URL;
 
 
 /**

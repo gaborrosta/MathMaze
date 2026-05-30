@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams  } from "react-router"
-import Loading from "react-fullscreen-loading";
+import Loading from "../utils/loading";
 import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import axios from "axios";
 import { BACKEND_URL, PASSWORD_REGEX } from "../utils/constants";
