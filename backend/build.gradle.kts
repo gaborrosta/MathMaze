@@ -36,7 +36,7 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlin-deeplearning-dataset:0.5.2")
 
 	//OpenCV
-	implementation(files("libs/opencv-490.jar"))
+	implementation("org.bytedeco:javacv-platform:1.5.11")
 
     //Database
 	implementation("org.hsqldb:hsqldb:2.7.4")
